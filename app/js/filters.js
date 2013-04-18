@@ -3,10 +3,9 @@
 /* Filters */
 
 angular.module('covoiturageFilter', []).filter('auto', function() {
-  return function(subscribers, filter) {
+  return function(subscribers, filter, markers) {
     	if(filter){
 		var result = new Array();				
-		markers = [];
 		for(var i=0;i<subscribers.length;i++){
 			var subscriber = subscribers[i];
 			var type = subscriber.type;

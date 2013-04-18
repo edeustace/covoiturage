@@ -30,14 +30,30 @@ function EventCtrl($scope, $http, marker) {
 				}
 				marker.recordSubscriber(subscriber);
 			}
-			$scope.$watch('subscribers', function(newValue, oldValue){
-				marker.reinitMarker();
-				marker.placeCurrentEvent();
-		       	 	for(var i=0; i<newValue.length; i++){				
-					marker.recordSubscriber(newValue[i]);
+	       }
+		var markers = $scope.markers;
+	       $scope.$watch('filterUsers', function(newValue, oldValue) {
+		if(newValue){ 
+			for(var i=0;i<$scope.markers.length;i++){
+				var marker = markers[i];
+				if(!(marker.type === newValue) && (marker.type != "EVENT")){
+					marker.visible = false; 
+				}else{
+					marker.visible = true; 
 				}
-			}, false);
-	       } 
+			}		
+		}else{
+			for(var i=0;i<$scope.markers.length;i++){
+				var marker = markers[i];
+				if(!(marker.type === newValue) && (marker.type != "EVENT")){
+					marker.visible = false; 
+				}else{
+					marker.visible = true; 
+				}
+			}		
+		}	
+	       });
+ 
 	    }
 
    });

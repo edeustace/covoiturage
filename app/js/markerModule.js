@@ -23,7 +23,7 @@ angular.module('markerModule', [], function($provide){
 	      new google.maps.Point(0,0),
 	      new google.maps.Point(9, 34));
 
-	var icons = [];
+	icons = [];
 	icons["CAR"] = iconAuto;
 	icons["STOP"] = iconStop;
 	icons["EVENT"] = iconEvent;
@@ -52,9 +52,6 @@ angular.module('markerModule', [], function($provide){
 	},
 	getEventMarker : function(event){
 		currentScope.center = event.location;
-		
-//		var marker = {type:"EVENT", latitude:event.location.lat, longitude:event.location.lng, icon: iconArrivee};
-		//return marker;
 		return this.getMarker(event.location.lat,event.location.lng, "EVENT", event);
 	}, 	
 	placeCurrentEvent : function(){
@@ -71,24 +68,10 @@ angular.module('markerModule', [], function($provide){
 		});
 		marker.type = type;
 		marker.data = data; 
+		return marker;
 	}, 
 	getSubscriberMarker: function(subscriber){
 		return this.getMarker(subscriber.location.lat,subscriber.location.lng, subscriber.type, subscriber);
-		//var icon = null;				
-		//if(subscriber.type && subscriber.type==="CAR"){
-		//	icon = iconAuto;
-	//		subscriber.picto = pictoAuto;
-	//	}else if(subscriber.type && subscriber.type==="STOP"){
-	//		icon = iconStop;		
-	//		subscriber.picto = pictoStop;			
-	//	}else{
-	//	}
-		//var marker = {type:subscriber.type, latitude:subscriber.location.lat, longitude:subscriber.location.lng, icon: icon};
-
-		// === Store the category and name info as a marker properties ===
-	//	marker.type:subscriber.type;                                 
-	//	marker.event = event;
-	//	return marker;
 	},  
 	recordSubscriber : function(subscriber){
 		var marker = this.getSubscriberMarker(subscriber);

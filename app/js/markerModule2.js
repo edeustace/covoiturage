@@ -52,26 +52,18 @@ angular.module('markerModule', [], function($provide){
 	},
 	getEventMarker : function(event){
 		currentScope.center = event.location;
-		return this.getMarker(event.location.lat,event.location.lng, "EVENT", event);
+		var marker = {type:"EVENT", latitude:event.location.lat, longitude:event.location.lng, icon: icons["EVENT"], visible:true};
+		return marker;
 	}, 	
 	placeCurrentEvent : function(){
 		currentScope.markers.push(currentEvent);	
 	}, 
-	getMarker: function(lat, lng, type, data){
-		var latlng = new google.maps.LatLng(lat, lng);
-		var marker = new google.maps.Marker({
-			position: latlng,
-			icon: icons[type],
-			shadow: iconShadow,
-			title: name,
-			zIndex: Math.round(latlng.lat()*-100000)<<5
-		});
-		marker.type = type;
-		marker.data = data; 
-		return marker;
-	}, 
 	getSubscriberMarker: function(subscriber){
-		return this.getMarker(subscriber.location.lat,subscriber.location.lng, subscriber.type, subscriber);
+		//subscriber.picto = icons[subscriber.type];
+		var marker = {type:subscriber.type, latitude:subscriber.location.lat, longitude:subscriber.location.lng, icon: icons[subscriber.type], visible:true};
+		marker.type = subscriber.type;                                 
+		marker.event = event;
+		return marker;
 	},  
 	recordSubscriber : function(subscriber){
 		var marker = this.getSubscriberMarker(subscriber);
@@ -82,5 +74,4 @@ angular.module('markerModule', [], function($provide){
 	}};
    });
 });
-
 
