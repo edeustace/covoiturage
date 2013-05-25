@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en" ng-app="covoiturage">
+<head>
+  <meta charset="utf-8">
+  <title>Covoiturage</title>
+  <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/app.css")" />
+  <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/bootstrap.css")" />
+  <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/google-maps.css")" />
+  
+  <link rel="shortcut icon" type="image/png" href="@routes.Assets.at("images/favicon.png")">
+  
+  <script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?libraries=places&sensor=false"></script>
+  
+  <script src="@routes.Assets.at("javascripts/lib/angular.js")"></script>
+  <script src="@routes.Assets.at("javascripts/app/evenementCreation.js")"></script>
+  <script src="@routes.Assets.at("javascripts/app/evenementCreationController.js")"></script>
+</head>
+<body ng-controller="EventCreationCtrl">
+	<div class="row-fluid">
+		<!--Header-->
+		<div class="span6 offset4">
+			<h1 class="text-center">Covoiturez !</h1>
+		</div>
+	</div> 
+	<div class="row-fluid">
+		<!--Colonne de gauche-->
+		<div class="span6">
+			<h2>Evenement</h2>
+			<label>Nom</label>
+			<input ng-model="evenement.name"></input>
+			<label>Description</label>
+			<input ng-model="evenement.description"></input>
+			<label>adresse</label>
+			<input ng-model="evenement.address" googleplace></input>			
+			
+			<h2>Createur</h2>
+			<label>Nom</label>
+			<input ng-model="evenement.creator.name"></input>
+			<label>Prénom</label>
+			<input ng-model="evenement.creator.surname"></input>
+			<label>Email</label>
+			<input ng-model="evenement.creator.email" type="email" required></input>
+			<label>Mot de passe</label>
+			<input ng-model="evenement.creator.password" type="password"></input>
+			<label>adresse</label>
+			<input ng-model="evenement.creator.address" googleplace></input>
+			<br/>
+			<label>Valider</label>		
+			<a href="" ng-click="valider()">Valider</a>
+		</div>
+		<!--Centre-->
+		<div class="span6 offset2">
+		</div>
+		<div class="span3"></div>
+	</div>
+
+</body>
+</html>

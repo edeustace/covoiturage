@@ -45,11 +45,7 @@ function EventCtrl($scope, $http, marker) {
 		}else{
 			for(var i=0;i<$scope.markers.length;i++){
 				var marker = markers[i];
-				if(!(marker.type === newValue) && (marker.type != "EVENT")){
-					marker.visible = false; 
-				}else{
-					marker.visible = true; 
-				}
+				marker.visible = true; 
 			}		
 		}	
 	       });

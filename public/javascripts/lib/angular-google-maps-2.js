@@ -182,7 +182,7 @@
       
       this.updateMarker = function (lat, lng, icon, infoWindowContent, visible, label, url,
           thumbnail) {
-        var marker = this.findMarker(lat, lng);
+        var marker = that.findMarker(lat, lng);
 	if(marker){
 	  marker.setVisible(visible);
         }

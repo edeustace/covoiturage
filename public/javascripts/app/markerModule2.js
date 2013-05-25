@@ -52,7 +52,7 @@ angular.module('markerModule', [], function($provide){
 	},
 	getEventMarker : function(event){
 		currentScope.center = event.location;
-		var marker = {type:"EVENT", latitude:event.location.lat, longitude:event.location.lng, icon: icons["EVENT"], visible:false};
+		var marker = {type:"EVENT", latitude:event.location.lat, longitude:event.location.lng, icon: icons["EVENT"], visible:true};
 		return marker;
 	}, 	
 	placeCurrentEvent : function(){

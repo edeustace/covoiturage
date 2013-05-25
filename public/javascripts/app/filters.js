@@ -13,14 +13,6 @@ angular.module('covoiturageFilter', []).filter('auto', function() {
 				result.push(subscriber);
 			}
 		}
-		for(var i=0;i<markers.length;i++){
-			var marker = markers[i];
-			if(!(marker.type === filter) && (marker.type != "EVENT")){
-				marker.visible = false; 
-			}else{
-				marker.visible = true; 
-			}
-		}
 		return result;
 	}else{
 		return subscribers;
