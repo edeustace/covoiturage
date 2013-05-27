@@ -5,9 +5,9 @@
 # Home page
 GET     /                           controllers.Application.index()
 #PAGES
-GET     /evenement                            controllers.EvenementCtrl.evenement
-GET     /evenement/creation                   controllers.EvenementCtrl.evenementCreation
-#GET     /evenement/:id/abonnement             controllers.EvenementCtrl.evenementCreation
+GET     /event                            controllers.EvenementCtrl.event
+GET     /event/creation                   controllers.EvenementCtrl.evenementCreation
+#GET     /event/:id/abonnement             controllers.EvenementCtrl.evenementCreation
 
 #API REST
 #Events

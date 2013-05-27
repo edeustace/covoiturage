@@ -2,11 +2,9 @@ package controllers;
 
 import java.io.IOException;
 
-import models.Evenement;
+import models.Event;
 
-import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.JsonNode;
-import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.node.ObjectNode;
 
@@ -45,16 +43,16 @@ public class EvenementCtrl extends Controller {
 	public static Result createEvenement() throws IOException {
 		RequestBody body = request().body();
 		JsonNode node = body.asJson();
-        Evenement evenement = Evenement.insert(node);
-		return ok(objectMapper.writeValueAsString(evenement)).as("application/json");
+        Event event = Event.insert(node);
+		return ok(objectMapper.writeValueAsString(event)).as("application/json");
 	}
 
     @BodyParser.Of(BodyParser.Json.class)
 	public static Result updateEvenement(String id) throws IOException {
         RequestBody body = request().body();
         JsonNode node = body.asJson();
-        Evenement evenement = Evenement.update(id, node);
-        return ok(objectMapper.writeValueAsString(evenement)).as("application/json");
+        Event event = Event.update(id, node);
+        return ok(objectMapper.writeValueAsString(event)).as("application/json");
 	}
 
 	public static Result deleteEvenement(String id) {
