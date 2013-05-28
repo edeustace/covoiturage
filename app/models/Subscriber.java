@@ -2,6 +2,8 @@ package models;
 
 import models.enums.Locomotion;
 import net.vz.mongodb.jackson.DBRef;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 
@@ -29,8 +31,61 @@ public class Subscriber {
 
     private Locomotion locomotion;
 
+    public void merge(Subscriber other){
+        if(!other.empty()){
+            if(other.name()!=null){
+                this.name(other.name());
+            }
+            if(other.surname()!=null){
+                this.surname(other.surname());
+            }
+            if(other.email()!=null){
+                this.email(other.email());
+            }
+            if(other.address()!=null){
+                this.address(other.address());
+            }
+            if(other.locomotion()!=null){
+                this.locomotion(other.locomotion());
+            }
+        }
+    }
+
+    public Boolean empty(){
+        return name==null && surname==null &&
+                locomotion == null && email==null &&
+                (address==null || address.empty()) &&
+                (user==null || user.empty()) &&
+                userRef==null;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(obj instanceof Subscriber){
+            if(this.email==null){
+                return false;
+            }
+            return this.email.equals(((Subscriber)obj).email());
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return (new HashCodeBuilder()).append(email).hashCode();
+    }
+
     public static Subscriber subscriber(){
         return new Subscriber();
+    }
+
+    public void saveUser(){
+        if(!this.user().empty() && this.user().id()==null){
+            this.user().insert();
+        } else if(this.user().empty()){
+            this.user(User.user().address(address()).name(name()).surname(surname()).email(email())).user().insert();
+        }
+        this.userRef(new DBRef<User, String>(this.user().id(), User.class));
     }
 
 
@@ -89,6 +144,9 @@ public class Subscriber {
     }
     @JsonProperty("address")
     public Address address() {
+        if(address==null){
+            address = Address.address();
+        }
         return address;
     }
     @JsonProperty("address")

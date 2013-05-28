@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashSet;
 
 import javax.persistence.Id;
 
@@ -13,7 +14,6 @@ import net.vz.mongodb.jackson.MongoCollection;
 import net.vz.mongodb.jackson.ObjectId;
 import net.vz.mongodb.jackson.WriteResult;
 
-import org.apache.commons.lang3.StringUtils;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
@@ -37,7 +37,7 @@ public class Event {
 
     public Address address;
 
-    private Collection<Subscriber> subscribers = new ArrayList<Subscriber>();
+    private Collection<Subscriber> subscribers = new HashSet<Subscriber>();
 
     private DBRef<User, String> creatorRef;
 
@@ -51,10 +51,10 @@ public class Event {
 
     public static Event insert(JsonNode node){
         Event event = objectMapper.convertValue(node, Event.class);
-        return event.insert();
+        return event.save();
     }
 
-    public static Event newOne(){
+    public static Event event(){
         return new Event();
     }
 
@@ -62,7 +62,7 @@ public class Event {
         Event event = read(id);
         ObjectReader updater = objectMapper.readerForUpdating(event);
         event = updater.readValue(node);
-        event.insert();
+        event.save();
         return event;
     }
 
@@ -73,22 +73,26 @@ public class Event {
     public static ObjectMapper objectMapper = new ObjectMapper();
 
     //MAJ
-    public Event insert(){
+    public Event save(){
         persistOrLoadCreatorAndCreateRef();
         addCreatorAsSubscriber();
-        WriteResult<Event, String> result = collection.insert(this);
+        persistUsersOnSubscribers();
+        WriteResult<Event, String> result = collection.save(this);
         this.id = result.getSavedId();
         return this;
     }
     private void persistOrLoadCreatorAndCreateRef(){
         if(creator!=null){
-            String idRef;
             if(creator.id()==null){
-                idRef = creator.insert().id();
-            }else{
-                idRef = creator.id();
+                creator.insert();
             }
-            creatorRef = new DBRef<User, String>(idRef, User.class);
+            creatorRef = new DBRef<User, String>(creator.id(), User.class);
+        }
+    }
+
+    private void persistUsersOnSubscribers(){
+        for(Subscriber subscriber : subscribers()){
+            subscriber.saveUser();
         }
     }
 
@@ -128,18 +132,36 @@ public class Event {
     }
 
     public Event addSubscriber(Subscriber subscriber){
-        if((subscriber.userRef()==null || StringUtils.isEmpty(subscriber.userRef().getId()))
-                && !subscriber.user().empty()){
-            String id = null;
-            User user = subscriber.user();
-            if(user.id()!=null){
-                id = user.id();
-            }else{
-                id = user.insert().id();
-            }
-            subscriber.userRef(new DBRef<User, String>(id, User.class));
+        if(!subscribers.contains(subscriber)){
+            subscribers.add(subscriber);
         }
-        subscribers.add(subscriber);
+        return this;
+    }
+    public Event addAndMergeSubscriber(Subscriber subscriber){
+        if(!subscribers.contains(subscriber)){
+            subscribers.add(subscriber);
+        }else{
+            for(Subscriber aSubscriber : subscribers){
+                if(aSubscriber.equals(subscriber)){
+                    //Merge
+                    aSubscriber.merge(subscriber);
+                }
+            }
+        }
+        return this;
+    }
+    public Event addAndReplaceSubscriber(Subscriber subscriber){
+        if(!subscribers.contains(subscriber)){
+            subscribers.add(subscriber);
+        }else{
+            for(Subscriber aSubscriber : subscribers){
+                if(aSubscriber.equals(subscriber)){
+                    subscribers.remove(aSubscriber);
+                    break;
+                }
+            }
+            subscribers.add(subscriber);
+        }
         return this;
     }
 
@@ -148,11 +170,7 @@ public class Event {
             Subscriber subscriberCreator = Subscriber
                     .subscriber().address(creator.address())
                     .name(creator.name()).surname(creator.surname())
-                    .email(creator.email());
-            if(creatorRef()==null){
-                persistOrLoadCreatorAndCreateRef();
-            }
-            subscriberCreator.userRef(creatorRef);
+                    .email(creator.email()).user(creator);
             this.subscribers.add(subscriberCreator);
         }
     }
