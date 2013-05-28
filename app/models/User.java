@@ -12,11 +12,14 @@ import play.modules.mongodb.jackson.MongoDB;
 @MongoCollection(name="users")
 public class User {
 	
-	private static JacksonDBCollection<User, String> collection = MongoDB.getCollection(User.class, String.class);
+	private static JacksonDBCollection<User, String> collection = null;
 	public static void collection(JacksonDBCollection<User, String> collection){
         User.collection = collection;
     }
     public static JacksonDBCollection<User, String> collection(){
+        if(collection==null){
+            collection = MongoDB.getCollection(User.class, String.class);
+        }
         return collection;
     }
 
@@ -102,7 +105,7 @@ public class User {
     }
 
     public User insert(){
-    	WriteResult<User, String> result = collection.insert(this);
+    	WriteResult<User, String> result = collection().insert(this);
         this.id = result.getSavedObject().id;
     	return this;
     }

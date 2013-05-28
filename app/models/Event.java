@@ -66,9 +66,15 @@ public class Event {
         return event;
     }
 
-    public static JacksonDBCollection<Event, String> collection = MongoDB.getCollection(Event.class, String.class);
+    public static JacksonDBCollection<Event, String> collection = null;
     public static void collection(JacksonDBCollection<Event, String> collection) {
         Event.collection = collection;
+    }
+    public static JacksonDBCollection<Event, String> collection(){
+        if(collection==null){
+            collection = MongoDB.getCollection(Event.class, String.class);
+        }
+        return collection;
     }
     public static ObjectMapper objectMapper = new ObjectMapper();
 
@@ -77,7 +83,7 @@ public class Event {
         persistOrLoadCreatorAndCreateRef();
         addCreatorAsSubscriber();
         persistUsersOnSubscribers();
-        WriteResult<Event, String> result = collection.save(this);
+        WriteResult<Event, String> result = collection().save(this);
         this.id = result.getSavedId();
         return this;
     }
@@ -97,7 +103,7 @@ public class Event {
     }
 
     public void update(){
-        collection.save(this);
+        collection().save(this);
     }
     //////SETTERS//////
     @Id

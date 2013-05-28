@@ -30,49 +30,36 @@ public class SubscriberTest {
     }
 
     public void testEmpty(){
-        running(fakeApplication(), new Runnable() {
-            public void run() {
-                assertThat(Subscriber.subscriber().empty()).isTrue();
-                assertThat(Subscriber.subscriber().email("a@t.com").empty()).isFalse();
-                assertThat(Subscriber.subscriber().name("toto").empty()).isFalse();
-                assertThat(Subscriber.subscriber().surname("toto").empty()).isFalse();
-                assertThat(Subscriber.subscriber().locomotion(Locomotion.AUTOSTOP).empty()).isFalse();
-                assertThat(Subscriber.subscriber().user(User.user()).empty()).isTrue();
-                assertThat(Subscriber.subscriber().user(User.user().email("toto")).empty()).isFalse();
-            }
-        });
+        assertThat(Subscriber.subscriber().empty()).isTrue();
+        assertThat(Subscriber.subscriber().email("a@t.com").empty()).isFalse();
+        assertThat(Subscriber.subscriber().name("toto").empty()).isFalse();
+        assertThat(Subscriber.subscriber().surname("toto").empty()).isFalse();
+        assertThat(Subscriber.subscriber().locomotion(Locomotion.AUTOSTOP).empty()).isFalse();
+        assertThat(Subscriber.subscriber().user(User.user()).empty()).isTrue();
     }
 
     @Test
     public void testMerge(){
-        running(fakeApplication(), new Runnable() {
-            public void run() {
-                Subscriber sub1 = Subscriber.subscriber().email("a@b.com").locomotion(Locomotion.AUTOSTOP).surname("alex");
-                Subscriber sub2 = Subscriber.subscriber().email("c@b.com").locomotion(Locomotion.CAR).surname("alex");
-                sub1.merge(sub2);
-                assertThat(sub1.email()).isEqualTo("c@b.com");
-                assertThat(sub1.locomotion()).isEqualTo(Locomotion.CAR);
-                assertThat(sub1.surname()).isEqualTo("alex");
-            }
-        });
+        Subscriber sub1 = Subscriber.subscriber().email("a@b.com").locomotion(Locomotion.AUTOSTOP).surname("alex");
+        Subscriber sub2 = Subscriber.subscriber().email("c@b.com").locomotion(Locomotion.CAR).surname("alex");
+        sub1.merge(sub2);
+        assertThat(sub1.email()).isEqualTo("c@b.com");
+        assertThat(sub1.locomotion()).isEqualTo(Locomotion.CAR);
+        assertThat(sub1.surname()).isEqualTo("alex");
     }
 
 
     @Test
     public void testMergeAllField(){
-        running(fakeApplication(), new Runnable() {
-            public void run() {
-                Subscriber sub1 = Subscriber.subscriber()
-                        .email("a@b.com").locomotion(Locomotion.AUTOSTOP)
-                        .surname("alex")
-                        .address(Address.address().description("nantes").location(Location.location().lat("33.92").lng("45.12")))
-                        .user(User.user().email("a@b.com"));
-                Subscriber sub2 = Subscriber.subscriber().email("c@b.com").locomotion(Locomotion.CAR).surname("alex");
-                sub1.merge(sub2);
-                assertThat(sub1.email()).isEqualTo("c@b.com");
-                assertThat(sub1.locomotion()).isEqualTo(Locomotion.CAR);
-                assertThat(sub1.surname()).isEqualTo("alex");
-            }
-        });
+        Subscriber sub1 = Subscriber.subscriber()
+                .email("a@b.com").locomotion(Locomotion.AUTOSTOP)
+                .surname("alex")
+                .address(Address.address().description("nantes").location(Location.location().lat("33.92").lng("45.12")))
+                .user(User.user().email("a@b.com"));
+        Subscriber sub2 = Subscriber.subscriber().email("c@b.com").locomotion(Locomotion.CAR).surname("alex");
+        sub1.merge(sub2);
+        assertThat(sub1.email()).isEqualTo("c@b.com");
+        assertThat(sub1.locomotion()).isEqualTo(Locomotion.CAR);
+        assertThat(sub1.surname()).isEqualTo("alex");
     }
 }
