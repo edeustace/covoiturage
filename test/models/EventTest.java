@@ -37,7 +37,7 @@ public class EventTest {
     }
     @Test
     public void testEmptyFalseBecauseOfCreatorRef(){
-        assertThat(Event.event().setCreatorRef("id").isEmpty()).isFalse();
+        assertThat(Event.event().setCreatorRef("getId").isEmpty()).isFalse();
     }
 
     //ADD AND MERGE

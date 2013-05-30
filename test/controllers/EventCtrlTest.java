@@ -11,7 +11,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import play.libs.WS;
-import play.mvc.Http;
 
 import java.net.UnknownHostException;
 
@@ -69,7 +68,7 @@ public class EventCtrlTest {
             public void run() {
                 Event event = Event.event().setName("event").setCreator(User.user().setEmail("email@toto.com"));
                 event.save();
-                WS.Response response = WS.url("http://localhost:3333/rest/events/"+event.id()).get().get();
+                WS.Response response = WS.url("http://localhost:3333/rest/events/"+event.getId()).get().get();
                 assertThat(response.getStatus()).isEqualTo(OK);
                 System.out.println(response.getBody());
             }

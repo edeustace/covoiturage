@@ -121,7 +121,7 @@ public class Event {
     //////SETTERS//////
     @Id
     @ObjectId
-    public String id() {
+    public String getId() {
         return id;
     }
 

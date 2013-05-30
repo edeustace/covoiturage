@@ -36,9 +36,9 @@ public class EventIntegrationTest {
                 User.collection(JacksonDBCollection.wrap(currentDataBase.getCollection("users"), User.class, String.class));
 
                 Event event = Event.event().setName("a getName").save();
-                assertThat(event.id()).isNotNull();
+                assertThat(event.getId()).isNotNull();
 
-                Event evtFromDb = Event.read(event.id());
+                Event evtFromDb = Event.read(event.getId());
                 assertThat(evtFromDb).isNotNull();
                 assertThat(evtFromDb.getName()).isEqualTo(event.getName());
                 assertThat(evtFromDb.getDescription()).isNull();
@@ -62,9 +62,9 @@ public class EventIntegrationTest {
                 //Test
                 Event event = Event.event().setName("a getName");
                 event.setCreator(User.user().setEmail("toto@gmail.com")).save();
-                assertThat(event.id()).isNotNull();
+                assertThat(event.getId()).isNotNull();
 
-                Event evtFromDb = Event.read(event.id());
+                Event evtFromDb = Event.read(event.getId());
                 assertThat(evtFromDb).isNotNull();
                 assertThat(evtFromDb.getName()).isEqualTo(event.getName());
                 assertThat(evtFromDb.getDescription()).isNull();
@@ -97,9 +97,9 @@ public class EventIntegrationTest {
                 User creator = User.user().setEmail("toto@gmail.com").save();
                 //Test :
                 Event event = Event.event().setName("a getName").setCreator(creator).save();
-                assertThat(event.id()).isNotNull();
+                assertThat(event.getId()).isNotNull();
 
-                Event evtFromDb = Event.read(event.id());
+                Event evtFromDb = Event.read(event.getId());
                 assertThat(evtFromDb).isNotNull();
                 assertThat(evtFromDb.getName()).isEqualTo(event.getName());
                 assertThat(evtFromDb.getDescription()).isNull();
@@ -134,8 +134,8 @@ public class EventIntegrationTest {
                         .setEmail("subs@test.com").setLocomotion(Locomotion.AUTOSTOP);
                 event.addSubscriber(subsc);
                 event.save();
-                assertThat(event.id()).isNotNull();
-                Event evtFromDb = Event.read(event.id());
+                assertThat(event.getId()).isNotNull();
+                Event evtFromDb = Event.read(event.getId());
                 assertThat(evtFromDb.getSubscribers().size()).isEqualTo(2);
 
                 int nbTest = 0;
@@ -180,8 +180,8 @@ public class EventIntegrationTest {
                         .setEmail("subs@test.com").setLocomotion(Locomotion.CAR);
                 event.addSubscriber(subsc).addSubscriber(subsc2);
                 event.save();
-                assertThat(event.id()).isNotNull();
-                Event evtFromDb = Event.read(event.id());
+                assertThat(event.getId()).isNotNull();
+                Event evtFromDb = Event.read(event.getId());
                 assertThat(evtFromDb.getSubscribers().size()).isEqualTo(2);
 
                 int nbTest = 0;
@@ -224,8 +224,8 @@ public class EventIntegrationTest {
                         .setEmail("subs@test.com").setLocomotion(Locomotion.CAR);
                 event.addSubscriber(subsc).addAndMergeSubscriber(subsc2);
                 event.save();
-                assertThat(event.id()).isNotNull();
-                Event evtFromDb = Event.read(event.id());
+                assertThat(event.getId()).isNotNull();
+                Event evtFromDb = Event.read(event.getId());
                 assertThat(evtFromDb.getSubscribers().size()).isEqualTo(1);
                 Subscriber subscriber = evtFromDb.getSubscribers().iterator().next();
                 assertThat(subscriber.getUserRef()).isNotNull();
@@ -251,8 +251,8 @@ public class EventIntegrationTest {
                         .setEmail("subs@test.com").setLocomotion(Locomotion.CAR);
                 event.addSubscriber(subsc).addAndReplaceSubscriber(subsc2);
                 event.save();
-                assertThat(event.id()).isNotNull();
-                Event evtFromDb = Event.read(event.id());
+                assertThat(event.getId()).isNotNull();
+                Event evtFromDb = Event.read(event.getId());
                 assertThat(evtFromDb.getSubscribers().size()).isEqualTo(1);
                 Subscriber subscriber = evtFromDb.getSubscribers().iterator().next();
                 assertThat(subscriber.getUserRef()).isNotNull();
