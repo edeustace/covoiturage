@@ -13,7 +13,7 @@ function EventCreationCtrl($scope, $http) {
 		//$scope.creator.creator = true;
 		//$scope.evenement.subscriber.push($scope.creator);
 		var data = $scope.evenement;
-		$http.post('/rest/evenement', data).success(function(data){
+		$http.post('/rest/events', data).success(function(data){
 			alert('done '+data.name);
 		}).error(function(data){
 			alert('error '+data);

@@ -35,20 +35,23 @@ public class EventIntegrationTest {
                 Event.collection = JacksonDBCollection.wrap(currentDataBase.getCollection("events"), Event.class, String.class);
                 User.collection(JacksonDBCollection.wrap(currentDataBase.getCollection("users"), User.class, String.class));
 
-                Event event = Event.event().name("a name").save();
+                Event event = Event.event().setName("a getName").save();
                 assertThat(event.id()).isNotNull();
 
                 Event evtFromDb = Event.read(event.id());
                 assertThat(evtFromDb).isNotNull();
-                assertThat(evtFromDb.name()).isEqualTo(event.name());
-                assertThat(evtFromDb.description()).isNull();
-                assertThat(evtFromDb.creator().empty()).isTrue();
-                assertThat(evtFromDb.creatorRef()).isNull();
+                assertThat(evtFromDb.getName()).isEqualTo(event.getName());
+                assertThat(evtFromDb.getDescription()).isNull();
+                assertThat(evtFromDb.getCreator()).isNull();
+                assertThat(evtFromDb.getCreatorRef()).isNull();
 
             }
         });
     }
 
+    /**
+     * Test with a getCreator. The getCreator should be added as subscriber with the good DBRef.
+     */
     @Test
     public void insertwithCreator(){
         running(fakeApplication(), new Runnable() {
@@ -57,30 +60,33 @@ public class EventIntegrationTest {
                 User.collection(JacksonDBCollection.wrap(currentDataBase.getCollection("users"), User.class, String.class));
 
                 //Test
-                Event event = Event.event().name("a name");
-                event.creator(User.user().email("toto@gmail.com")).save();
+                Event event = Event.event().setName("a getName");
+                event.setCreator(User.user().setEmail("toto@gmail.com")).save();
                 assertThat(event.id()).isNotNull();
 
                 Event evtFromDb = Event.read(event.id());
                 assertThat(evtFromDb).isNotNull();
-                assertThat(evtFromDb.name()).isEqualTo(event.name());
-                assertThat(evtFromDb.description()).isNull();
-                assertThat(evtFromDb.creator().email()).isEqualTo("toto@gmail.com");
-                assertThat(evtFromDb.creatorRef()).isNotNull();
-                assertThat(evtFromDb.creatorRef().getId()).isEqualTo(evtFromDb.creator().id());
-                assertThat(evtFromDb.subscribers()).isNotNull();
-                assertThat(evtFromDb.subscribers().size()).isEqualTo(1);
-                Subscriber subscriber = evtFromDb.subscribers().iterator().next();
-                assertThat(evtFromDb.creator().empty()).isFalse();
-                assertThat(evtFromDb.creator().email()).isEqualTo(event.creator().email());
-                assertThat(evtFromDb.creator().email()).isEqualTo(subscriber.email());
-                assertThat(subscriber.userRef()).isNotNull();
-                assertThat(evtFromDb.creatorRef().getId()).isEqualTo(subscriber.userRef().getId());
+                assertThat(evtFromDb.getName()).isEqualTo(event.getName());
+                assertThat(evtFromDb.getDescription()).isNull();
+                assertThat(evtFromDb.getCreator().getEmail()).isEqualTo("toto@gmail.com");
+                assertThat(evtFromDb.getCreatorRef()).isNotNull();
+                assertThat(evtFromDb.getCreatorRef()).isEqualTo(evtFromDb.getCreator().id());
+                assertThat(evtFromDb.getSubscribers()).isNotNull();
+                assertThat(evtFromDb.getSubscribers().size()).isEqualTo(1);
+                Subscriber subscriber = evtFromDb.getSubscribers().iterator().next();
+                assertThat(evtFromDb.getCreator().isEmpty()).isFalse();
+                assertThat(evtFromDb.getCreator().getEmail()).isEqualTo(event.getCreator().getEmail());
+                assertThat(evtFromDb.getCreator().getEmail()).isEqualTo(subscriber.getEmail());
+                assertThat(subscriber.getUserRef()).isNotNull();
+                assertThat(evtFromDb.getCreatorRef()).isEqualTo(subscriber.getUserRef());
 
             }
         });
     }
 
+    /**
+     * Test with a getCreator already existing in DB. The getCreator should be added as subscriber with the good DBRef.
+     */
     @Test
     public void insertwithCreatorAlreadyExisting(){
         running(fakeApplication(), new Runnable() {
@@ -88,58 +94,62 @@ public class EventIntegrationTest {
                 Event.collection = JacksonDBCollection.wrap(currentDataBase.getCollection("events"), Event.class, String.class);
                 User.collection(JacksonDBCollection.wrap(currentDataBase.getCollection("users"), User.class, String.class));
 
-                User creator = User.user().email("toto@gmail.com").insert();
+                User creator = User.user().setEmail("toto@gmail.com").save();
                 //Test :
-                Event event = Event.event().name("a name").creator(creator).save();
+                Event event = Event.event().setName("a getName").setCreator(creator).save();
                 assertThat(event.id()).isNotNull();
 
                 Event evtFromDb = Event.read(event.id());
                 assertThat(evtFromDb).isNotNull();
-                assertThat(evtFromDb.name()).isEqualTo(event.name());
-                assertThat(evtFromDb.description()).isNull();
-                assertThat(evtFromDb.creator().empty()).isFalse();
-                assertThat(evtFromDb.creatorRef()).isNotNull();
-                assertThat(evtFromDb.subscribers()).isNotNull();
-                assertThat(evtFromDb.subscribers().size()).isEqualTo(1);
-                Subscriber subscriber = evtFromDb.subscribers().iterator().next();
-                assertThat(evtFromDb.creator()).isNotNull();
-                assertThat(evtFromDb.creator().email()).isEqualTo(event.creator().email());
-                assertThat(evtFromDb.creator().email()).isEqualTo(subscriber.email());
-                assertThat(subscriber.userRef()).isNotNull();
-                assertThat(evtFromDb.creatorRef().getId()).isEqualTo(subscriber.userRef().getId());
+                assertThat(evtFromDb.getName()).isEqualTo(event.getName());
+                assertThat(evtFromDb.getDescription()).isNull();
+                assertThat(evtFromDb.getCreator().isEmpty()).isFalse();
+                assertThat(evtFromDb.getCreatorRef()).isNotNull();
+                assertThat(evtFromDb.getSubscribers()).isNotNull();
+                assertThat(evtFromDb.getSubscribers().size()).isEqualTo(1);
+                Subscriber subscriber = evtFromDb.getSubscribers().iterator().next();
+                assertThat(evtFromDb.getCreator()).isNotNull();
+                assertThat(evtFromDb.getCreator().getEmail()).isEqualTo(event.getCreator().getEmail());
+                assertThat(evtFromDb.getCreator().getEmail()).isEqualTo(subscriber.getEmail());
+                assertThat(subscriber.getUserRef()).isNotNull();
+                assertThat(evtFromDb.getCreatorRef()).isEqualTo(subscriber.getUserRef());
 
             }
         });
     }
 
+    /**
+     * Test the add of a subscriber. The subscriber should be link to a getUser with a dbref. If the getUser does not exist, the getUser is created
+     */
     @Test
     public void testCreateEventAndAddSubriber(){
         running(fakeApplication(), new Runnable() {
             public void run() {
                 Event.collection = JacksonDBCollection.wrap(currentDataBase.getCollection("events"), Event.class, String.class);
                 User.collection(JacksonDBCollection.wrap(currentDataBase.getCollection("users"), User.class, String.class));
-                Event event = Event.event().name("a name");
-                event.creator().email("toto@gmail.com");
+                Event event = Event.event().setName("a getName");
+                event.setCreator(User.user().setEmail("toto@gmail.com"));
                 Subscriber subsc = Subscriber.subscriber()
-                        .address(Address.address().description("An adress"))
-                        .email("subs@test.com").locomotion(Locomotion.AUTOSTOP);
+                        .setAddress(Address.address().setDescription("An adress"))
+                        .setEmail("subs@test.com").setLocomotion(Locomotion.AUTOSTOP);
                 event.addSubscriber(subsc);
                 event.save();
                 assertThat(event.id()).isNotNull();
                 Event evtFromDb = Event.read(event.id());
-                assertThat(evtFromDb.subscribers().size()).isEqualTo(2);
+                assertThat(evtFromDb.getSubscribers().size()).isEqualTo(2);
 
                 int nbTest = 0;
                 boolean creatorFinded = false;
                 boolean subscFinded = false;
-                for(Subscriber subscriber : evtFromDb.subscribers()){
-                    assertThat(subscriber.userRef()).isNotNull();
-                    assertThat(subscriber.user().email()).isEqualTo(subscriber.email());
-                    if(subscriber.email().equals("toto@gmail.com")){
+                for(Subscriber subscriber : evtFromDb.getSubscribers()){
+                    assertThat(subscriber.getUserRef()).isNotNull();
+                    assertThat(User.findById(subscriber.getUserRef())).isNotNull();
+                    assertThat(subscriber.user().getEmail()).isEqualTo(subscriber.getEmail());
+                    if(subscriber.getEmail().equals("toto@gmail.com")){
                         creatorFinded = true;
-                    }else if(subscriber.email().equals("subs@test.com")){
-                        assertThat(subscriber.locomotion()).isEqualTo(subsc.locomotion());
-                        assertThat(subscriber.address().description()).isEqualTo(subsc.address().description());
+                    }else if(subscriber.getEmail().equals("subs@test.com")){
+                        assertThat(subscriber.getLocomotion()).isEqualTo(subsc.getLocomotion());
+                        assertThat(subscriber.getAddress().getDescription()).isEqualTo(subsc.getAddress().getDescription());
                         subscFinded = true;
                     }
                     nbTest++;
@@ -151,34 +161,41 @@ public class EventIntegrationTest {
         });
     }
 
+    /**
+     * If we add twice, the second should not be added
+     */
     @Test
     public void testCreateEventAndAddSubriberTwice(){
         running(fakeApplication(), new Runnable() {
             public void run() {
                 Event.collection = JacksonDBCollection.wrap(currentDataBase.getCollection("events"), Event.class, String.class);
                 User.collection(JacksonDBCollection.wrap(currentDataBase.getCollection("users"), User.class, String.class));
-                Event event = Event.event().name("a name");
-                event.creator().email("toto@gmail.com");
+                Event event = Event.event().setName("a getName");
+                event.setCreator(User.user().setEmail("toto@gmail.com"));
                 Subscriber subsc = Subscriber.subscriber()
-                        .address(Address.address().description("An adress"))
-                        .email("subs@test.com").locomotion(Locomotion.AUTOSTOP);
-                event.addSubscriber(subsc).addSubscriber(subsc);
+                        .setAddress(Address.address().setDescription("An adress"))
+                        .setEmail("subs@test.com").setLocomotion(Locomotion.AUTOSTOP);
+                Subscriber subsc2 = Subscriber.subscriber()
+                        .setAddress(Address.address().setDescription("An adress"))
+                        .setEmail("subs@test.com").setLocomotion(Locomotion.CAR);
+                event.addSubscriber(subsc).addSubscriber(subsc2);
                 event.save();
                 assertThat(event.id()).isNotNull();
                 Event evtFromDb = Event.read(event.id());
-                assertThat(evtFromDb.subscribers().size()).isEqualTo(2);
+                assertThat(evtFromDb.getSubscribers().size()).isEqualTo(2);
 
                 int nbTest = 0;
                 boolean creatorFinded = false;
                 boolean subscFinded = false;
-                for(Subscriber subscriber : evtFromDb.subscribers()){
-                    assertThat(subscriber.userRef()).isNotNull();
-                    assertThat(subscriber.user().email()).isEqualTo(subscriber.email());
-                    if(subscriber.email().equals("toto@gmail.com")){
+                for(Subscriber subscriber : evtFromDb.getSubscribers()){
+                    assertThat(subscriber.getUserRef()).isNotNull();
+                    assertThat(User.findById(subscriber.getUserRef())).isNotNull();
+                    assertThat(subscriber.user().getEmail()).isEqualTo(subscriber.getEmail());
+                    if(subscriber.getEmail().equals("toto@gmail.com")){
                         creatorFinded = true;
-                    }else if(subscriber.email().equals("subs@test.com")){
-                        assertThat(subscriber.locomotion()).isEqualTo(subsc.locomotion());
-                        assertThat(subscriber.address().description()).isEqualTo(subsc.address().description());
+                    }else if(subscriber.getEmail().equals("subs@test.com")){
+                        assertThat(subscriber.getLocomotion()).isEqualTo(subsc.getLocomotion());
+                        assertThat(subscriber.getAddress().getDescription()).isEqualTo(subsc.getAddress().getDescription());
                         subscFinded = true;
                     }
                     nbTest++;
@@ -190,31 +207,35 @@ public class EventIntegrationTest {
         });
     }
 
+    /**
+     * Add merge method should merge the not null fields
+     */
     @Test
     public void testAddAndMergeSubscriber(){
         running(fakeApplication(), new Runnable() {
             public void run() {
                 Event.collection = JacksonDBCollection.wrap(currentDataBase.getCollection("events"), Event.class, String.class);
                 User.collection(JacksonDBCollection.wrap(currentDataBase.getCollection("users"), User.class, String.class));
-                Event event = Event.event().name("a name");
+                Event event = Event.event().setName("a getName");
                 Subscriber subsc = Subscriber.subscriber()
-                        .address(Address.address().description("An adress"))
-                        .email("subs@test.com").locomotion(Locomotion.AUTOSTOP);
+                        .setAddress(Address.address().setDescription("An adress"))
+                        .setEmail("subs@test.com").setLocomotion(Locomotion.AUTOSTOP);
                 Subscriber subsc2 = Subscriber.subscriber()
-                        .email("subs@test.com").locomotion(Locomotion.CAR);
+                        .setEmail("subs@test.com").setLocomotion(Locomotion.CAR);
                 event.addSubscriber(subsc).addAndMergeSubscriber(subsc2);
                 event.save();
                 assertThat(event.id()).isNotNull();
                 Event evtFromDb = Event.read(event.id());
-                assertThat(evtFromDb.subscribers().size()).isEqualTo(1);
-                Subscriber subscriber = evtFromDb.subscribers().iterator().next();
-                assertThat(subscriber.userRef()).isNotNull();
-                assertThat(subscriber.user().email()).isEqualTo(subscriber.email());
-                assertThat(subscriber.locomotion()).isEqualTo(subsc2.locomotion());
-                assertThat(subscriber.address().description()).isEqualTo(subsc.address().description());
+                assertThat(evtFromDb.getSubscribers().size()).isEqualTo(1);
+                Subscriber subscriber = evtFromDb.getSubscribers().iterator().next();
+                assertThat(subscriber.getUserRef()).isNotNull();
+                assertThat(subscriber.user().getEmail()).isEqualTo(subsc.getEmail());
+                assertThat(subscriber.getLocomotion()).isEqualTo(subsc2.getLocomotion());
+                assertThat(subscriber.getAddress().getDescription()).isEqualTo(subsc.getAddress().getDescription());
             }
         });
     }
+
 
     @Test
     public void testAddAndReplaceSubscriber(){
@@ -222,23 +243,31 @@ public class EventIntegrationTest {
             public void run() {
                 Event.collection = JacksonDBCollection.wrap(currentDataBase.getCollection("events"), Event.class, String.class);
                 User.collection(JacksonDBCollection.wrap(currentDataBase.getCollection("users"), User.class, String.class));
-                Event event = Event.event().name("a name");
+                Event event = Event.event().setName("a getName");
                 Subscriber subsc = Subscriber.subscriber()
-                        .address(Address.address().description("An adress"))
-                        .email("subs@test.com").locomotion(Locomotion.AUTOSTOP);
+                        .setAddress(Address.address().setDescription("An adress"))
+                        .setEmail("subs@test.com").setLocomotion(Locomotion.AUTOSTOP);
                 Subscriber subsc2 = Subscriber.subscriber()
-                        .email("subs@test.com").locomotion(Locomotion.CAR);
+                        .setEmail("subs@test.com").setLocomotion(Locomotion.CAR);
                 event.addSubscriber(subsc).addAndReplaceSubscriber(subsc2);
                 event.save();
                 assertThat(event.id()).isNotNull();
                 Event evtFromDb = Event.read(event.id());
-                assertThat(evtFromDb.subscribers().size()).isEqualTo(1);
-                Subscriber subscriber = evtFromDb.subscribers().iterator().next();
-                assertThat(subscriber.userRef()).isNotNull();
-                assertThat(subscriber.user().email()).isEqualTo(subscriber.email());
-                assertThat(subscriber.locomotion()).isEqualTo(subsc2.locomotion());
-                assertThat(subscriber.address().empty()).isTrue();
+                assertThat(evtFromDb.getSubscribers().size()).isEqualTo(1);
+                Subscriber subscriber = evtFromDb.getSubscribers().iterator().next();
+                assertThat(subscriber.getUserRef()).isNotNull();
+                assertThat(subscriber.user().getEmail()).isEqualTo(subscriber.getEmail());
+                assertThat(subscriber.getLocomotion()).isEqualTo(subsc2.getLocomotion());
+                assertThat(subscriber.getAddress()).isNull();
             }
         });
+    }
+
+    private void validateSubscriber(Subscriber subscriber, Subscriber expected){
+        assertThat(subscriber.getUserRef()).isNotNull();
+        assertThat(User.findById(subscriber.getUserRef())).isNotNull();
+        assertThat(subscriber.user().getEmail()).isEqualTo(expected.getEmail());
+        assertThat(subscriber.getLocomotion()).isEqualTo(expected.getLocomotion());
+        assertThat(subscriber.getAddress()).isEqualTo(expected);
     }
 }

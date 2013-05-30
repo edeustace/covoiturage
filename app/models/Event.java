@@ -1,14 +1,14 @@
 package models;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 
 import javax.persistence.Id;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 
-import net.vz.mongodb.jackson.DBRef;
 import net.vz.mongodb.jackson.JacksonDBCollection;
 import net.vz.mongodb.jackson.MongoCollection;
 import net.vz.mongodb.jackson.ObjectId;
@@ -24,9 +24,20 @@ import play.modules.mongodb.jackson.MongoDB;
 
 @MongoCollection(name="events")
 public class Event {
+    public static JacksonDBCollection<Event, String> collection = null;
+    public static void collection(JacksonDBCollection<Event, String> collection) {
+        Event.collection = collection;
+    }
+    public static JacksonDBCollection<Event, String> collection(){
+        if(collection==null){
+            collection = MongoDB.getCollection(Event.class, String.class);
+        }
+        return collection;
+    }
 
     private String id;
 
+    @NotNull
     private String name;
 
     private String description;
@@ -35,13 +46,14 @@ public class Event {
 
     private Date toDate;
 
-    public Address address;
+    @NotNull @Valid
+    private Address address;
 
     private Collection<Subscriber> subscribers = new HashSet<Subscriber>();
 
-    private DBRef<User, String> creatorRef;
+    private String creatorRef;
 
-    @JsonIgnore
+    @JsonIgnore @NotNull @Valid
     private User creator;
 
     //STATIC
@@ -66,38 +78,39 @@ public class Event {
         return event;
     }
 
-    public static JacksonDBCollection<Event, String> collection = null;
-    public static void collection(JacksonDBCollection<Event, String> collection) {
-        Event.collection = collection;
-    }
-    public static JacksonDBCollection<Event, String> collection(){
-        if(collection==null){
-            collection = MongoDB.getCollection(Event.class, String.class);
-        }
-        return collection;
-    }
     public static ObjectMapper objectMapper = new ObjectMapper();
+
+    @JsonIgnore
+    public Boolean isEmpty(){
+        return this.name==null && this.description==null &&
+                this.fromDate==null && this.toDate==null &&
+                this.creatorRef==null &&
+                (this.address==null || this.address.empty()) &&
+                (this.subscribers==null || this.subscribers.isEmpty()) &&
+                (this.creator==null || this.creator.isEmpty());
+    }
 
     //MAJ
     public Event save(){
-        persistOrLoadCreatorAndCreateRef();
-        addCreatorAsSubscriber();
-        persistUsersOnSubscribers();
+        this.persistOrLoadCreatorAndCreateRef();
+        this.addCreatorAsSubscriber();
+        this.persistUsersOnSubscribers();
         WriteResult<Event, String> result = collection().save(this);
         this.id = result.getSavedId();
         return this;
     }
+
     private void persistOrLoadCreatorAndCreateRef(){
         if(creator!=null){
             if(creator.id()==null){
-                creator.insert();
+                creator.save();
             }
-            creatorRef = new DBRef<User, String>(creator.id(), User.class);
+            creatorRef = creator.id();
         }
     }
 
     private void persistUsersOnSubscribers(){
-        for(Subscriber subscriber : subscribers()){
+        for(Subscriber subscriber : getSubscribers()){
             subscriber.saveUser();
         }
     }
@@ -113,27 +126,27 @@ public class Event {
     }
 
     @JsonProperty("name")
-    public String name() {
+    public String getName() {
         return name;
     }
-    @JsonProperty("description")
-    public String description() {
+    @JsonProperty("setDescription")
+    public String getDescription() {
         return description;
     }
     @JsonProperty("fromDate")
-    public Date fromDate() {
+    public Date getFromDate() {
         return fromDate;
     }
     @JsonProperty("toDate")
-    public Date toDate() {
+    public Date getToDate() {
         return toDate;
     }
     @JsonProperty("address")
-    public Address address() {
+    public Address getAddress() {
         return address;
     }
     @JsonProperty("subscribers")
-    public Collection<Subscriber> subscribers() {
+    public Collection<Subscriber> getSubscribers() {
         return subscribers;
     }
 
@@ -174,48 +187,46 @@ public class Event {
     private void addCreatorAsSubscriber(){
         if(creator!=null){
             Subscriber subscriberCreator = Subscriber
-                    .subscriber().address(creator.address())
-                    .name(creator.name()).surname(creator.surname())
-                    .email(creator.email()).user(creator);
+                    .subscriber().setAddress(creator.getAddress())
+                    .setName(creator.getName()).setSurname(creator.getSurname())
+                    .setEmail(creator.getEmail()).setUser(creator);
             this.subscribers.add(subscriberCreator);
         }
     }
 
     @JsonIgnore
-    public User creator(){
-        if((this.creator==null || (this.creator!=null && this.creator.empty())) && creatorRef!=null){
-            this.creator = creatorRef.fetch();
-        }else if(this.creator==null && creatorRef==null){
-            this.creator = User.user();
+    public User getCreator(){
+        if((this.creator==null || (this.creator!=null && this.creator.isEmpty())) && creatorRef!=null){
+            this.creator = User.findById(creatorRef);
         }
         return this.creator;
     }
 
     @JsonProperty("creatorRef")
-    public DBRef<User, String> creatorRef() {
+    public String getCreatorRef() {
         return creatorRef;
     }
 
     @JsonProperty("creator")
-    public Event creator(User creator) {
+    public Event setCreator(User creator) {
         this.creator = creator;
         return this;
     }
 
     @Id
     @ObjectId
-    public Event id(String id) {
+    public Event setId(String id) {
         this.id = id;
         return this;
     }
 
     @JsonProperty("name")
-    public Event name(String name) {
+    public Event setName(String name) {
         this.name = name;
         return this;
     }
     @JsonProperty("description")
-    public Event description(String description) {
+    public Event setDescription(String description) {
         this.description = description;
         return this;
     }
@@ -225,12 +236,12 @@ public class Event {
         return this;
     }
     @JsonProperty("address")
-    public Event address(Address address) {
+    public Event setAddress(Address address) {
         this.address = address;
         return this;
     }
     @JsonProperty("creatorRef")
-    public Event creatorRef(DBRef<User, String> creatorRef) {
+    public Event setCreatorRef(String creatorRef) {
         this.creatorRef = creatorRef;
         return this;
     }

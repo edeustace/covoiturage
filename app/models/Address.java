@@ -2,8 +2,13 @@ package models;
 
 import org.codehaus.jackson.annotate.JsonProperty;
 
+import javax.validation.constraints.NotNull;
+
 public class Address {
+
+    @NotNull
 	private String description;
+    @NotNull
 	private Location location;
 
     public static Address address() {
@@ -12,37 +17,37 @@ public class Address {
 
     public void merge(Address other){
         if(!other.empty()){
-            if(other.description()!=null){
-                this.description(other.description());
+            if(other.getDescription()!=null){
+                this.setDescription(other.getDescription());
             }
-            if(!other.location().empty()){
-                this.location().merge(other.location());
+            if(other.getLocation()!=null && !other.getLocation().isEmpty()){
+                this.getLocation().merge(other.getLocation());
             }
         }
     }
 
     public Boolean empty(){
-        return description==null && (location==null || location.empty());
+        return description==null && (location==null || location.isEmpty());
     }
 
     @JsonProperty("description")
-    public String description() {
+    public String getDescription() {
         return description;
     }
     @JsonProperty("description")
-    public Address description(String description) {
+    public Address setDescription(String description) {
         this.description = description;
         return this;
     }
     @JsonProperty("location")
-    public Location location() {
+    public Location getLocation() {
         if(location==null){
             location = Location.location();
         }
         return location;
     }
     @JsonProperty("location")
-    public Address location(Location location) {
+    public Address setLocation(Location location) {
         this.location = location;
         return this;
     }

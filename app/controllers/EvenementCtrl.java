@@ -13,12 +13,15 @@ import play.mvc.BodyParser;
 import play.mvc.Controller;
 import play.mvc.Http.RequestBody;
 import play.mvc.Result;
+import play.data.Form;
+import static play.data.Form.*;
 import views.html.evenement;
 import views.html.evenementCreation;
 
 public class EvenementCtrl extends Controller {
 
     private static ObjectMapper objectMapper = new ObjectMapper();
+    private static Form<Event> eventForm = form(Event.class);
 
 	public static Result list() {
 		return ok();
@@ -36,6 +39,7 @@ public class EvenementCtrl extends Controller {
 		ObjectNode result = Json.newObject();
 		result.put("status", "OK");
 		result.put("message", "Hello " + id);
+
 		return ok(result);
 	}
 
@@ -43,8 +47,14 @@ public class EvenementCtrl extends Controller {
 	public static Result createEvenement() throws IOException {
 		RequestBody body = request().body();
 		JsonNode node = body.asJson();
-        Event event = Event.insert(node);
-		return ok(objectMapper.writeValueAsString(event)).as("application/json");
+
+        Form<Event> form = eventForm.bindFromRequest();
+        if(form.hasErrors()){
+            return badRequest(form.errorsAsJson()).as("application/json");
+        } else {
+            Event event = Event.insert(node);
+            return ok(objectMapper.writeValueAsString(event)).as("application/json");
+        }
 	}
 
     @BodyParser.Of(BodyParser.Json.class)

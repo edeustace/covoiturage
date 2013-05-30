@@ -1,11 +1,13 @@
 package models;
 
 import models.enums.Locomotion;
-import net.vz.mongodb.jackson.DBRef;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
+import org.hibernate.validator.constraints.Email;
+
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 
 /**
  * Created with IntelliJ IDEA.
@@ -16,46 +18,50 @@ import org.codehaus.jackson.annotate.JsonProperty;
  */
 public class Subscriber {
 
-    private DBRef<User, String> userRef;
+    private String userRef;
 
     @JsonIgnore
     private User user;
-
+    @JsonIgnore
     private String name;
-
+    @JsonIgnore
     private String surname;
 
+    @JsonIgnore @NotNull @Email
     private String email;
 
+    @JsonIgnore @NotNull @Valid
     private Address address;
 
+    @JsonIgnore @NotNull
     private Locomotion locomotion;
 
     public void merge(Subscriber other){
-        if(!other.empty()){
-            if(other.name()!=null){
-                this.name(other.name());
+        if(!other.isEmpty()){
+            if(other.getName()!=null){
+                this.setName(other.getName());
             }
-            if(other.surname()!=null){
-                this.surname(other.surname());
+            if(other.getSurname()!=null){
+                this.setSurname(other.getSurname());
             }
-            if(other.email()!=null){
-                this.email(other.email());
+            if(other.getEmail()!=null){
+                this.setEmail(other.getEmail());
             }
-            if(other.address()!=null){
-                this.address(other.address());
+            if(other.getAddress()!=null){
+                this.setAddress(other.getAddress());
             }
-            if(other.locomotion()!=null){
-                this.locomotion(other.locomotion());
+            if(other.getLocomotion()!=null){
+                this.setLocomotion(other.getLocomotion());
             }
         }
     }
 
-    public Boolean empty(){
+    @JsonIgnore
+    public Boolean isEmpty(){
         return name==null && surname==null &&
                 locomotion == null && email==null &&
                 (address==null || address.empty()) &&
-                (user==null || user.empty()) &&
+                (user==null || user.isEmpty()) &&
                 userRef==null;
     }
 
@@ -65,7 +71,7 @@ public class Subscriber {
             if(this.email==null){
                 return false;
             }
-            return this.email.equals(((Subscriber)obj).email());
+            return this.email.equals(((Subscriber)obj).getEmail());
         }
         return false;
     }
@@ -80,86 +86,81 @@ public class Subscriber {
     }
 
     public void saveUser(){
-        if(!this.user().empty() && this.user().id()==null){
-            this.user().insert();
-        } else if(this.user().empty()){
-            this.user(User.user().address(address()).name(name()).surname(surname()).email(email())).user().insert();
+        if(this.user()!=null && !this.user().isEmpty() && this.user().id()==null){
+            this.user().save();
+        } else if(this.user()==null || this.user().isEmpty()){
+            this.setUser(User.user().setAddress(getAddress()).setName(getName()).setSurname(getSurname()).setEmail(getEmail())).user().save();
         }
-        this.userRef(new DBRef<User, String>(this.user().id(), User.class));
+        this.setUserRef(this.user().id());
     }
 
 
     public User user() {
-        if(this.user!=null && !user.empty()){
+        if(this.user!=null && !user.isEmpty()){
             return user;
-        }else if (this.userRef!=null && this.userRef.getId()!=null){
-            this.user = userRef.fetch();
-        }else{
-            this.user = User.user();
+        }else if (this.userRef!=null && this.userRef!=null){
+            this.user = User.findById(this.userRef);
         }
         return user;
     }
 
-    public Subscriber user(User user) {
+    public Subscriber setUser(User user) {
         this.user = user;
         return this;
     }
 
     @JsonProperty("userRef")
-    public DBRef<User, String> userRef() {
+    public String getUserRef() {
         return userRef;
     }
     @JsonProperty("userRef")
-    public Subscriber userRef(DBRef<User, String> userRef) {
+    public Subscriber setUserRef(String userRef) {
         this.userRef = userRef;
         return this;
     }
 
     @JsonProperty("name")
-    public String name() {
+    public String getName() {
         return name;
     }
     @JsonProperty("name")
-    public Subscriber name(String name) {
+    public Subscriber setName(String name) {
         this.name = name;
         return this;
     }
     @JsonProperty("surname")
-    public String surname() {
+    public String getSurname() {
         return surname;
     }
     @JsonProperty("surname")
-    public Subscriber surname(String surname) {
+    public Subscriber setSurname(String surname) {
         this.surname = surname;
         return this;
     }
     @JsonProperty("email")
-    public String email() {
+    public String getEmail() {
         return email;
     }
     @JsonProperty("email")
-    public Subscriber email(String email) {
+    public Subscriber setEmail(String email) {
         this.email = email;
         return this;
     }
     @JsonProperty("address")
-    public Address address() {
-        if(address==null){
-            address = Address.address();
-        }
+    public Address getAddress() {
         return address;
     }
     @JsonProperty("address")
-    public Subscriber address(Address address) {
+    public Subscriber setAddress(Address address) {
         this.address = address;
         return this;
     }
     @JsonProperty("locomotion")
-    public Locomotion locomotion() {
+    public Locomotion getLocomotion() {
         return locomotion;
     }
     @JsonProperty("locomotion")
-    public Subscriber locomotion(Locomotion locomotion) {
+    public Subscriber setLocomotion(Locomotion locomotion) {
         this.locomotion = locomotion;
         return this;
     }
