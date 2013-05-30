@@ -5,16 +5,16 @@
 # Home page
 GET     /                           controllers.Application.index()
 #PAGES
-GET     /evenement                            controllers.EvenementCtrl.evenement
-GET     /evenement/creation                   controllers.EvenementCtrl.evenementCreation
-#GET     /evenement/:id/abonnement             controllers.EvenementCtrl.evenementCreation
+GET     /evenement                            controllers.EventCtrl.evenement
+GET     /evenement/creation                   controllers.EventCtrl.evenementCreation
+#GET     /evenement/:id/abonnement             controllers.EventCtrl.evenementCreation
 
 #API REST
 #Events
-GET     /rest/events/:id                   controllers.EvenementCtrl.getEvenement(id :String)
-POST    /rest/events                       controllers.EvenementCtrl.createEvenement
-PUT     /rest/events/:id                   controllers.EvenementCtrl.updateEvenement(id :String)
-DELETE  /rest/events/:id                   controllers.EvenementCtrl.deleteEvenement(id :String)
+GET     /rest/events/:id                   controllers.EventCtrl.getEvenement(id :String)
+POST    /rest/events                       controllers.EventCtrl.createEvenement
+PUT     /rest/events/:id                   controllers.EventCtrl.updateEvenement(id :String)
+DELETE  /rest/events/:id                   controllers.EventCtrl.deleteEvenement(id :String)
 
 #Subscribers
 GET     /rest/events/:id/subscribers/:idSub       controllers.SubscriberCtrl.getSubscriber(id :String, idSub :String)

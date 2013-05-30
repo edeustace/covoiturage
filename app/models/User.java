@@ -7,6 +7,7 @@ import net.vz.mongodb.jackson.JacksonDBCollection;
 import net.vz.mongodb.jackson.MongoCollection;
 import net.vz.mongodb.jackson.ObjectId;
 import net.vz.mongodb.jackson.WriteResult;
+import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.hibernate.validator.constraints.Email;
 import play.modules.mongodb.jackson.MongoDB;
@@ -39,6 +40,7 @@ public class User {
 
     private Address address;
 
+    @JsonIgnore
     public Boolean isEmpty(){
         return id==null && email == null &&
                 password==null && name==null &&

@@ -18,7 +18,7 @@ import static play.data.Form.*;
 import views.html.evenement;
 import views.html.evenementCreation;
 
-public class EvenementCtrl extends Controller {
+public class EventCtrl extends Controller {
 
     private static ObjectMapper objectMapper = new ObjectMapper();
     private static Form<Event> eventForm = form(Event.class);
@@ -36,12 +36,13 @@ public class EvenementCtrl extends Controller {
 	}
 
 	public static Result getEvenement(String id) {
-		ObjectNode result = Json.newObject();
-		result.put("status", "OK");
-		result.put("message", "Hello " + id);
-
-		return ok(result);
-	}
+	    Event event = Event.read(id);
+        try {
+            return ok(objectMapper.writeValueAsString(event)).as("application/json");
+        } catch (IOException e) {
+            return internalServerError("Error");
+        }
+    }
 
 	@BodyParser.Of(BodyParser.Json.class)
 	public static Result createEvenement() throws IOException {
