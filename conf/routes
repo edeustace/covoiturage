@@ -17,8 +17,10 @@ PUT     /rest/events/:id                   controllers.EventCtrl.updateEvent(id 
 DELETE  /rest/events/:id                   controllers.EventCtrl.deleteEvent(id :String)
 
 #Subscribers
+GET     /rest/events/:id/subscribers/              controllers.SubscriberCtrl.list(id :String)
 GET     /rest/events/:id/subscribers/:idSub       controllers.SubscriberCtrl.getSubscriber(id :String, idSub :String)
-POST    /rest/events/:id/subscribers              controllers.SubscriberCtrl.createSubscriber(id :String)
+POST    /rest/events/:id/subscribers/              controllers.SubscriberCtrl.createSubscriber(id :String)
+PUT     /rest/events/:id/subscribers/              controllers.SubscriberCtrl.updateSubscriber(id :String)
 PUT     /rest/events/:id/subscribers/:idSub       controllers.SubscriberCtrl.updateSubscriber(id :String, idSub :String)
 DELETE  /rest/events/:id/subscribers/:idSub       controllers.SubscriberCtrl.deleteSubscriber(id :String, idSub :String)
 

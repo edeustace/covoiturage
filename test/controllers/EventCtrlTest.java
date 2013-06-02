@@ -58,7 +58,10 @@ public class EventCtrlTest {
                 WS.Response response = WS.url("http://localhost:3333/rest/events").post(node).get();
                 System.out.println(response.getStatus());
                 System.out.println(response.getBody());
-                JsonNode resp = objectMapper.convertValue(response.getBody(), JsonNode.class);
+                JsonNode resp = null;
+                try {
+                    resp = objectMapper.readValue(response.getBody(), JsonNode.class);
+                }catch (IOException e){};
                 assertThat(response.getStatus()).isEqualTo(400);
                 assertThat(resp.get("name")).isNotEmpty();
                 assertThat(resp.get("address")).isNotEmpty();

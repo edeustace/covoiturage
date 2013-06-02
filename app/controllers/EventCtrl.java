@@ -54,18 +54,22 @@ public class EventCtrl extends Controller {
     }
 
 	@BodyParser.Of(BodyParser.Json.class)
-	public static Result createEvent() throws IOException {
-		RequestBody body = request().body();
-		JsonNode node = body.asJson();
+	public static Result createEvent() {
+		try{
+            RequestBody body = request().body();
+            JsonNode node = body.asJson();
 
-        Form<Event> form = eventForm.bindFromRequest();
-        if(form.hasErrors()){
-            return badRequest(form.errorsAsJson()).as("application/json");
-        } else {
-            Event event = Event.insert(node);
-            String link = controllers.routes.EventCtrl.getEvent(event.getId()).toString();
-            LigthEvent responseBody = new LigthEvent(event, Link.link(Link.SELF, link));
-            return ok(objectMapper.writeValueAsString(responseBody)).as("application/json");
+            Form<Event> form = eventForm.bindFromRequest();
+            if(form.hasErrors()){
+                return badRequest(form.errorsAsJson()).as("application/json");
+            } else {
+                Event event = Event.insert(node);
+                String link = controllers.routes.EventCtrl.getEvent(event.getId()).toString();
+                LigthEvent responseBody = new LigthEvent(event, Link.link(Link.SELF, link));
+                return ok(objectMapper.writeValueAsString(responseBody)).as("application/json");
+            }
+        }catch (Exception e){
+            return internalServerError().as("application/json");
         }
 	}
 
