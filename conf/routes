@@ -11,16 +11,20 @@ GET     /evenement/creation                   controllers.EventCtrl.evenementCre
 
 #API REST
 #Events
-GET     /rest/events/:id                   controllers.EventCtrl.getEvenement(id :String)
-POST    /rest/events                       controllers.EventCtrl.createEvenement
-PUT     /rest/events/:id                   controllers.EventCtrl.updateEvenement(id :String)
-DELETE  /rest/events/:id                   controllers.EventCtrl.deleteEvenement(id :String)
+GET     /rest/events/:id                   controllers.EventCtrl.getEvent(id :String)
+POST    /rest/events                       controllers.EventCtrl.createEvent
+PUT     /rest/events/:id                   controllers.EventCtrl.updateEvent(id :String)
+DELETE  /rest/events/:id                   controllers.EventCtrl.deleteEvent(id :String)
 
 #Subscribers
 GET     /rest/events/:id/subscribers/:idSub       controllers.SubscriberCtrl.getSubscriber(id :String, idSub :String)
 POST    /rest/events/:id/subscribers              controllers.SubscriberCtrl.createSubscriber(id :String)
 PUT     /rest/events/:id/subscribers/:idSub       controllers.SubscriberCtrl.updateSubscriber(id :String, idSub :String)
 DELETE  /rest/events/:id/subscribers/:idSub       controllers.SubscriberCtrl.deleteSubscriber(id :String, idSub :String)
+
+#Users
+GET     /rest/users/:id                   controllers.UserCtrl.getUser(id :String)
+
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)

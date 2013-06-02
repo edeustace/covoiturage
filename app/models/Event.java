@@ -95,6 +95,7 @@ public class Event {
         this.persistOrLoadCreatorAndCreateRef();
         this.addCreatorAsSubscriber();
         this.persistUsersOnSubscribers();
+        this.setFromDate(new Date());
         WriteResult<Event, String> result = collection().save(this);
         this.id = result.getSavedId();
         return this;
@@ -129,7 +130,7 @@ public class Event {
     public String getName() {
         return name;
     }
-    @JsonProperty("setDescription")
+    @JsonProperty("description")
     public String getDescription() {
         return description;
     }
@@ -194,9 +195,9 @@ public class Event {
         }
     }
 
-    @JsonIgnore
+    @JsonProperty("creator")
     public User getCreator(){
-        if((this.creator==null || (this.creator!=null && this.creator.isEmpty())) && creatorRef!=null){
+        if(creatorRef!=null){
             this.creator = User.findById(creatorRef);
         }
         return this.creator;
@@ -230,8 +231,13 @@ public class Event {
         this.description = description;
         return this;
     }
+    @JsonProperty("fromDate")
+    public Event setFromDate(Date fromDate) {
+        this.fromDate = fromDate;
+        return this;
+    }
     @JsonProperty("toDate")
-    public Event toDate(Date toDate) {
+    public Event setToDate(Date toDate) {
         this.toDate = toDate;
         return this;
     }
@@ -245,9 +251,6 @@ public class Event {
         this.creatorRef = creatorRef;
         return this;
     }
-
-
-
 }
 
 

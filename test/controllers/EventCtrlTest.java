@@ -2,7 +2,9 @@ package controllers;
 
 import com.mongodb.DB;
 import com.mongodb.Mongo;
+import models.Address;
 import models.Event;
+import models.Location;
 import models.User;
 import net.vz.mongodb.jackson.JacksonDBCollection;
 import org.codehaus.jackson.JsonNode;
@@ -12,6 +14,7 @@ import org.junit.Before;
 import org.junit.Test;
 import play.libs.WS;
 
+import java.io.IOException;
 import java.net.UnknownHostException;
 
 import static org.fest.assertions.Assertions.assertThat;
@@ -43,18 +46,51 @@ public class EventCtrlTest {
      * in this example we just check if the welcome page is being shown
      */
     @Test
-    public void test() {
+    public void testCreateWithErrors() {
         Event.collection = JacksonDBCollection.wrap(currentDataBase.getCollection("events"), Event.class, String.class);
         User.collection(JacksonDBCollection.wrap(currentDataBase.getCollection("users"), User.class, String.class));
 
         running(testServer(3333), new Runnable() {
             public void run() {
-                Event event = Event.event().setName("event").setCreator(User.user().setEmail("email@toto.com"));
+                Event event = Event.event().setCreator(User.user().setEmail("email@toto.com"));
                 ObjectMapper objectMapper = new ObjectMapper();
                 JsonNode node = objectMapper.convertValue(event, JsonNode.class);
                 WS.Response response = WS.url("http://localhost:3333/rest/events").post(node).get();
                 System.out.println(response.getStatus());
                 System.out.println(response.getBody());
+                JsonNode resp = objectMapper.convertValue(response.getBody(), JsonNode.class);
+                assertThat(response.getStatus()).isEqualTo(400);
+                assertThat(resp.get("name")).isNotEmpty();
+                assertThat(resp.get("address")).isNotEmpty();
+                assertThat(resp.get("creator.password")).isNotEmpty();
+                assertThat(resp.get("name")).isNotEmpty();
+            }
+        });
+    }
+
+    @Test
+    public void testCreateOk() {
+        Event.collection = JacksonDBCollection.wrap(currentDataBase.getCollection("events"), Event.class, String.class);
+        User.collection(JacksonDBCollection.wrap(currentDataBase.getCollection("users"), User.class, String.class));
+
+        running(testServer(3333), new Runnable() {
+            public void run() {
+                Event event = Event.event()
+                        .setName("the event").setCreator(User.user().setEmail("email@toto.com").setPassword("password"))
+                        .setAddress(Address.address().setDescription("somme address").setLocation(Location.location().setLng("55").setLat("56")));
+                ObjectMapper objectMapper = new ObjectMapper();
+                JsonNode node = objectMapper.convertValue(event, JsonNode.class);
+                WS.Response response = WS.url("http://localhost:3333/rest/events").post(node).get();
+                System.out.println(response.getStatus());
+                System.out.println(response.getBody());
+                JsonNode resp = null;
+                try {
+                    resp = objectMapper.readValue(response.getBody(), JsonNode.class);
+                } catch (IOException e) {}
+                assertThat(response.getStatus()).isEqualTo(200);
+                assertThat(resp.get("name").getTextValue()).isEqualTo(event.getName());
+                WS.Response read = WS.url("http://localhost:3333"+resp.get("link").get("href").getTextValue()).get().get();
+                assertThat(response.getStatus()).isEqualTo(OK);
             }
         });
     }

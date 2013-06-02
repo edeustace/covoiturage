@@ -2,8 +2,10 @@ package models;
 
 import models.enums.Locomotion;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.hibernate.validator.constraints.Email;
 
 import javax.validation.Valid;
@@ -17,6 +19,9 @@ import javax.validation.constraints.NotNull;
  * To change this template use File | Settings | File Templates.
  */
 public class Subscriber {
+
+    @JsonIgnore
+    private static ObjectMapper objectMapper = new ObjectMapper();
 
     private String userRef;
 
