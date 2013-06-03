@@ -21,7 +21,7 @@ public class UserModelLight {
     public UserModelLight(User user) {
         this.user = user;
         if(user!=null){
-            String link = controllers.routes.UserCtrl.getUser(user.id()).toString();
+            String link = controllers.routes.UserCtrl.getUser(user.getId()).toString();
             this.link = Link.link(Link.SELF, link);
         }
     }
@@ -34,7 +34,7 @@ public class UserModelLight {
     @Id
     @ObjectId
     public User id(String id) {
-        return user.id(id);
+        return user.getId(id);
     }
 
     @JsonProperty("email")

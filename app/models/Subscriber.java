@@ -2,7 +2,6 @@ package models;
 
 import models.enums.Locomotion;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -23,10 +22,13 @@ public class Subscriber {
     @JsonIgnore
     private static ObjectMapper objectMapper = new ObjectMapper();
 
+    private String id;
+
     private String userRef;
 
-    @JsonIgnore
+    @JsonIgnore @NotNull @Valid
     private User user;
+
     @JsonIgnore
     private String name;
     @JsonIgnore
@@ -73,6 +75,9 @@ public class Subscriber {
     @Override
     public boolean equals(Object obj) {
         if(obj instanceof Subscriber){
+            if(this.id!=null && ((Subscriber) obj).getId()!=null){
+                return this.id.equals(((Subscriber)obj).getId());
+            }
             if(this.email==null){
                 return false;
             }
@@ -91,29 +96,36 @@ public class Subscriber {
     }
 
     public void saveUser(){
-        if(this.user()!=null && !this.user().isEmpty() && this.user().id()==null){
-            this.user().save();
-        } else if(this.user()==null || this.user().isEmpty()){
-            this.setUser(User.user().setAddress(getAddress()).setName(getName()).setSurname(getSurname()).setEmail(getEmail())).user().save();
+        if(this.getUser()!=null && !this.getUser().isEmpty() && this.getUser().getId()==null){
+            this.getUser().save();
+        } else if(this.getUser()==null || this.getUser().isEmpty()){
+            this.setUser(User.user().setAddress(getAddress()).setName(getName()).setSurname(getSurname()).setEmail(getEmail())).getUser().save();
         }
-        this.setUserRef(this.user().id());
+        this.setUserRef(this.getUser().getId());
     }
 
-
-    public User user() {
-        if(this.user!=null && !user.isEmpty()){
-            return user;
-        }else if (this.userRef!=null && this.userRef!=null){
+    @JsonProperty("user")
+    public User getUser() {
+        if (this.userRef!=null && this.userRef!=null){
             this.user = User.findById(this.userRef);
         }
         return user;
     }
 
+    @JsonProperty("user")
     public Subscriber setUser(User user) {
         this.user = user;
         return this;
     }
 
+    @JsonProperty("id")
+    public String getId() {
+        return id;
+    }
+    @JsonProperty("id")
+    public void setId(String id) {
+        this.id = id;
+    }
     @JsonProperty("userRef")
     public String getUserRef() {
         return userRef;

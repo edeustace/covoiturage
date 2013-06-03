@@ -1,12 +1,12 @@
 package models;
 
 import java.io.IOException;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashSet;
+import java.util.*;
 
 import javax.persistence.Id;
+import javax.validation.ConstraintViolation;
 import javax.validation.Valid;
+import javax.validation.Validator;
 import javax.validation.constraints.NotNull;
 
 import net.vz.mongodb.jackson.JacksonDBCollection;
@@ -20,6 +20,7 @@ import org.codehaus.jackson.annotate.JsonProperty;
 
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.ObjectReader;
+import play.data.validation.Validation;
 import play.modules.mongodb.jackson.MongoDB;
 
 @MongoCollection(name="events")
@@ -49,7 +50,8 @@ public class Event {
     @NotNull @Valid
     private Address address;
 
-    private Collection<Subscriber> subscribers = new HashSet<Subscriber>();
+    @Valid @NotNull
+    private Collection<Subscriber> subscribers = new ArrayList<Subscriber>();
 
     private String creatorRef;
 
@@ -59,11 +61,6 @@ public class Event {
     //STATIC
     public static Event read(String id){
         return collection.findOneById(id);
-    }
-
-    public static Event insert(JsonNode node){
-        Event event = objectMapper.convertValue(node, Event.class);
-        return event.save();
     }
 
     public static Event event(){
@@ -103,16 +100,29 @@ public class Event {
 
     private void persistOrLoadCreatorAndCreateRef(){
         if(creator!=null){
-            if(creator.id()==null){
+            if(creator.getId()==null){
                 creator.save();
             }
-            creatorRef = creator.id();
+            creatorRef = creator.getId();
         }
     }
 
     private void persistUsersOnSubscribers(){
+        int maxId = 0;
         for(Subscriber subscriber : getSubscribers()){
             subscriber.saveUser();
+            if(subscriber.getId()!=null){
+                Integer id = Integer.valueOf(subscriber.getId());
+                if(id>maxId){
+                     maxId = id;
+                }
+            }
+        }
+        for(Subscriber subscriber : getSubscribers()){
+            if(subscriber.getId()==null){
+                subscriber.setId(String.valueOf(maxId));
+                maxId++;
+            }
         }
     }
 
@@ -151,13 +161,13 @@ public class Event {
         return subscribers;
     }
 
-    public Event addSubscriber(Subscriber subscriber){
+    public Event addSubscriber(@Valid Subscriber subscriber){
         if(!subscribers.contains(subscriber)){
             subscribers.add(subscriber);
         }
         return this;
     }
-    public Event addAndMergeSubscriber(Subscriber subscriber){
+    public Event addAndMergeSubscriber(@Valid Subscriber subscriber){
         if(!subscribers.contains(subscriber)){
             subscribers.add(subscriber);
         }else{
@@ -170,7 +180,7 @@ public class Event {
         }
         return this;
     }
-    public Event addAndReplaceSubscriber(Subscriber subscriber){
+    public Event addAndReplaceSubscriber(@Valid Subscriber subscriber){
         if(!subscribers.contains(subscriber)){
             subscribers.add(subscriber);
         }else{

@@ -41,9 +41,9 @@ public class UserIntegrationTest {
                 User.collection(JacksonDBCollection.wrap(currentDataBase.getCollection("users"), User.class, String.class));
 
                 User user = User.user().setName("a getName").save();
-                assertThat(user.id()).isNotNull();
+                assertThat(user.getId()).isNotNull();
 
-                User userFromDb = User.findById(user.id());
+                User userFromDb = User.findById(user.getId());
                 assertThat(userFromDb).isNotNull();
                 assertThat(userFromDb.getName()).isEqualTo(user.getName());
                 assertThat(userFromDb.getPassword()).isNull();

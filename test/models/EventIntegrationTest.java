@@ -70,10 +70,11 @@ public class EventIntegrationTest {
                 assertThat(evtFromDb.getDescription()).isNull();
                 assertThat(evtFromDb.getCreator().getEmail()).isEqualTo("toto@gmail.com");
                 assertThat(evtFromDb.getCreatorRef()).isNotNull();
-                assertThat(evtFromDb.getCreatorRef()).isEqualTo(evtFromDb.getCreator().id());
+                assertThat(evtFromDb.getCreatorRef()).isEqualTo(evtFromDb.getCreator().getId());
                 assertThat(evtFromDb.getSubscribers()).isNotNull();
                 assertThat(evtFromDb.getSubscribers().size()).isEqualTo(1);
                 Subscriber subscriber = evtFromDb.getSubscribers().iterator().next();
+                assertThat(subscriber.getId()).isNotNull();
                 assertThat(evtFromDb.getCreator().isEmpty()).isFalse();
                 assertThat(evtFromDb.getCreator().getEmail()).isEqualTo(event.getCreator().getEmail());
                 assertThat(evtFromDb.getCreator().getEmail()).isEqualTo(subscriber.getEmail());
@@ -108,6 +109,7 @@ public class EventIntegrationTest {
                 assertThat(evtFromDb.getSubscribers()).isNotNull();
                 assertThat(evtFromDb.getSubscribers().size()).isEqualTo(1);
                 Subscriber subscriber = evtFromDb.getSubscribers().iterator().next();
+                assertThat(subscriber.getId()).isNotNull();
                 assertThat(evtFromDb.getCreator()).isNotNull();
                 assertThat(evtFromDb.getCreator().getEmail()).isEqualTo(event.getCreator().getEmail());
                 assertThat(evtFromDb.getCreator().getEmail()).isEqualTo(subscriber.getEmail());
@@ -142,9 +144,10 @@ public class EventIntegrationTest {
                 boolean creatorFinded = false;
                 boolean subscFinded = false;
                 for(Subscriber subscriber : evtFromDb.getSubscribers()){
+                    assertThat(subscriber.getId()).isNotNull();
                     assertThat(subscriber.getUserRef()).isNotNull();
                     assertThat(User.findById(subscriber.getUserRef())).isNotNull();
-                    assertThat(subscriber.user().getEmail()).isEqualTo(subscriber.getEmail());
+                    assertThat(subscriber.getUser().getEmail()).isEqualTo(subscriber.getEmail());
                     if(subscriber.getEmail().equals("toto@gmail.com")){
                         creatorFinded = true;
                     }else if(subscriber.getEmail().equals("subs@test.com")){
@@ -188,9 +191,10 @@ public class EventIntegrationTest {
                 boolean creatorFinded = false;
                 boolean subscFinded = false;
                 for(Subscriber subscriber : evtFromDb.getSubscribers()){
+                    assertThat(subscriber.getId()).isNotNull();
                     assertThat(subscriber.getUserRef()).isNotNull();
                     assertThat(User.findById(subscriber.getUserRef())).isNotNull();
-                    assertThat(subscriber.user().getEmail()).isEqualTo(subscriber.getEmail());
+                    assertThat(subscriber.getUser().getEmail()).isEqualTo(subscriber.getEmail());
                     if(subscriber.getEmail().equals("toto@gmail.com")){
                         creatorFinded = true;
                     }else if(subscriber.getEmail().equals("subs@test.com")){
@@ -229,7 +233,7 @@ public class EventIntegrationTest {
                 assertThat(evtFromDb.getSubscribers().size()).isEqualTo(1);
                 Subscriber subscriber = evtFromDb.getSubscribers().iterator().next();
                 assertThat(subscriber.getUserRef()).isNotNull();
-                assertThat(subscriber.user().getEmail()).isEqualTo(subsc.getEmail());
+                assertThat(subscriber.getUser().getEmail()).isEqualTo(subsc.getEmail());
                 assertThat(subscriber.getLocomotion()).isEqualTo(subsc2.getLocomotion());
                 assertThat(subscriber.getAddress().getDescription()).isEqualTo(subsc.getAddress().getDescription());
             }
@@ -255,8 +259,9 @@ public class EventIntegrationTest {
                 Event evtFromDb = Event.read(event.getId());
                 assertThat(evtFromDb.getSubscribers().size()).isEqualTo(1);
                 Subscriber subscriber = evtFromDb.getSubscribers().iterator().next();
+                assertThat(subscriber.getId()).isNotNull();
                 assertThat(subscriber.getUserRef()).isNotNull();
-                assertThat(subscriber.user().getEmail()).isEqualTo(subscriber.getEmail());
+                assertThat(subscriber.getUser().getEmail()).isEqualTo(subscriber.getEmail());
                 assertThat(subscriber.getLocomotion()).isEqualTo(subsc2.getLocomotion());
                 assertThat(subscriber.getAddress()).isNull();
             }
@@ -266,7 +271,7 @@ public class EventIntegrationTest {
     private void validateSubscriber(Subscriber subscriber, Subscriber expected){
         assertThat(subscriber.getUserRef()).isNotNull();
         assertThat(User.findById(subscriber.getUserRef())).isNotNull();
-        assertThat(subscriber.user().getEmail()).isEqualTo(expected.getEmail());
+        assertThat(subscriber.getUser().getEmail()).isEqualTo(expected.getEmail());
         assertThat(subscriber.getLocomotion()).isEqualTo(expected.getLocomotion());
         assertThat(subscriber.getAddress()).isEqualTo(expected);
     }

@@ -58,18 +58,18 @@ public class SubscriberCtrlTest {
                         .setAddress(Address.address()
                                 .setDescription("somewhere")
                                 .setLocation(Location.location().setLat("123").setLng("456")))
-                        .setEmail("adelegue@hotmail.com").setLocomotion(Locomotion.CAR).setUser(User.user().setEmail("adelegue@hotmail.com"));
+                        .setEmail("adelegue@hotmail.com").setLocomotion(Locomotion.CAR).setUser(User.user().setEmail("adelegue@hotmail.com").setPassword("password"));
                 ObjectMapper objectMapper = new ObjectMapper();
                 JsonNode node = objectMapper.convertValue(subscriber, JsonNode.class);
                 WS.Response response = WS.url("http://localhost:3333/rest/events/"+event.getId()+"/subscribers").post(node).get();
-                System.out.println(response.getBody());
+                //System.out.println(response.getBody());
                 JsonNode resp = null;
                 try {
                     resp = objectMapper.readValue(response.getBody(), JsonNode.class);
                 } catch (IOException e) {}
                 assertThat(response.getStatus()).isEqualTo(OK);
                 WS.Response read = WS.url("http://localhost:3333/rest/events/"+event.getId()).get().get();
-                System.out.println(read.getBody());
+                //System.out.println(read.getBody());
                 assertThat(response.getStatus()).isEqualTo(OK);
             }
         });

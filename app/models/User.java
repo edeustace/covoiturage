@@ -3,14 +3,18 @@ package models;
 import javax.persistence.Id;
 import javax.validation.constraints.NotNull;
 
-import net.vz.mongodb.jackson.JacksonDBCollection;
-import net.vz.mongodb.jackson.MongoCollection;
-import net.vz.mongodb.jackson.ObjectId;
-import net.vz.mongodb.jackson.WriteResult;
+import models.validators.UniqueEmail;
+import net.vz.mongodb.jackson.*;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.hibernate.validator.constraints.Email;
+import play.data.validation.Validation;
+import play.data.validation.ValidationError;
 import play.modules.mongodb.jackson.MongoDB;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 @MongoCollection(name="users")
 public class User {
@@ -28,7 +32,7 @@ public class User {
 
 	private String id;
 
-    @NotNull @Email
+    @NotNull @Email @UniqueEmail
     private String email;
 
     @NotNull
@@ -70,9 +74,24 @@ public class User {
         }
     }
 
+    public User save(){
+        WriteResult<User, String> result = collection().save(this);
+        this.id = result.getSavedObject().id;
+        return this;
+    }
+
+    public static User findById(String id){
+        return collection().findOneById(id);
+    }
+
+    public static Boolean isUserWithEmailExists(String email){
+        DBCursor<User> cursor = collection().find(DBQuery.is("email",email));
+        return cursor.hasNext();
+    }
+
     @Id
     @ObjectId
-    public String id() {
+    public String getId() {
         return id;
     }
 
@@ -82,7 +101,7 @@ public class User {
 
     @Id
     @ObjectId
-    public User id(String id) {
+    public User getId(String id) {
         this.id = id;
         return this;
     }
@@ -133,13 +152,5 @@ public class User {
         return this;
     }
 
-    public User save(){
-    	WriteResult<User, String> result = collection().save(this);
-        this.id = result.getSavedObject().id;
-    	return this;
-    }
 
-    public static User findById(String id){
-        return collection().findOneById(id);
-    }
 }

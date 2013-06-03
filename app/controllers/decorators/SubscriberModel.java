@@ -22,7 +22,7 @@ public class SubscriberModel {
 
     @JsonProperty("user")
     public UserModelLight getUser() {
-        return new UserModelLight(subscriber.user());
+        return new UserModelLight(subscriber.getUser());
     }
 
     @JsonProperty("name")

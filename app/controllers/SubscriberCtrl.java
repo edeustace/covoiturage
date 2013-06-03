@@ -35,9 +35,6 @@ public class SubscriberCtrl extends Controller {
 
     @BodyParser.Of(BodyParser.Json.class)
     public static Result createSubscriber(String id){
-        Http.RequestBody body = request().body();
-        JsonNode node = body.asJson();
-
         Form<Subscriber> form = subscriberForm.bindFromRequest();
         if(form.hasErrors()){
             return badRequest(form.errorsAsJson()).as("application/json");
