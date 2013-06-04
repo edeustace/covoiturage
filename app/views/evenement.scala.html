@@ -37,7 +37,7 @@
 			</h2>
 			<p class="text-center">{{event.description}}</p>
 			<address>
-			  {{event.address}}
+			  {{event.address.description}}
 			</address>
 			<br/>
 			
@@ -53,7 +53,7 @@
 			      	   <tr ng-repeat="subscriber in subscribers | auto:filterUsers:markers ">
 					<td>{{subscriber.name}}</td>
 					<td>{{subscriber.surname}}</td>
-					<td>{{subscriber.address}}</td>
+					<td>{{subscriber.address.description}}</td>
 					<td><img src="{{subscriber.picto}}" /></td>
 				   </tr>
 				</table>

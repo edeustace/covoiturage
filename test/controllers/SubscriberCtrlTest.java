@@ -61,7 +61,7 @@ public class SubscriberCtrlTest {
                         .setEmail("adelegue@hotmail.com").setLocomotion(Locomotion.CAR).setUser(User.user().setEmail("adelegue@hotmail.com").setPassword("password"));
                 ObjectMapper objectMapper = new ObjectMapper();
                 JsonNode node = objectMapper.convertValue(subscriber, JsonNode.class);
-                WS.Response response = WS.url("http://localhost:3333/rest/events/"+event.getId()+"/subscribers").post(node).get();
+                WS.Response response = WS.url("http://localhost:3333/rest/events/"+event.getId()+"/subscribers/").post(node).get();
                 //System.out.println(response.getBody());
                 JsonNode resp = null;
                 try {

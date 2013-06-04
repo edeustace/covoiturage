@@ -12,11 +12,20 @@ function EventCreationCtrl($scope, $http) {
 		//$scope.evenement.subscriber = [];
 		//$scope.creator.creator = true;
 		//$scope.evenement.subscriber.push($scope.creator);
-		var data = $scope.evenement;
-		$http.post('/rest/events', data).success(function(data){
+		var theEvent = $scope.event;
+		$http.post('/rest/events', theEvent).success(function(data){
 			alert('done '+data.name);
 		}).error(function(data){
-			alert('error '+data);
+		    var msg = '';
+            if(data.errors){
+                var someErrors = data.errors;
+                for(var anError in someErrors){
+                    msg += anError + ' : '+someErrors[anError]+'<br/>';
+                }
+                alert(msg);
+            }else{
+                alert('error '+data);
+            }
 		});
 	}
 }

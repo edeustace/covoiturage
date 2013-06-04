@@ -5,7 +5,7 @@
 # Home page
 GET     /                           controllers.Application.index()
 #PAGES
-GET     /evenement                            controllers.EventCtrl.evenement
+GET     /evenement/:id                            controllers.EventCtrl.evenement(id: String)
 GET     /evenement/creation                   controllers.EventCtrl.evenementCreation
 #GET     /evenement/:id/abonnement             controllers.EventCtrl.evenementCreation
 
@@ -20,7 +20,6 @@ DELETE  /rest/events/:id                   controllers.EventCtrl.deleteEvent(id 
 GET     /rest/events/:id/subscribers/              controllers.SubscriberCtrl.list(id :String)
 GET     /rest/events/:id/subscribers/:idSub       controllers.SubscriberCtrl.getSubscriber(id :String, idSub :String)
 POST    /rest/events/:id/subscribers/              controllers.SubscriberCtrl.createSubscriber(id :String)
-PUT     /rest/events/:id/subscribers/              controllers.SubscriberCtrl.updateSubscriber(id :String)
 PUT     /rest/events/:id/subscribers/:idSub       controllers.SubscriberCtrl.updateSubscriber(id :String, idSub :String)
 DELETE  /rest/events/:id/subscribers/:idSub       controllers.SubscriberCtrl.deleteSubscriber(id :String, idSub :String)
 

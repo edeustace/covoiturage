@@ -9,6 +9,7 @@ import javax.validation.Valid;
 import javax.validation.Validator;
 import javax.validation.constraints.NotNull;
 
+import models.validators.EmailAlreadyUsed;
 import net.vz.mongodb.jackson.JacksonDBCollection;
 import net.vz.mongodb.jackson.MongoCollection;
 import net.vz.mongodb.jackson.ObjectId;
@@ -55,12 +56,12 @@ public class Event {
 
     private String creatorRef;
 
-    @JsonIgnore @NotNull @Valid
+    @JsonIgnore @NotNull @EmailAlreadyUsed @Valid
     private User creator;
 
     //STATIC
     public static Event read(String id){
-        return collection.findOneById(id);
+        return collection().findOneById(id);
     }
 
     public static Event event(){
@@ -73,6 +74,35 @@ public class Event {
         event = updater.readValue(node);
         event.save();
         return event;
+    }
+
+    public void merge(Event event){
+        if(event.getName()==null){
+            this.setName(event.getName());
+        }
+        if(event.getDescription()==null){
+            this.setDescription(event.getDescription());
+        }
+        if(event.getFromDate()==null){
+            this.setFromDate(event.getFromDate());
+        }
+        if(event.getToDate()==null){
+            this.setToDate(event.getToDate());
+        }
+        if(event.getAddress()!=null && !event.getAddress().empty()){
+            if(this.getAddress()==null){
+                this.setAddress(Address.address());
+            }
+            this.getAddress().merge(event.getAddress());
+        }
+        if(event.getCreatorRef()!=null){
+            this.setCreatorRef(event.getCreatorRef());
+        }
+        if(event.getSubscribers()!=null && !event.getSubscribers().isEmpty()){
+            for(Subscriber subscriber : event.getSubscribers()){
+                this.addAndMergeSubscriber(subscriber);
+            }
+        }
     }
 
     public static ObjectMapper objectMapper = new ObjectMapper();
@@ -180,6 +210,25 @@ public class Event {
         }
         return this;
     }
+
+    public Subscriber getSubscriberByMail(String email){
+        for(Subscriber subscriber : subscribers){
+            if(subscriber.getEmail()!=null && subscriber.getEmail().equals(email)){
+                return subscriber;
+            }
+        }
+        return null;
+    }
+
+    public Subscriber getSubscriberById(String id){
+        for(Subscriber subscriber : subscribers){
+            if(subscriber.getId()!=null && subscriber.getId().equals(id)){
+                return subscriber;
+            }
+        }
+        return null;
+    }
+
     public Event addAndReplaceSubscriber(@Valid Subscriber subscriber){
         if(!subscribers.contains(subscriber)){
             subscribers.add(subscriber);

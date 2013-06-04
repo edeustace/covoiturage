@@ -16,8 +16,19 @@ public class SubscriberModel {
 
     private Subscriber subscriber;
 
-    public SubscriberModel(Subscriber subscriber) {
+    private Link link;
+
+    public SubscriberModel(Subscriber subscriber, String idEvent) {
         this.subscriber = subscriber;
+        if(subscriber!=null){
+            String link = controllers.routes.SubscriberCtrl.getSubscriber(idEvent, subscriber.getId()).toString();
+            this.link = Link.link(Link.SELF, link);
+        }
+    }
+
+    @JsonProperty("link")
+    public Link getLink() {
+        return link;
     }
 
     @JsonProperty("user")

@@ -29,7 +29,7 @@ app.directive('googleplace', function() {
 					function() {
 						scope.$apply(function() {
 							var address = {
-								address : '',
+								description : '',
 								location : {
 									lat : '',
 									lng : ''
@@ -39,10 +39,10 @@ app.directive('googleplace', function() {
 							if (!place && !place.geometry) {
 								// Inform the user that a place was not
 								// found and return.
-								address.address = null;
+								address.description = null;
 							}
 							var loc = place.geometry.location;
-							address.address = element.val();
+							address.description = element.val();
 							if(loc){
 								address.location.lat = loc.lat();
 								address.location.lng = loc.lng();

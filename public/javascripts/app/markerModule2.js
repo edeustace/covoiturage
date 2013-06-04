@@ -51,8 +51,8 @@ angular.module('markerModule', [], function($provide){
 		currentScope.markers.push(marker);		
 	},
 	getEventMarker : function(event){
-		currentScope.center = event.location;
-		var marker = {type:"EVENT", latitude:event.location.lat, longitude:event.location.lng, icon: icons["EVENT"], visible:true};
+		currentScope.center = event.address.location;
+		var marker = {type:"EVENT", latitude:event.address.location.lat, longitude:event.address.location.lng, icon: icons["EVENT"], visible:true};
 		return marker;
 	}, 	
 	placeCurrentEvent : function(){
@@ -60,7 +60,7 @@ angular.module('markerModule', [], function($provide){
 	}, 
 	getSubscriberMarker: function(subscriber){
 		//subscriber.picto = icons[subscriber.type];
-		var marker = {type:subscriber.type, latitude:subscriber.location.lat, longitude:subscriber.location.lng, icon: icons[subscriber.type], visible:true};
+		var marker = {type:subscriber.type, latitude:subscriber.address.location.lat, longitude:subscriber.address.location.lng, icon: icons[subscriber.type], visible:true};
 		marker.type = subscriber.type;                                 
 		marker.event = event;
 		return marker;

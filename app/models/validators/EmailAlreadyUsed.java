@@ -8,10 +8,10 @@ import javax.validation.*;
 
 @Target({FIELD})
 @Retention(RUNTIME)
-@Constraint(validatedBy = UniqueEmailValidator.class)
+@Constraint(validatedBy = EmailAlreadyUsedValidator.class)
 @play.data.Form.Display(name="constraint.uniqueemail")
-public @interface UniqueEmail {
-    String message() default UniqueEmailValidator.message;
+public @interface EmailAlreadyUsed {
+    String message() default EmailAlreadyUsedValidator.message;
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
 }

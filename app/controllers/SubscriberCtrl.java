@@ -30,43 +30,72 @@ public class SubscriberCtrl extends Controller {
     private static Form<Subscriber> subscriberForm = form(Subscriber.class);
 
     public static Result getSubscriber(String id, String idSub){
-        return ok().as("application/json");
-    }
-
-    @BodyParser.Of(BodyParser.Json.class)
-    public static Result createSubscriber(String id){
-        Form<Subscriber> form = subscriberForm.bindFromRequest();
-        if(form.hasErrors()){
-            return badRequest(form.errorsAsJson()).as("application/json");
-        } else {
-            Subscriber subscriber = form.get();
+        try{
             Event event = Event.read(id);
-            event.addSubscriber(subscriber);
-            event.save();
-            return ok().as("application/json");
-        }
-    }
-
-    public static Result list(String id){
-        Event event = Event.read(id);
-        Collection<Subscriber> subscribers = event.getSubscribers();
-        Collection<SubscriberModel> models = new ArrayList<SubscriberModel>();
-        for(Subscriber subscriber : subscribers){
-            models.add(new SubscriberModel(subscriber));
-        }
-        try {
-            return ok(objectMapper.writeValueAsString(models)).as("application/json");
-        } catch (IOException e) {
+            Subscriber subsc = event.getSubscriberById(id);
+            SubscriberModel subscriberModel = new SubscriberModel(subsc, event.getId());
+            return ok(objectMapper.writeValueAsString(subscriberModel)).as("application/json");
+        } catch (Exception e){
             return internalServerError().as("application/json");
         }
     }
 
-    public static Result updateSubscriber(String id){
-        return ok().as("application/json");
+    @BodyParser.Of(BodyParser.Json.class)
+    public static Result createSubscriber(String id){
+        try{
+            Form<Subscriber> form = subscriberForm.bindFromRequest();
+            if(form.hasErrors()){
+                return badRequest(form.errorsAsJson()).as("application/json");
+            } else {
+                Subscriber subscriber = form.get();
+                Event event = Event.read(id);
+                event.addSubscriber(subscriber);
+                event.save();
+                Subscriber subsc = event.getSubscriberByMail(subscriber.getEmail());
+                SubscriberModel subscriberModel = new SubscriberModel(subsc, event.getId());
+                return ok(objectMapper.writeValueAsString(subscriberModel)).as("application/json");
+            }
+        } catch (Exception e){
+            return internalServerError().as("application/json");
+        }
     }
 
+    @BodyParser.Of(BodyParser.Json.class)
     public static Result updateSubscriber(String id, String idSub){
-        return ok().as("application/json");
+        try{
+            Form<Subscriber> form = subscriberForm.bindFromRequest();
+            if(form.hasErrors()){
+                return badRequest(form.errorsAsJson()).as("application/json");
+            } else {
+                Subscriber subscriber = form.get();
+                Event event = Event.read(id);
+                if(event.getSubscriberById(idSub)==null){
+                    //Subscriber not exist
+                    return badRequest("Subscriber not exist").as("application/json");
+                }
+                event.addAndMergeSubscriber(subscriber);
+                event.save();
+                Subscriber subsc = event.getSubscriberByMail(subscriber.getEmail());
+                SubscriberModel subscriberModel = new SubscriberModel(subsc, event.getId());
+                return ok(objectMapper.writeValueAsString(subscriberModel)).as("application/json");
+            }
+        } catch (Exception e){
+            return internalServerError().as("application/json");
+        }
+    }
+
+    public static Result list(String id){
+        try {
+            Event event = Event.read(id);
+            Collection<Subscriber> subscribers = event.getSubscribers();
+            Collection<SubscriberModel> models = new ArrayList<SubscriberModel>();
+            for(Subscriber subscriber : subscribers){
+                models.add(new SubscriberModel(subscriber, id));
+            }
+            return ok(objectMapper.writeValueAsString(models)).as("application/json");
+        } catch (IOException e) {
+            return internalServerError().as("application/json");
+        }
     }
 
     public static Result deleteSubscriber(String id, String idSub){

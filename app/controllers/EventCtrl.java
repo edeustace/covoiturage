@@ -1,10 +1,7 @@
 package controllers;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 import controllers.decorators.Link;
 import controllers.decorators.SubscriberModel;
@@ -36,7 +33,7 @@ public class EventCtrl extends Controller {
 		return ok();
 	}
 
-	public static Result evenement() {
+	public static Result evenement(String id) {
 		return ok(evenement.render());
 	}
 
@@ -58,7 +55,7 @@ public class EventCtrl extends Controller {
 		try{
             Form<Event> form = eventForm.bindFromRequest();
             if(form.hasErrors()){
-                return badRequest(form.errorsAsJson()).as("application/json");
+                return buildErrors(form);
             } else {
                 Event event = form.get().save();
                 String link = controllers.routes.EventCtrl.getEvent(event.getId()).toString();
@@ -72,16 +69,38 @@ public class EventCtrl extends Controller {
 
     @BodyParser.Of(BodyParser.Json.class)
 	public static Result updateEvent(String id) throws IOException {
-        RequestBody body = request().body();
-        JsonNode node = body.asJson();
-        Event event = Event.update(id, node);
-        return ok(objectMapper.writeValueAsString(event)).as("application/json");
+        try{
+            Form<Event> form = eventForm.bindFromRequest();
+            if(form.hasErrors()){
+                return buildErrors(form);
+            } else {
+                Event event = form.get();
+                Event eventInDb = Event.read(id);
+                eventInDb.merge(event);
+                eventInDb.save();
+                String link = controllers.routes.EventCtrl.getEvent(eventInDb.getId()).toString();
+                LigthEvent responseBody = new LigthEvent(eventInDb, Link.link(Link.SELF, link));
+                return ok(objectMapper.writeValueAsString(responseBody)).as("application/json");
+            }
+        }catch (Exception e){
+            return internalServerError().as("application/json");
+        }
 	}
 
 	public static Result deleteEvent(String id) {
 		String json = "{message:toto}";
 		return ok(json).as("application/json");
 	}
+
+    private static Result buildErrors(Form<?> form){
+        try{
+            Map<String, Object> errors = new HashMap<String, Object>();
+            errors.put("errors", form.errorsAsJson());
+            return badRequest(objectMapper.writeValueAsString(errors)).as("application/json");
+        }catch (Exception e){
+            return internalServerError().as("application/json");
+        }
+    }
 
     public static class EventModel{
         private Event event;
@@ -135,7 +154,7 @@ public class EventCtrl extends Controller {
         public Collection<SubscriberModel> getSubscribers() {
             Collection<SubscriberModel> models = new ArrayList<SubscriberModel>();
             for(Subscriber subscriber : event.getSubscribers()){
-                SubscriberModel model = new SubscriberModel(subscriber);
+                SubscriberModel model = new SubscriberModel(subscriber, this.event.getId());
                 models.add(model);
             }
             return models;

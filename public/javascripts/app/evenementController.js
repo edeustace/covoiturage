@@ -5,20 +5,25 @@
 
 /* Controllers */
 
-function EventCtrl($scope, $http, marker) {
+function EventCtrl($scope, $http, marker, $location) {
+    function extractFromUrl(url){
+        var index = url.lastIndexOf("/")
+        return url.substring(index+1, url.length);
+    }
     marker.initMaps($scope);
-    $http.get('/app/evenement/data.json').success(function(data) {
-	    if(data && data.event){
-	       $scope.event = data.event;
+    var id = extractFromUrl($location.absUrl());
+    $http.get('/rest/events/'+id).success(function(event) {
+	    if(event){
+	       $scope.event = event;
 	       marker.reinitMarker();
-	       if(data.event){
-		        marker.recordEvent(data.event);
+	       if(event){
+		        marker.recordEvent(event);
 	       }
-	       if(data.event.subscribers){
-			$scope.subscribers = data.event.subscribers;
-			var length = data.event.subscribers.length;
+	       if(event.subscribers){
+			$scope.subscribers = event.subscribers;
+			var length = event.subscribers.length;
 	       	 	for(var i=0; i<length; i++){
-				var subscriber = data.event.subscribers[i];
+				var subscriber = event.subscribers[i];
 				if(subscriber.type && subscriber.type==="CAR"){
 					subscriber.picto = marker.pictoAuto;
 				}else if(subscriber.type && subscriber.type==="STOP"){

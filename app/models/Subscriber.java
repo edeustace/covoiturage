@@ -1,6 +1,7 @@
 package models;
 
 import models.enums.Locomotion;
+import models.validators.EmailAlreadyUsed;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
@@ -26,7 +27,7 @@ public class Subscriber {
 
     private String userRef;
 
-    @JsonIgnore @NotNull @Valid
+    @JsonIgnore @EmailAlreadyUsed @NotNull @Valid
     private User user;
 
     @JsonIgnore

@@ -12,13 +12,13 @@ import javax.validation.ConstraintValidator;
  * Time: 22:10
  * To change this template use File | Settings | File Templates.
  */
-public class UniqueEmailValidator extends play.data.validation.Constraints.Validator<Object>
-        implements ConstraintValidator<UniqueEmail, Object> {
+public class EmailAlreadyUsedValidator extends play.data.validation.Constraints.Validator<Object>
+        implements ConstraintValidator<EmailAlreadyUsed, Object> {
     /* Default error message */
     final static public String message = "error.uniqueemail";
 
     @Override
-    public void initialize(UniqueEmail uniqueEmailValidator) {
+    public void initialize(EmailAlreadyUsed uniqueEmailValidator) {
         //To change body of implemented methods use File | Settings | File Templates.
     }
 
@@ -28,8 +28,21 @@ public class UniqueEmailValidator extends play.data.validation.Constraints.Valid
             String email = (String)o;
             Boolean exists = User.isUserWithEmailExists(email);
             return !exists;
+        }else if(o instanceof User){
+            User user = (User)o;
+            if(user.getEmail()!=null) {
+                if(user.getId()!=null){
+                    User userInDB = User.getUserwithEmail(user.getEmail());
+                    return userInDB.getId().equals(user.getId());
+                }else {
+                    Boolean exists = User.isUserWithEmailExists(user.getEmail());
+                    return !exists;
+                }
+            }else{
+                return true;
+            }
         }
-        return false;  //To change body of implemented methods use File | Settings | File Templates.
+        return true;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override

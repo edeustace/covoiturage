@@ -3,18 +3,12 @@ package models;
 import javax.persistence.Id;
 import javax.validation.constraints.NotNull;
 
-import models.validators.UniqueEmail;
+import models.validators.EmailAlreadyUsed;
 import net.vz.mongodb.jackson.*;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.hibernate.validator.constraints.Email;
-import play.data.validation.Validation;
-import play.data.validation.ValidationError;
 import play.modules.mongodb.jackson.MongoDB;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 
 @MongoCollection(name="users")
 public class User {
@@ -32,7 +26,7 @@ public class User {
 
 	private String id;
 
-    @NotNull @Email @UniqueEmail
+    @NotNull @Email
     private String email;
 
     @NotNull
@@ -87,6 +81,11 @@ public class User {
     public static Boolean isUserWithEmailExists(String email){
         DBCursor<User> cursor = collection().find(DBQuery.is("email",email));
         return cursor.hasNext();
+    }
+
+    public static User getUserwithEmail(String email){
+        User user = collection().findOne(DBQuery.is("email",email));
+        return user;
     }
 
     @Id

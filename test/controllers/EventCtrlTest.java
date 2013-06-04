@@ -86,13 +86,13 @@ public class EventCtrlTest {
                 ObjectMapper objectMapper = new ObjectMapper();
                 JsonNode node = objectMapper.convertValue(event, JsonNode.class);
                 WS.Response response = WS.url("http://localhost:3333/rest/events").post(node).get();
+                //System.out.println(response.getBody());
                 JsonNode resp = null;
                 try {
                     resp = objectMapper.readValue(response.getBody(), JsonNode.class);
                 } catch (IOException e) {}
                 assertThat(response.getStatus()).isEqualTo(BAD_REQUEST);
-                assertThat(resp.get("creator.email")).isNotNull();
-
+                assertThat(resp.get("creator")).isNotNull();
             }
         });
     }
@@ -136,7 +136,7 @@ public class EventCtrlTest {
                 event.save();
                 WS.Response response = WS.url("http://localhost:3333/rest/events/"+event.getId()).get().get();
                 assertThat(response.getStatus()).isEqualTo(OK);
-                //System.out.println(response.getBody());
+                System.out.println(response.getBody());
             }
         });
     }
