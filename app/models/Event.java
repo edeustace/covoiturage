@@ -26,17 +26,8 @@ import play.modules.mongodb.jackson.MongoDB;
 
 @MongoCollection(name="events")
 public class Event {
-    public static JacksonDBCollection<Event, String> collection = null;
-    public static void collection(JacksonDBCollection<Event, String> collection) {
-        Event.collection = collection;
-    }
-    public static JacksonDBCollection<Event, String> collection(){
-        if(collection==null){
-            collection = MongoDB.getCollection(Event.class, String.class);
-        }
-        return collection;
-    }
 
+    ///////////    FIELDS  /////////////////////
     private String id;
 
     @NotNull
@@ -59,22 +50,7 @@ public class Event {
     @JsonIgnore @NotNull @EmailAlreadyUsed @Valid
     private User creator;
 
-    //STATIC
-    public static Event read(String id){
-        return collection().findOneById(id);
-    }
-
-    public static Event event(){
-        return new Event();
-    }
-
-    public static Event update(String id, JsonNode node) throws IOException {
-        Event event = read(id);
-        ObjectReader updater = objectMapper.readerForUpdating(event);
-        event = updater.readValue(node);
-        event.save();
-        return event;
-    }
+    ///////////  CLASS METHODS /////////////////
 
     public void merge(Event event){
         if(event.getName()==null){
@@ -104,8 +80,6 @@ public class Event {
             }
         }
     }
-
-    public static ObjectMapper objectMapper = new ObjectMapper();
 
     @JsonIgnore
     public Boolean isEmpty(){
@@ -144,7 +118,7 @@ public class Event {
             if(subscriber.getId()!=null){
                 Integer id = Integer.valueOf(subscriber.getId());
                 if(id>maxId){
-                     maxId = id;
+                    maxId = id;
                 }
             }
         }
@@ -156,10 +130,43 @@ public class Event {
         }
     }
 
-    public void update(){
-        collection().save(this);
+
+    //////////////////////////////////////////////
+    /////////        STATIC //////////////////////
+    //////////////////////////////////////////////
+    public static ObjectMapper objectMapper = new ObjectMapper();
+    public static JacksonDBCollection<Event, String> collection = null;
+
+    public static void collection(JacksonDBCollection<Event, String> collection) {
+        Event.collection = collection;
     }
-    //////SETTERS//////
+    public static JacksonDBCollection<Event, String> collection(){
+        if(collection==null){
+            collection = MongoDB.getCollection(Event.class, String.class);
+        }
+        return collection;
+    }
+
+    public static Event read(String id){
+        return collection().findOneById(id);
+    }
+
+    public static Event event(){
+        return new Event();
+    }
+
+    public static Event update(String id, JsonNode node) throws IOException {
+        Event event = read(id);
+        ObjectReader updater = objectMapper.readerForUpdating(event);
+        event = updater.readValue(node);
+        event.save();
+        return event;
+    }
+
+
+    //////////////////////////////////////////////
+    /////////  GETTERS AND SETTERS ///////////////
+    //////////////////////////////////////////////
     @Id
     @ObjectId
     public String getId() {

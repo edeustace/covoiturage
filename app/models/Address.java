@@ -6,15 +6,13 @@ import javax.validation.constraints.NotNull;
 
 public class Address {
 
+    ///////////    FIELDS  /////////////////////
     @NotNull
 	private String description;
     @NotNull
 	private Location location;
 
-    public static Address address() {
-        return new Address();
-    }
-
+    ///////////  CLASS METHODS /////////////////
     public void merge(Address other){
         if(!other.empty()){
             if(other.getDescription()!=null){
@@ -30,6 +28,16 @@ public class Address {
         return description==null && (location==null || location.isEmpty());
     }
 
+    //////////////////////////////////////////////
+    /////////        STATIC //////////////////////
+    //////////////////////////////////////////////
+    public static Address address() {
+        return new Address();
+    }
+
+    //////////////////////////////////////////////
+    /////////  GETTERS AND SETTERS ///////////////
+    //////////////////////////////////////////////
     @JsonProperty("description")
     public String getDescription() {
         return description;

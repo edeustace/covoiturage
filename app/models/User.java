@@ -3,15 +3,22 @@ package models;
 import javax.persistence.Id;
 import javax.validation.constraints.NotNull;
 
+import be.objectify.deadbolt.core.models.Subject;
+import com.feth.play.module.pa.providers.password.UsernamePasswordAuthUser;
+import com.feth.play.module.pa.user.*;
 import models.validators.EmailAlreadyUsed;
 import net.vz.mongodb.jackson.*;
+import net.vz.mongodb.jackson.ObjectId;
+import org.bson.types.*;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.hibernate.validator.constraints.Email;
 import play.modules.mongodb.jackson.MongoDB;
 
+import java.util.*;
+
 @MongoCollection(name="users")
-public class User {
+public class User implements Subject {
 	
 	private static JacksonDBCollection<User, String> collection = null;
 	public static void collection(JacksonDBCollection<User, String> collection){
@@ -24,7 +31,13 @@ public class User {
         return collection;
     }
 
-	private String id;
+    @Override
+    @JsonIgnore
+    public String getIdentifier() {
+        return id;
+    }
+
+    private String id;
 
     @NotNull @Email
     private String email;
@@ -38,6 +51,18 @@ public class User {
 
     private Address address;
 
+    private Boolean emailValidated;
+
+    private Boolean active;
+
+    private Date lastLogin;
+
+    private List<LinkedAccount> linkedAccounts = new ArrayList<LinkedAccount>();
+
+    private java.util.List<SecurityRole> roles = new ArrayList<SecurityRole>();
+
+    private java.util.List<UserPermission> permissions = new ArrayList<UserPermission>();
+
     @JsonIgnore
     public Boolean isEmpty(){
         return id==null && email == null &&
@@ -45,7 +70,7 @@ public class User {
                 surname == null && address==null;
     }
 
-    public void merge(User user){
+    public User merge(User user){
         if(user!= null && !user.isEmpty()){
             if(user.getEmail()!=null){
                 this.setEmail(user.getEmail());
@@ -66,12 +91,18 @@ public class User {
                 this.getAddress().merge(user.getAddress());
             }
         }
+        return this;
     }
 
     public User save(){
         WriteResult<User, String> result = collection().save(this);
         this.id = result.getSavedObject().id;
         return this;
+    }
+
+    public static User merge(final AuthUser oldUser, final AuthUser newUser) {
+        return User.findByAuthUserIdentity(oldUser).merge(
+                User.findByAuthUserIdentity(newUser));
     }
 
     public static User findById(String id){
@@ -86,6 +117,139 @@ public class User {
     public static User getUserwithEmail(String email){
         User user = collection().findOne(DBQuery.is("email",email));
         return user;
+    }
+
+    public static User create(final AuthUser authUser) {
+        final User user = User.user()
+                .setRoles(Collections.singletonList(SecurityRole.securityRole().setId((new org.bson.types.ObjectId()).toString())
+                        .setRoleName(controllers.Application.USER_ROLE)))
+        // user.permissions = new ArrayList<UserPermission>();
+        // user.permissions.add(UserPermission.findByValue("printers.edit"));
+                .setActive(true).setLastLogin(new Date())
+                .setLinkedAccounts(Collections.singletonList(LinkedAccount
+                        .create(authUser)));
+
+        if (authUser instanceof EmailIdentity) {
+            final EmailIdentity identity = (EmailIdentity) authUser;
+            // Remember, even when getting them from FB & Co., emails should be
+            // verified within the application as a security breach there might
+            // break your security as well!
+            user.setEmail(identity.getEmail())
+                    .setEmailValidated(false);
+
+        }
+
+        if (authUser instanceof NameIdentity) {
+            final NameIdentity identity = (NameIdentity) authUser;
+            final String name = identity.getName();
+            if (name != null) {
+                user.setName(name);
+            }
+        }
+
+        if (authUser instanceof FirstLastNameIdentity) {
+            final FirstLastNameIdentity identity = (FirstLastNameIdentity) authUser;
+            final String firstName = identity.getFirstName();
+            final String lastName = identity.getLastName();
+            if (firstName != null) {
+                user.setSurname(firstName);
+            }
+            if (lastName != null) {
+                user.setName(lastName);
+            }
+        }
+        user.save();
+        return user;
+    }
+
+    public static boolean existsByAuthUserIdentity(final AuthUserIdentity identity) {
+        if (identity instanceof UsernamePasswordAuthUser) {
+            User user = User.findByUsernamePasswordIdentity((UsernamePasswordAuthUser) identity);
+            return user!=null;
+        } else {
+            User user = User.findByAuthUserIdentity(identity);
+            return user!=null;
+        }
+    }
+
+    public static void addLinkedAccount(final AuthUser oldUser,
+                                        final AuthUser newUser) {
+        final User u = User.findByAuthUserIdentity(oldUser);
+        u.getLinkedAccounts().add(LinkedAccount.create(newUser));
+        u.save();
+    }
+
+    public void changePassword(final UsernamePasswordAuthUser authUser,
+                               final boolean create) {
+        LinkedAccount a = this.getAccountByProvider(authUser.getProvider());
+        if (a == null) {
+            if (create) {
+                a = LinkedAccount.create(authUser);
+            } else {
+                throw new RuntimeException(
+                        "Account not enabled for password usage");
+            }
+        }
+        a.setProviderUserId(authUser.getHashedPassword());
+        this.save();
+    }
+
+    public LinkedAccount getAccountByProvider(final String providerKey) {
+        for (LinkedAccount linkedAccount : getLinkedAccounts()){
+            if(linkedAccount.getProviderKey().equals(providerKey)){
+                return linkedAccount;
+            }
+        }
+        return null;
+    }
+
+    public void resetPassword(final UsernamePasswordAuthUser authUser,
+                              final boolean create) {
+        // You might want to wrap this into a transaction
+        this.changePassword(authUser, create);
+        TokenAction.deleteByUser(this, TokenAction.Type.PASSWORD_RESET);
+    }
+
+    @JsonIgnore
+    public Set<String> getProviders() {
+        final Set<String> providerKeys = new HashSet<String>(
+                linkedAccounts.size());
+        for (final LinkedAccount acc : linkedAccounts) {
+            providerKeys.add(acc.getProviderKey());
+        }
+        return providerKeys;
+    }
+
+    public static void verify(final User unverified) {
+        // You might want to wrap this into a transaction
+        unverified.emailValidated = true;
+        unverified.save();
+        TokenAction.deleteByUser(unverified, TokenAction.Type.EMAIL_VERIFICATION);
+    }
+
+    public static User findByAuthUserIdentity(final AuthUserIdentity identity) {
+        if (identity == null) {
+            return null;
+        }
+        if (identity instanceof UsernamePasswordAuthUser) {
+            return findByUsernamePasswordIdentity((UsernamePasswordAuthUser) identity);
+        } else {
+            return collection().findOne(DBQuery.and(DBQuery.is("active", true),
+                    DBQuery.is("linkedAccounts.providerUserId", identity.getId()),
+                    DBQuery.is("linkedAccounts.providerKey", identity.getProvider())));
+        }
+    }
+
+    public static User findByUsernamePasswordIdentity(final UsernamePasswordAuthUser identity) {
+        User user = getUserwithEmail(identity.getEmail());
+        if(user!=null){
+            for (LinkedAccount linkedAccount : user.getLinkedAccounts()){
+                if(linkedAccount.getProviderKey().equals(identity.getProvider())){
+                    return user;
+                }
+            }
+        }
+        return null;
     }
 
     @Id
@@ -150,6 +314,60 @@ public class User {
         this.address = address;
         return this;
     }
+    @JsonProperty("roles")
+    public List<SecurityRole> getRoles() {
+        return roles;
+    }
+    @JsonProperty("roles")
+    public User setRoles(List<SecurityRole> roles) {
+        this.roles = roles;
+        return this;
+    }
+    @JsonProperty("permissions")
+    public List<UserPermission> getPermissions() {
+        return permissions;
+    }
+    @JsonProperty("permissions")
+    public User setPermissions(List<UserPermission> permissions) {
+        this.permissions = permissions;
+        return this;
+    }
+    @JsonProperty("linkedAccounts")
+    public List<LinkedAccount> getLinkedAccounts() {
+        return linkedAccounts;
+    }
 
+    @JsonProperty("linkedAccounts")
+    public User setLinkedAccounts(List<LinkedAccount> linkedAccounts) {
+        this.linkedAccounts = linkedAccounts;
+        return this;
+    }
+    @JsonProperty("emailValidated")
+    public Boolean getEmailValidated() {
+        return emailValidated;
+    }
+    @JsonProperty("emailValidated")
+    public User setEmailValidated(Boolean emailValidated) {
+        this.emailValidated = emailValidated;
+        return this;
+    }
+    @JsonProperty("active")
+    public Boolean getActive() {
+        return active;
+    }
 
+    @JsonProperty("active")
+    public User setActive(Boolean active) {
+        this.active = active;
+        return this;
+    }
+    @JsonProperty("lastLogin")
+    public Date getLastLogin() {
+        return lastLogin;
+    }
+    @JsonProperty("lastLogin")
+    public User setLastLogin(Date lastLogin) {
+        this.lastLogin = lastLogin;
+        return this;
+    }
 }

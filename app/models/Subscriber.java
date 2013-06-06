@@ -20,9 +20,7 @@ import javax.validation.constraints.NotNull;
  */
 public class Subscriber {
 
-    @JsonIgnore
-    private static ObjectMapper objectMapper = new ObjectMapper();
-
+    ///////////    FIELDS  /////////////////////
     private String id;
 
     private String userRef;
@@ -43,6 +41,8 @@ public class Subscriber {
 
     @JsonIgnore @NotNull
     private Locomotion locomotion;
+
+    ///////////  CLASS METHODS /////////////////
 
     public void merge(Subscriber other){
         if(!other.isEmpty()){
@@ -105,6 +105,9 @@ public class Subscriber {
         this.setUserRef(this.getUser().getId());
     }
 
+    //////////////////////////////////////////////
+    /////////  GETTERS AND SETTERS ///////////////
+    //////////////////////////////////////////////
     @JsonProperty("user")
     public User getUser() {
         if (this.userRef!=null && this.userRef!=null){
