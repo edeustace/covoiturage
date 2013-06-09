@@ -18,6 +18,9 @@ GET     /authenticate/:provider     com.feth.play.module.pa.controllers.Authenti
 GET     /signup                     controllers.Application.signup
 POST    /signup                     controllers.Application.doSignup
 
+GET     /signupOrLogin                     controllers.Application.signupOrLogin
+#POST    /signup                     controllers.Application.doSignup
+
 GET     /accounts/unverified        controllers.Signup.unverified
 GET     /authenticate/:provider/denied     controllers.Signup.oAuthDenied(provider: String)
 

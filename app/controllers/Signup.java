@@ -27,7 +27,7 @@ public class Signup extends Controller {
 			this.token = token;
 		}
 
-		public String token;
+		private String token;
 
 		public String getToken() {
 			return token;
@@ -146,8 +146,8 @@ public class Signup extends Controller {
 		if (filledForm.hasErrors()) {
 			return badRequest(password_reset.render(filledForm));
 		} else {
-			final String token = filledForm.get().token;
-			final String newPassword = filledForm.get().password;
+			final String token = filledForm.get().getToken();
+			final String newPassword = filledForm.get().getPassword();
 
 			final TokenAction ta = tokenIsValid(token, Type.PASSWORD_RESET);
 			if (ta == null) {

@@ -89,10 +89,26 @@ public class MyUsernamePasswordAuthProvider
 
 		@Required
 		@MinLength(5)
-		public String repeatPassword;
+		private String repeatPassword;
 
 		@Required
-		public String name;
+		private String name;
+
+		public String getRepeatPassword() {
+			return repeatPassword;
+		}
+
+		public void setRepeatPassword(String repeatPassword) {
+			this.repeatPassword = repeatPassword;
+		}
+
+		public String getName() {
+			return name;
+		}
+
+		public void setName(String name) {
+			this.name = name;
+		}
 
 		public String validate() {
 			if (password == null || !password.equals(repeatPassword)) {
@@ -103,6 +119,46 @@ public class MyUsernamePasswordAuthProvider
 		}
 	}
 
+	public static class MySignUpOrLogin{
+		private MySignup signup = new MySignup();
+		private MyLogin login = new MySignup();
+		public String getRepeatPassword() {
+			return signup.getRepeatPassword();
+		}
+		public void setRepeatPassword(String repeatPassword) {
+			signup.setRepeatPassword(repeatPassword);
+		}
+		public String getName() {
+			return signup.getName();
+		}
+		public void setName(String name) {
+			signup.setName(name);
+		}
+		public String validate() {
+			return signup.validate();
+		}
+		public String getEmail() {
+			return login.getEmail();
+		}
+		public String getPassword() {
+			return login.getPassword();
+		}
+		public String toString() {
+			return login.toString();
+		}
+		
+		public void setEmail(String email){
+			login.email = email;
+			signup.email = email;
+		}
+		
+		public void setPassword(String password){
+			login.password = password;
+			signup.password = password;
+		}
+	}
+	
+	public static final Form<MySignUpOrLogin> SIGNUP_OR_LOGIN_FORM = form(MySignUpOrLogin.class);
 	public static final Form<MySignup> SIGNUP_FORM = form(MySignup.class);
 	public static final Form<MyLogin> LOGIN_FORM = form(MyLogin.class);
 

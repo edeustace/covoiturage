@@ -40,11 +40,11 @@ public class Account extends Controller {
 	public static class PasswordChange {
 		@MinLength(5)
 		@Required
-		public String password;
+		private String password;
 
 		@MinLength(5)
 		@Required
-		public String repeatPassword;
+		private String repeatPassword;
 
 		public String getPassword() {
 			return password;
