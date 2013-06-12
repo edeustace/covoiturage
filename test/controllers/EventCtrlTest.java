@@ -4,7 +4,10 @@ import com.mongodb.DB;
 import com.mongodb.Mongo;
 import models.*;
 import net.vz.mongodb.jackson.JacksonDBCollection;
+
+import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.JsonNode;
+import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.After;
 import org.junit.Before;
@@ -61,10 +64,8 @@ public class EventCtrlTest {
                     resp = objectMapper.readValue(response.getBody(), JsonNode.class);
                 }catch (IOException e){};
                 assertThat(response.getStatus()).isEqualTo(BAD_REQUEST);
-                assertThat(resp.get("name")).isNotEmpty();
-                assertThat(resp.get("address")).isNotEmpty();
-                assertThat(resp.get("creator.password")).isNotEmpty();
-                assertThat(resp.get("name")).isNotEmpty();
+                assertThat(resp.get("errors").get("name")).isNotEmpty();
+                assertThat(resp.get("errors").get("address")).isNotEmpty();
             }
         });
     }
@@ -85,6 +86,7 @@ public class EventCtrlTest {
                 //event.getSubscribers().add(Subscriber.subscriber().setEmail("toto@test.fr"));
                 ObjectMapper objectMapper = new ObjectMapper();
                 JsonNode node = objectMapper.convertValue(event, JsonNode.class);
+                
                 WS.Response response = WS.url("http://localhost:3333/rest/events").post(node).get();
                 //System.out.println(response.getBody());
                 JsonNode resp = null;
@@ -92,7 +94,7 @@ public class EventCtrlTest {
                     resp = objectMapper.readValue(response.getBody(), JsonNode.class);
                 } catch (IOException e) {}
                 assertThat(response.getStatus()).isEqualTo(BAD_REQUEST);
-                assertThat(resp.get("creator")).isNotNull();
+                assertThat(resp.get("errors").get("creator")).isNotNull();
             }
         });
     }
@@ -110,12 +112,16 @@ public class EventCtrlTest {
                         .setAddress(Address.address().setDescription("somme address").setLocation(Location.location().setLng("55").setLat("56")));
                 ObjectMapper objectMapper = new ObjectMapper();
                 JsonNode node = objectMapper.convertValue(event, JsonNode.class);
+                try {
+					System.err.println(""+objectMapper.writeValueAsString(node));
+				} catch (IOException e1) {}
                 WS.Response response = WS.url("http://localhost:3333/rest/events").post(node).get();
                 //System.out.println(response.getStatus());
                 //System.out.println(response.getBody());
                 JsonNode resp = null;
                 try {
                     resp = objectMapper.readValue(response.getBody(), JsonNode.class);
+                    System.err.println(""+resp);
                 } catch (IOException e) {}
                 assertThat(response.getStatus()).isEqualTo(OK);
                 assertThat(resp.get("name").getTextValue()).isEqualTo(event.getName());
