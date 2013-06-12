@@ -22,7 +22,11 @@
     <!-- Le styles -->
     <link href="@routes.Assets.at("stylesheets/main.min.css")" rel="stylesheet">
     <link href="@routes.Assets.at("css/bootstrap.min.css")" rel="stylesheet">
-    
+  	<!--     
+    <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/app.css")" />
+	<link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/bootstrap.css")" /> 
+  	<link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/google-maps.css")" />
+    -->
 
     <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
     <!--[if lt IE 9]>
@@ -66,7 +70,7 @@
           <div class="nav-collapse">
             <ul class="nav">
               <li class="@("active".when(nav == ""))"><a href="@routes.Application.index()">@Messages("playauthenticate.navigation.home")</a></li>
-              <li class="@("active".when(nav == "restricted"))"><a href="@routes.Application.restricted()">@Messages("playauthenticate.navigation.restricted")</a></li>
+              <li class="@("active".when(nav == "restricted"))"><a href="@routes.Application.createEvent()">@Messages("playauthenticate.navigation.createEvent")</a></li>
                 
                 @subjectNotPresent() {
 			    	<li class="@("active".when(nav == "signup"))"><a href="@routes.Application.signup()">@Messages("playauthenticate.navigation.signup")</a></li>

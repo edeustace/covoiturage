@@ -1,6 +1,6 @@
-import java.util.Arrays;
-
-import models.SecurityRole;
+import play.Application;
+import play.GlobalSettings;
+import play.mvc.Call;
 
 import com.feth.play.module.pa.PlayAuthenticate;
 import com.feth.play.module.pa.PlayAuthenticate.Resolver;
@@ -8,10 +8,6 @@ import com.feth.play.module.pa.exceptions.AccessDeniedException;
 import com.feth.play.module.pa.exceptions.AuthException;
 
 import controllers.routes;
-
-import play.Application;
-import play.GlobalSettings;
-import play.mvc.Call;
 
 public class Global extends GlobalSettings {
 
@@ -21,7 +17,7 @@ public class Global extends GlobalSettings {
             @Override
             public Call login() {
                 // Your login page
-                return routes.Application.login();
+                return routes.Application.signupOrLogin();
             }
 
             @Override

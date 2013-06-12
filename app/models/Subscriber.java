@@ -1,15 +1,15 @@
 package models;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+
 import models.enums.Locomotion;
 import models.validators.EmailAlreadyUsed;
+
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.hibernate.validator.constraints.Email;
-
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 
 /**
  * Created with IntelliJ IDEA.

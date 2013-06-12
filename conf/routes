@@ -4,6 +4,7 @@
 
 # Home page
 GET     /                           controllers.Application.index
+GET     /evenement/creation         controllers.Application.createEvent
 GET     /restricted                 controllers.Application.restricted
 GET     /assets/javascript/routes.js    controllers.Application.jsRoutes
 
@@ -49,7 +50,6 @@ POST    /login/password/forgot     controllers.Signup.doForgotPassword
 
 
 #PAGES
-GET     /evenement/creation                   controllers.EventCtrl.evenementCreation
 GET     /evenement/:id                            controllers.EventCtrl.evenement(id: String)
 #GET     /evenement/:id/abonnement             controllers.EventCtrl.evenementCreation
 
@@ -68,6 +68,7 @@ PUT     /rest/events/:id/subscribers/:idSub       controllers.SubscriberCtrl.upd
 DELETE  /rest/events/:id/subscribers/:idSub       controllers.SubscriberCtrl.deleteSubscriber(id :String, idSub :String)
 
 #Users
+GET     /rest/users/current                   controllers.UserCtrl.getCurrentUser()
 GET     /rest/users/:id                   controllers.UserCtrl.getUser(id :String)
 
 

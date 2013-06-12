@@ -1,12 +1,12 @@
 package models;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
 
 import javax.persistence.Id;
-import javax.validation.ConstraintViolation;
 import javax.validation.Valid;
-import javax.validation.Validator;
 import javax.validation.constraints.NotNull;
 
 import models.validators.EmailAlreadyUsed;
@@ -18,15 +18,17 @@ import net.vz.mongodb.jackson.WriteResult;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
-
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.ObjectReader;
-import play.data.validation.Validation;
+
 import play.modules.mongodb.jackson.MongoDB;
 
 @MongoCollection(name="events")
 public class Event {
 
+	public static @interface Update{}
+	public static @interface Create{}
+	
     ///////////    FIELDS  /////////////////////
     private String id;
 
@@ -47,7 +49,7 @@ public class Event {
 
     private String creatorRef;
 
-    @JsonIgnore @NotNull @EmailAlreadyUsed @Valid
+    @JsonIgnore @NotNull @Valid @EmailAlreadyUsed
     private User creator;
 
     ///////////  CLASS METHODS /////////////////
@@ -103,9 +105,15 @@ public class Event {
     }
 
     private void persistOrLoadCreatorAndCreateRef(){
-        if(creator!=null){
+    	if(creatorRef!=null){
+    		User user = User.findById(creatorRef);
+    		user.mergeIfNull(creator);
+    		creator = user;
+    		creator.save();
+    	}else if(creator!=null){
             if(creator.getId()==null){
-                creator.save();
+            	creator.setLastLogin(new Date());
+            	creator.save();
             }
             creatorRef = creator.getId();
         }
@@ -252,7 +260,7 @@ public class Event {
     }
 
     private void addCreatorAsSubscriber(){
-        if(creator!=null){
+        if(creator!=null && subscribers!=null && !subscribers.contains(creator)){
             Subscriber subscriberCreator = Subscriber
                     .subscriber().setAddress(creator.getAddress())
                     .setName(creator.getName()).setSurname(creator.getSurname())
@@ -263,9 +271,6 @@ public class Event {
 
     @JsonProperty("creator")
     public User getCreator(){
-        if(creatorRef!=null){
-            this.creator = User.findById(creatorRef);
-        }
         return this.creator;
     }
 

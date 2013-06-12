@@ -1,10 +1,8 @@
 package controllers;
 
-import be.objectify.deadbolt.java.actions.Group;
-import be.objectify.deadbolt.java.actions.Restrict;
-import com.feth.play.module.pa.PlayAuthenticate;
-import com.feth.play.module.pa.providers.password.UsernamePasswordAuthProvider;
-import com.feth.play.module.pa.user.AuthUser;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import models.User;
 import play.Routes;
 import play.data.Form;
@@ -14,11 +12,19 @@ import play.mvc.Result;
 import providers.MyUsernamePasswordAuthProvider;
 import providers.MyUsernamePasswordAuthProvider.MyLogin;
 import providers.MyUsernamePasswordAuthProvider.MySignup;
+import views.html.evenementCreation;
+import views.html.index;
+import views.html.login;
+import views.html.profile;
+import views.html.restricted;
+import views.html.signup;
+import views.html.signupOrLogin;
+import be.objectify.deadbolt.java.actions.Group;
+import be.objectify.deadbolt.java.actions.Restrict;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
-import views.html.*;
+import com.feth.play.module.pa.PlayAuthenticate;
+import com.feth.play.module.pa.providers.password.UsernamePasswordAuthProvider;
+import com.feth.play.module.pa.user.AuthUser;
 
 public class Application extends Controller {
 
@@ -35,7 +41,12 @@ public class Application extends Controller {
 		final User localUser = User.findByAuthUserIdentity(currentAuthUser);
 		return localUser;
 	}
-
+	
+	@Restrict(@Group(Application.USER_ROLE))
+	public static Result createEvent() {
+		return ok(evenementCreation.render());
+	}
+	
 	@Restrict(@Group(Application.USER_ROLE))
 	public static Result restricted() {
 		final User localUser = getLocalUser(session());

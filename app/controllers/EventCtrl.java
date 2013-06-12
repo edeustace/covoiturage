@@ -1,44 +1,41 @@
 package controllers;
 
-import java.io.IOException;
-import java.util.*;
+import static play.data.Form.form;
 
-import controllers.decorators.Link;
-import controllers.decorators.SubscriberModel;
-import controllers.decorators.UserModelLight;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
 import models.Address;
 import models.Event;
-
 import models.Subscriber;
-import models.User;
-import org.codehaus.jackson.JsonNode;
+
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.codehaus.jackson.map.ObjectMapper;
 
+import play.data.Form;
 import play.mvc.BodyParser;
 import play.mvc.Controller;
-import play.mvc.Http.RequestBody;
 import play.mvc.Result;
-import play.data.Form;
-import static play.data.Form.*;
 import views.html.evenement;
-import views.html.evenementCreation;
+import controllers.decorators.Link;
+import controllers.decorators.SubscriberModel;
+import controllers.decorators.UserModelLight;
 
 public class EventCtrl extends Controller {
 
     private static ObjectMapper objectMapper = new ObjectMapper();
     private static Form<Event> eventForm = form(Event.class);
-
+    
 	public static Result list() {
 		return ok();
 	}
 
 	public static Result evenement(String id) {
 		return ok(evenement.render());
-	}
-
-	public static Result evenementCreation() {
-		return ok(evenementCreation.render());
 	}
 
 	public static Result getEvent(String id) {
@@ -53,6 +50,8 @@ public class EventCtrl extends Controller {
 	@BodyParser.Of(BodyParser.Json.class)
 	public static Result createEvent() {
 		try{
+			String toto = objectMapper.writeValueAsString(request().body().asJson());
+			
             Form<Event> form = eventForm.bindFromRequest();
             if(form.hasErrors()){
                 return buildErrors(form);

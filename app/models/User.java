@@ -1,21 +1,36 @@
 package models;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import javax.persistence.Id;
 import javax.validation.constraints.NotNull;
 
-import be.objectify.deadbolt.core.models.Subject;
-import com.feth.play.module.pa.providers.password.UsernamePasswordAuthUser;
-import com.feth.play.module.pa.user.*;
-import models.validators.EmailAlreadyUsed;
-import net.vz.mongodb.jackson.*;
+import net.vz.mongodb.jackson.DBCursor;
+import net.vz.mongodb.jackson.DBQuery;
+import net.vz.mongodb.jackson.JacksonDBCollection;
+import net.vz.mongodb.jackson.MongoCollection;
 import net.vz.mongodb.jackson.ObjectId;
-import org.bson.types.*;
+import net.vz.mongodb.jackson.WriteResult;
+
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.hibernate.validator.constraints.Email;
-import play.modules.mongodb.jackson.MongoDB;
 
-import java.util.*;
+import play.data.format.Formats.DateTime;
+import play.modules.mongodb.jackson.MongoDB;
+import be.objectify.deadbolt.core.models.Subject;
+
+import com.feth.play.module.pa.providers.password.UsernamePasswordAuthUser;
+import com.feth.play.module.pa.user.AuthUser;
+import com.feth.play.module.pa.user.AuthUserIdentity;
+import com.feth.play.module.pa.user.EmailIdentity;
+import com.feth.play.module.pa.user.FirstLastNameIdentity;
+import com.feth.play.module.pa.user.NameIdentity;
 
 @MongoCollection(name="users")
 public class User implements Subject {
@@ -42,7 +57,6 @@ public class User implements Subject {
     @NotNull @Email
     private String email;
 
-    @NotNull
     private String password;
 
     private String name;
@@ -54,7 +68,8 @@ public class User implements Subject {
     private Boolean emailValidated;
 
     private Boolean active;
-
+    
+    @DateTime(pattern="yyyy-MM-dd'T'HH:mm:ssZ")
     private Date lastLogin;
 
     private List<LinkedAccount> linkedAccounts = new ArrayList<LinkedAccount>();
@@ -93,7 +108,30 @@ public class User implements Subject {
         }
         return this;
     }
-
+    public User mergeIfNull(User user){
+        if(user!= null && !user.isEmpty()){
+            if(this.getEmail()==null && user.getEmail()!=null){
+                this.setEmail(user.getEmail());
+            }
+            if(this.getName()==null && user.getName()!=null){
+                this.setName(user.getName());
+            }
+            if(this.getSurname()==null && user.getSurname()!=null){
+                this.setSurname(user.getSurname());
+            }
+            if(this.getPassword()==null && user.getPassword()!=null){
+                this.setPassword(user.getPassword());
+            }
+            if((this.getAddress()==null || this.getAddress().empty()) 
+            		&& user.getAddress()!=null && !user.getAddress().empty()){
+                if(this.getAddress()==null){
+                    this.setAddress(Address.address());
+                }
+                this.getAddress().merge(user.getAddress());
+            }
+        }
+        return this;
+    }
     public User save(){
         WriteResult<User, String> result = collection().save(this);
         this.id = result.getSavedObject().id;
@@ -257,14 +295,15 @@ public class User implements Subject {
     public String getId() {
         return id;
     }
-
+    
     public static User user() {
         return new User();
     }
 
     @Id
     @ObjectId
-    public User getId(String id) {
+    @JsonProperty("id")
+    public User setId(String id) {
         this.id = id;
         return this;
     }

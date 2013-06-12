@@ -1,17 +1,10 @@
-<!doctype html>
-<html lang="en" ng-app="covoiturage">
-<head>
-  <meta charset="utf-8">
-  <title>Covoiturage</title>
-  <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/app.css")" />
-  <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/bootstrap.css")" />
-  <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/google-maps.css")" />
-  
-  <link rel="shortcut icon" type="image/png" href="@routes.Assets.at("images/favicon.png")">
-  
-  <script src="@routes.Assets.at("javascripts/jquery-1.9.0.min.js")" type="text/javascript"></script>  
-  
-  <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+@import helper._ 
+@import helper.twitterBootstrap._
+
+
+
+@main(Messages("playauthenticate.event.title"),"event") {
+<link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/google-maps.css")" />
   <script src="http://maps.googleapis.com/maps/api/js?sensor=false&language=en"></script>
   
   <script src="@routes.Assets.at("javascripts/lib/angular.js")"></script>
@@ -20,17 +13,14 @@
   <script src="@routes.Assets.at("javascripts/app/markerModule2.js")"></script>
   <script src="@routes.Assets.at("javascripts/app/evenementController.js")"></script>
   <script src="@routes.Assets.at("javascripts/app/filters.js")"></script>
-</head>
-<body ng-controller="EventCtrl">
-	<div class="row-fluid">
-		<!--Header-->
-		<div class="span6 offset4">
-			<h1 class="text-center">Covoiturez !</h1>
-		</div>
-	</div> 
-	<div class="row-fluid">
-		<!--Colonne de gauche-->
+	<div class="row">
 		<div class="span6">
+			<h1>@Messages("playauthenticate.event.title")</h1>
+		</div>
+	</div>
+	<div class="row" ng-controller="EventCtrl" ng-app="covoiturage">
+		<!--Colonne de gauche-->
+		<div class="span4">
 			<br/>
 			<h2>
 			{{event.name}}
@@ -60,11 +50,9 @@
 			</div>
 		</div>
 		<!--Centre-->
-		<div class="span6 offset2">
+		<div class="span6">
 				<google-map center="center" draggable="true" zoom="zoom" markers="markers" mark-click="true" style="height: 400px" class="angular-google-map" refresh="true"></google-map>
 		</div>
-		<div class="span3"></div>
 	</div>
 
-</body>
-</html>
+}

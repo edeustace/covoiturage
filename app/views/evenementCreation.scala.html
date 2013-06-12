@@ -1,60 +1,41 @@
-<!doctype html>
-<html lang="en" ng-app="covoiturage">
-<head>
-  <meta charset="utf-8">
-  <title>Covoiturage</title>
-  <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/app.css")" />
-  <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/bootstrap.css")" />
-  <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/google-maps.css")" />
-  
-  <link rel="shortcut icon" type="image/png" href="@routes.Assets.at("images/favicon.png")">
-  
-  <script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?libraries=places&sensor=false"></script>
-  
-  <script src="@routes.Assets.at("javascripts/lib/angular.js")"></script>
-  <script src="@routes.Assets.at("javascripts/app/evenementCreation.js")"></script>
-  <script src="@routes.Assets.at("javascripts/app/evenementCreationController.js")"></script>
-</head>
-<body ng-controller="EventCreationCtrl">
-	<div class="row-fluid">
-		<!--Header-->
-		<div class="span6 offset4">
-			<h1 class="text-center">Covoiturez !</h1>
+@import helper._ 
+@import helper.twitterBootstrap._
+
+@main(Messages("playauthenticate.createEvent.title"),"createEvent") {
+
+	<div class="row">
+		<div class="span6">
+			<h1>@Messages("playauthenticate.createEvent.title")</h1>
 		</div>
-	</div> 
-	<div class="row-fluid">
+	</div>
+	<script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?libraries=places&sensor=false"></script>
+	<script type="text/javascript" src="@routes.Assets.at("javascripts/lib/angular.js")"></script>
+	<script type="text/javascript" src="@routes.Assets.at("javascripts/app/evenementCreation.js")"></script>
+	<script type="text/javascript" src="@routes.Assets.at("javascripts/app/evenementCreationController.js")"></script>
+	
+	<div class="row" ng-controller="EventCreationCtrl" ng-app="covoiturage">
 		<!--Colonne de gauche-->
-        <div class="span3"></div>
-        <div class="span3 offset2">
+		<div class="span3"></div>
+		<div class="span3 offset2">
 			<h2>Evenement</h2>
-			<label>Nom</label>
-			<input ng-model="event.name"></input>
-			<label>Description</label>
-			<input ng-model="event.description"></input>
-			<label>adresse</label>
-			<input ng-model="event.address" googleplace></input>
-        </div>
-        <div class="span3 offset3">
+			<label>Nom</label> <input ng-model="event.name"></input> <label>Description</label>
+			<input ng-model="event.description"></input> <label>adresse</label> <input
+				ng-model="event.address" googleplace></input>
+		</div>
+		<div class="span3 offset3">
 			<h2>Createur</h2>
-			<label>Nom</label>
-			<input ng-model="event.creator.name"></input>
-			<label>Prénom</label>
-			<input ng-model="event.creator.surname"></input>
 			<label>Email</label>
 			<input ng-model="event.creator.email" type="email" required></input>
-			<label>Mot de passe</label>
-			<input ng-model="event.creator.password" type="password"></input>
-			<label>adresse</label>
-			<input ng-model="event.creator.address" googleplace></input>
-			<br/>
-            <a href="" ng-click="valider()">Valider</a>
+			<label>Nom</label> 
+			<input ng-model="event.creator.name"></input> 
+			<label>Prénom</label>
+			<input ng-model="event.creator.surname"></input> 
+			<label>adresse</label> 
+			<input ng-model="event.creator.address" googleplace></input> 
+			<br /> 
+			<a href="" ng-click="valider()">Valider</a>
 		</div>
-
-		<!--Centre-->
-		<div class="span6 offset2">
-		</div>
-		<div class="span3"></div>
 	</div>
 
-</body>
-</html>
+
+}
