@@ -30,7 +30,6 @@ import com.feth.play.module.pa.user.AuthUser;
 import com.feth.play.module.pa.user.AuthUserIdentity;
 import com.feth.play.module.pa.user.EmailIdentity;
 import com.feth.play.module.pa.user.FirstLastNameIdentity;
-import com.feth.play.module.pa.user.NameIdentity;
 
 @MongoCollection(name="users")
 public class User implements Subject {
@@ -77,6 +76,8 @@ public class User implements Subject {
     private java.util.List<SecurityRole> roles = new ArrayList<SecurityRole>();
 
     private java.util.List<UserPermission> permissions = new ArrayList<UserPermission>();
+
+    ///////////  CLASS METHODS /////////////////
 
     @JsonIgnore
     public Boolean isEmpty(){
@@ -138,85 +139,8 @@ public class User implements Subject {
         return this;
     }
 
-    public static User merge(final AuthUser oldUser, final AuthUser newUser) {
-        return User.findByAuthUserIdentity(oldUser).merge(
-                User.findByAuthUserIdentity(newUser));
-    }
 
-    public static User findById(String id){
-        return collection().findOneById(id);
-    }
-
-    public static Boolean isUserWithEmailExists(String email){
-        DBCursor<User> cursor = collection().find(DBQuery.is("email",email));
-        return cursor.hasNext();
-    }
-
-    public static User getUserwithEmail(String email){
-        User user = collection().findOne(DBQuery.is("email",email));
-        return user;
-    }
-
-    public static User create(final AuthUser authUser) {
-        final User user = User.user()
-                .setRoles(Collections.singletonList(SecurityRole.securityRole().setId((new org.bson.types.ObjectId()).toString())
-                        .setRoleName(controllers.Application.USER_ROLE)))
-        // user.permissions = new ArrayList<UserPermission>();
-        // user.permissions.add(UserPermission.findByValue("printers.edit"));
-                .setActive(true).setLastLogin(new Date())
-                .setLinkedAccounts(Collections.singletonList(LinkedAccount
-                        .create(authUser)));
-
-        if (authUser instanceof EmailIdentity) {
-            final EmailIdentity identity = (EmailIdentity) authUser;
-            // Remember, even when getting them from FB & Co., emails should be
-            // verified within the application as a security breach there might
-            // break your security as well!
-            user.setEmail(identity.getEmail())
-                    .setEmailValidated(false);
-
-        }
-
-        if (authUser instanceof NameIdentity) {
-            final NameIdentity identity = (NameIdentity) authUser;
-            final String name = identity.getName();
-            if (name != null) {
-                user.setName(name);
-            }
-        }
-
-        if (authUser instanceof FirstLastNameIdentity) {
-            final FirstLastNameIdentity identity = (FirstLastNameIdentity) authUser;
-            final String firstName = identity.getFirstName();
-            final String lastName = identity.getLastName();
-            if (firstName != null) {
-                user.setSurname(firstName);
-            }
-            if (lastName != null) {
-                user.setName(lastName);
-            }
-        }
-        user.save();
-        return user;
-    }
-
-    public static boolean existsByAuthUserIdentity(final AuthUserIdentity identity) {
-        if (identity instanceof UsernamePasswordAuthUser) {
-            User user = User.findByUsernamePasswordIdentity((UsernamePasswordAuthUser) identity);
-            return user!=null;
-        } else {
-            User user = User.findByAuthUserIdentity(identity);
-            return user!=null;
-        }
-    }
-
-    public static void addLinkedAccount(final AuthUser oldUser,
-                                        final AuthUser newUser) {
-        final User u = User.findByAuthUserIdentity(oldUser);
-        u.getLinkedAccounts().add(LinkedAccount.create(newUser));
-        u.save();
-    }
-
+    
     public void changePassword(final UsernamePasswordAuthUser authUser,
                                final boolean create) {
         LinkedAccount a = this.getAccountByProvider(authUser.getProvider());
@@ -258,6 +182,86 @@ public class User implements Subject {
         return providerKeys;
     }
 
+    //////////////////////////////////////////////
+    /////////        STATIC //////////////////////
+    //////////////////////////////////////////////
+    
+    public static User merge(final AuthUser oldUser, final AuthUser newUser) {
+        return User.findByAuthUserIdentity(oldUser).merge(
+                User.findByAuthUserIdentity(newUser));
+    }
+
+    public static User findById(String id){
+        return collection().findOneById(id);
+    }
+
+    public static Boolean isUserWithEmailExists(String email){
+        DBCursor<User> cursor = collection().find(DBQuery.is("email",email));
+        return cursor.hasNext();
+    }
+
+    public static User getUserwithEmail(String email){
+        User user = collection().findOne(DBQuery.is("email",email));
+        return user;
+    }
+
+    public static User create(final AuthUser authUser) {
+    	
+    	String email = null;
+        if (authUser instanceof EmailIdentity) {
+        	final EmailIdentity identity = (EmailIdentity) authUser;
+            email = identity.getEmail();
+        }    	
+        User user = null;
+        LinkedAccount linkedAccount = LinkedAccount.create(authUser);
+        if(email!=null){
+        	user = User.getUserwithEmail(email);
+        	if(user!=null && !user.getLinkedAccounts().contains(linkedAccount)){
+        		user.getLinkedAccounts().add(linkedAccount);
+        	}
+        }
+        if(user==null){
+        	user = User.user()
+                    .setRoles(Collections.singletonList(SecurityRole.securityRole().setId((new org.bson.types.ObjectId()).toString())
+                            .setRoleName(controllers.Application.USER_ROLE)))
+            // user.permissions = new ArrayList<UserPermission>();
+            // user.permissions.add(UserPermission.findByValue("printers.edit"));
+                    .setEmail(email).setEmailValidated(false).setActive(true).setLastLogin(new Date())
+                    .setLinkedAccounts(Collections.singletonList(linkedAccount));
+        }
+
+        if (authUser instanceof FirstLastNameIdentity) {
+            final FirstLastNameIdentity identity = (FirstLastNameIdentity) authUser;
+            final String firstName = identity.getFirstName();
+            final String lastName = identity.getLastName();
+            if (user.getSurname()!=null && firstName != null) {
+                user.setSurname(firstName);
+            }
+            if (user.getName()!=null && lastName != null) {
+                user.setName(lastName);
+            }
+        }
+        user.save();
+        return user;
+    }
+
+    public static boolean existsByAuthUserIdentity(final AuthUserIdentity identity) {
+        if (identity instanceof UsernamePasswordAuthUser) {
+            User user = User.findByUsernamePasswordIdentity((UsernamePasswordAuthUser) identity);
+            return user!=null;
+        } else {
+            User user = User.findByAuthUserIdentity(identity);
+            return user!=null;
+        }
+    }
+
+    public static void addLinkedAccount(final AuthUser oldUser,
+                                        final AuthUser newUser) {
+        final User u = User.findByAuthUserIdentity(oldUser);
+        u.getLinkedAccounts().add(LinkedAccount.create(newUser));
+        u.save();
+    }
+
     public static void verify(final User unverified) {
         // You might want to wrap this into a transaction
         unverified.emailValidated = true;
@@ -290,6 +294,8 @@ public class User implements Subject {
         return null;
     }
 
+    
+    
     @Id
     @ObjectId
     public String getId() {

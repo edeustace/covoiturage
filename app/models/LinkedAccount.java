@@ -1,10 +1,12 @@
 package models;
 
-import com.feth.play.module.pa.user.AuthUser;
+import java.util.List;
+
 import org.bson.types.ObjectId;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
-import java.util.List;
+
+import com.feth.play.module.pa.user.AuthUser;
 
 public class LinkedAccount {
 
@@ -16,7 +18,31 @@ public class LinkedAccount {
     @JsonIgnore
     private String providerKey;
 
-    ///////////  CLASS METHODS /////////////////
+    @Override
+	public int hashCode() {
+		if(id!=null){
+			return id.hashCode();
+		}else{
+			return super.hashCode();
+		}
+	}
+	@Override
+	public boolean equals(Object obj) {
+		if(obj==null){
+			return false;
+		}
+		if(obj instanceof LinkedAccount){
+			LinkedAccount linkedAccount = (LinkedAccount)obj;
+			
+			return 
+					((this.providerUserId==null && linkedAccount.providerUserId==null) || 
+							(this.providerUserId!=null && linkedAccount.providerUserId!=null && this.providerUserId.equals(providerUserId))) &&
+					((this.providerKey==null && linkedAccount.providerKey==null) || (
+							this.providerKey!=null && linkedAccount.providerKey!=null && this.providerKey.equals(linkedAccount.providerKey)));
+		}
+		return super.equals(obj);
+	}
+	///////////  CLASS METHODS /////////////////
     @JsonIgnore
 	public void update(final AuthUser authUser) {
 		this.providerKey = authUser.getProvider();
@@ -45,6 +71,10 @@ public class LinkedAccount {
         final LinkedAccount ret = new LinkedAccount();
         ret.update(authUser);
         return ret;
+    }
+    
+    public static LinkedAccount linkedAccount(){
+    	return new LinkedAccount();
     }
 
 

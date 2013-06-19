@@ -83,6 +83,19 @@ public class UserTest {
         assertThat(user.getPassword()).isEqualTo("pwd2");
 
     }
+    
+	@Test
+	public void testMergeIfNull() {
+		User user = User.user().setName("name").setSurname("surname").setEmail("email").setPassword("pwd").setAddress(Address.address().setDescription("address"));
+		User user2 = User.user().mergeIfNull(user);
+		assertThat(user2.getAddress().getDescription()).isEqualTo("address");
+        assertThat(user2.getName()).isEqualTo("name");
+        assertThat(user2.getSurname()).isEqualTo("surname");
+        assertThat(user2.getEmail()).isEqualTo("email");
+        assertThat(user2.getPassword()).isEqualTo("pwd");
+
+	}
+
 }
 
 
