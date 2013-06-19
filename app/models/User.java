@@ -10,6 +10,7 @@ import java.util.Set;
 import javax.persistence.Id;
 import javax.validation.constraints.NotNull;
 
+import models.enums.Locomotion;
 import net.vz.mongodb.jackson.DBCursor;
 import net.vz.mongodb.jackson.DBQuery;
 import net.vz.mongodb.jackson.JacksonDBCollection;
@@ -70,8 +71,10 @@ public class User implements Subject {
     
     @DateTime(pattern="yyyy-MM-dd'T'HH:mm:ssZ")
     private Date lastLogin;
+    
+    private Locomotion locomotion;
 
-    private List<LinkedAccount> linkedAccounts = new ArrayList<LinkedAccount>();
+	private List<LinkedAccount> linkedAccounts = new ArrayList<LinkedAccount>();
 
     private java.util.List<SecurityRole> roles = new ArrayList<SecurityRole>();
 
@@ -147,6 +150,7 @@ public class User implements Subject {
         if (a == null) {
             if (create) {
                 a = LinkedAccount.create(authUser);
+                this.getLinkedAccounts().add(a);
             } else {
                 throw new RuntimeException(
                         "Account not enabled for password usage");
@@ -293,8 +297,6 @@ public class User implements Subject {
         }
         return null;
     }
-
-    
     
     @Id
     @ObjectId
@@ -415,4 +417,13 @@ public class User implements Subject {
         this.lastLogin = lastLogin;
         return this;
     }
+    @JsonProperty("locomotion")
+    public Locomotion getLocomotion() {
+		return locomotion;
+	}
+    @JsonProperty("locomotion")
+	public User setLocomotion(Locomotion locomotion) {
+		this.locomotion = locomotion;
+		return this;
+	}
 }

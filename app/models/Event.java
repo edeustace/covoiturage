@@ -264,7 +264,7 @@ public class Event {
             Subscriber subscriberCreator = Subscriber
                     .subscriber().setAddress(creator.getAddress())
                     .setName(creator.getName()).setSurname(creator.getSurname())
-                    .setEmail(creator.getEmail()).setUser(creator);
+                    .setEmail(creator.getEmail()).setUser(creator).setLocomotion(creator.getLocomotion());
             this.subscribers.add(subscriberCreator);
         }
     }

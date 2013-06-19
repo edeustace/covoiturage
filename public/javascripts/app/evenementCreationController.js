@@ -8,6 +8,11 @@
 function EventCreationCtrl($scope, $http, $location) {
 	$scope.evenement = {};
 	var scope = $scope;
+	$scope.items = [
+	                  { id: "CAR", name: 'en voiture' },
+	                  { id: "AUTOSTOP", name: 'à pied' },
+	                  { id: "DONT_KNOW_YET", name: 'Je ne sais pas encore' }
+                    ];
 	$http.get('/rest/users/current').success(function(user) {
 		if(user){
 			user.lastLogin = null;

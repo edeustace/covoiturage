@@ -13,31 +13,38 @@
 	<script type="text/javascript" src="@routes.Assets.at("javascripts/app/evenementCreation.js")"></script>
 	<script type="text/javascript" src="@routes.Assets.at("javascripts/app/evenementCreationController.js")"></script>
 	
-	<div class="row" ng-controller="EventCreationCtrl" ng-app="covoiturage">
-		<!--Colonne de gauche-->
-		<div class="span3"></div>
-		<div class="span3 offset2">
-			<h2>Evenement</h2>
-			<label>Nom</label> <input ng-model="event.name"></input> <label>Description</label>
-			<input ng-model="event.description"></input> <label>adresse</label> <input
-				ng-model="event.address" googleplace></input>
-		</div>
-		<div class="span3 offset3">
-			<h2>Createur</h2>
-			<label>Email</label>
-			<input ng-model="event.creator.email" type="email" required></input>
-			<label>Nom</label> 
-			<input ng-model="event.creator.name"></input> 
-			<label>Prénom</label>
-			<input ng-model="event.creator.surname"></input> 
-			<label>adresse</label> 
-			<input ng-model="event.creator.address" googleplace></input> 
-			<label>Je cherche </label> 
-			 
-			<br /> 
-			<a href="" ng-click="valider()">Valider</a>
+	<div ng-controller="EventCreationCtrl" ng-app="covoiturage">
+		<div class="row" >
+			<!--Colonne de gauche-->
+			<div class="span2">
+				<fieldset>
+				<legend>Evenement</legend>
+				<label>Nom</label> 
+				<input ng-model="event.name" type="text" ></input> 
+				<label>Description</label>
+				<input ng-model="event.description" type="text" ></input> 
+				<label>adresse</label> 
+				<input ng-model="event.address" googleplace type="text" ></input>
+				</fieldset>
+			</div>
+			<div class="span2 offset2" >
+			 	<fieldset>
+					<legend>Createur</legend>
+					<label>Email</label>
+					<input ng-model="event.creator.email" type="email" required></input>
+					<label>Nom</label> 
+					<input ng-model="event.creator.name" type="text" ></input> 
+					<label>Prénom</label>
+					<input ng-model="event.creator.surname" type="text" ></input> 
+					<label>Adresse</label> 
+					<input ng-model="event.creator.address" googleplace type="text" ></input> 
+					<label>Je suis :</label> 
+					<select ng-model="event.creator.locomotion" ng-options="item.id as item.name for item in items"></select>
+				</fieldset>
+				<button class="btn btn-large btn-block btn-primary" type="button" ng-click="valider()">Valider</button>
+			</div>
+			
 		</div>
 	</div>
-
 
 }
