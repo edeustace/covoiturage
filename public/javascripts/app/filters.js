@@ -8,7 +8,7 @@ angular.module('covoiturageFilter', []).filter('auto', function() {
 		var result = new Array();				
 		for(var i=0;i<subscribers.length;i++){
 			var subscriber = subscribers[i];
-			var type = subscriber.type;
+			var type = subscriber.locomotion;
 			if(type === filter){
 				result.push(subscriber);
 			}

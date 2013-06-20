@@ -99,6 +99,7 @@ public class Event {
         this.addCreatorAsSubscriber();
         this.persistUsersOnSubscribers();
         this.setFromDate(new Date());
+        this.setCreator(null);
         WriteResult<Event, String> result = collection().save(this);
         this.id = result.getSavedId();
         return this;
@@ -123,6 +124,7 @@ public class Event {
         int maxId = 0;
         for(Subscriber subscriber : getSubscribers()){
             subscriber.saveUser();
+            subscriber.setUser(null);
             if(subscriber.getId()!=null){
                 Integer id = Integer.valueOf(subscriber.getId());
                 if(id>maxId){
@@ -138,6 +140,12 @@ public class Event {
         }
     }
 
+    public User loadCreator(){
+    	if(this.creatorRef!=null){
+    		return User.findById(creatorRef);
+    	}
+    	return null;
+    }
 
     //////////////////////////////////////////////
     /////////        STATIC //////////////////////

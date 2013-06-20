@@ -23,9 +23,6 @@ function EventCreationCtrl($scope, $http, $location) {
 		alert('error : '+error);
 	});
 	$scope.valider = function(){
-		//$scope.evenement.subscriber = [];
-		//$scope.creator.creator = true;
-		//$scope.evenement.subscriber.push($scope.creator);
 		var theEvent = $scope.event;
 		$http.post('/rest/events', theEvent).success(function(data){
 			alert('done '+data.name);

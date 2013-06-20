@@ -63,6 +63,14 @@ public class MyUsernamePasswordAuthProvider
 			this.email = email;
 		}
 
+		public String getEmail() {
+			return email;
+		}
+
+		public void setEmail(String email) {
+			this.email = email;
+		}
+
 		@Required
 		@Email
 		public String email;
@@ -77,6 +85,10 @@ public class MyUsernamePasswordAuthProvider
 		@Override
 		public String getEmail() {
 			return email;
+		}
+
+		public void setPassword(String password) {
+			this.password = password;
 		}
 
 		@Override
@@ -104,6 +116,16 @@ public class MyUsernamePasswordAuthProvider
 
 		public String getName() {
 			return name;
+		}
+
+		@Override
+		public String getEmail() {
+			return super.getEmail();
+		}
+
+		@Override
+		public String getPassword() {
+			return super.getPassword();
 		}
 
 		public void setName(String name) {

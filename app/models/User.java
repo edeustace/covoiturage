@@ -126,6 +126,9 @@ public class User implements Subject {
             if(this.getPassword()==null && user.getPassword()!=null){
                 this.setPassword(user.getPassword());
             }
+            if(this.getLocomotion()==null && user.getLocomotion()!=null){
+                this.setLocomotion(user.getLocomotion());
+            }
             if((this.getAddress()==null || this.getAddress().empty()) 
             		&& user.getAddress()!=null && !user.getAddress().empty()){
                 if(this.getAddress()==null){
@@ -230,7 +233,7 @@ public class User implements Subject {
                             .setRoleName(controllers.Application.USER_ROLE)))
             // user.permissions = new ArrayList<UserPermission>();
             // user.permissions.add(UserPermission.findByValue("printers.edit"));
-                    .setEmail(email).setEmailValidated(false).setActive(true).setLastLogin(new Date())
+                    .setEmail(email).setEmailValidated(true).setActive(true).setLastLogin(new Date())
                     .setLinkedAccounts(Collections.singletonList(linkedAccount));
         }
 

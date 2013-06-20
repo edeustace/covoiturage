@@ -50,8 +50,6 @@ public class EventCtrl extends Controller {
 	@BodyParser.Of(BodyParser.Json.class)
 	public static Result createEvent() {
 		try{
-			String toto = objectMapper.writeValueAsString(request().body().asJson());
-			
             Form<Event> form = eventForm.bindFromRequest();
             if(form.hasErrors()){
                 return buildErrors(form);
@@ -161,7 +159,7 @@ public class EventCtrl extends Controller {
 
         @JsonProperty("creator")
         public UserModelLight getCreator() {
-            return new UserModelLight(event.getCreator());
+            return new UserModelLight(event.loadCreator());
         }
     }
 

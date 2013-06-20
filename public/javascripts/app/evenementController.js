@@ -24,9 +24,9 @@ function EventCtrl($scope, $http, marker, $location) {
 			var length = event.subscribers.length;
 	       	 	for(var i=0; i<length; i++){
 				var subscriber = event.subscribers[i];
-				if(subscriber.type && subscriber.type==="CAR"){
+				if(subscriber.locomotion && subscriber.locomotion==="CAR"){
 					subscriber.picto = marker.pictoAuto;
-				}else if(subscriber.type && subscriber.type==="STOP"){
+				}else if(subscriber.locomotion && subscriber.locomotion==="STOP"){
 					subscriber.picto = marker.pictoStop;			
 				}else{
 				}

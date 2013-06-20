@@ -68,16 +68,16 @@ public class EventIntegrationTest {
                 assertThat(evtFromDb).isNotNull();
                 assertThat(evtFromDb.getName()).isEqualTo(event.getName());
                 assertThat(evtFromDb.getDescription()).isNull();
-                assertThat(evtFromDb.getCreator().getEmail()).isEqualTo("toto@gmail.com");
+                assertThat(evtFromDb.getCreator()).isNull();
                 assertThat(evtFromDb.getCreatorRef()).isNotNull();
-                assertThat(evtFromDb.getCreatorRef()).isEqualTo(evtFromDb.getCreator().getId());
+                User creator = evtFromDb.loadCreator();
+                assertThat(creator.getEmail()).isEqualTo("toto@gmail.com");
                 assertThat(evtFromDb.getSubscribers()).isNotNull();
                 assertThat(evtFromDb.getSubscribers().size()).isEqualTo(1);
                 Subscriber subscriber = evtFromDb.getSubscribers().iterator().next();
                 assertThat(subscriber.getId()).isNotNull();
-                assertThat(evtFromDb.getCreator().isEmpty()).isFalse();
-                assertThat(evtFromDb.getCreator().getEmail()).isEqualTo(event.getCreator().getEmail());
-                assertThat(evtFromDb.getCreator().getEmail()).isEqualTo(subscriber.getEmail());
+                assertThat(creator.getEmail()).isEqualTo("toto@gmail.com");
+                assertThat(creator.getEmail()).isEqualTo(subscriber.getEmail());
                 assertThat(subscriber.getUserRef()).isNotNull();
                 assertThat(evtFromDb.getCreatorRef()).isEqualTo(subscriber.getUserRef());
 
@@ -104,15 +104,16 @@ public class EventIntegrationTest {
                 assertThat(evtFromDb).isNotNull();
                 assertThat(evtFromDb.getName()).isEqualTo(event.getName());
                 assertThat(evtFromDb.getDescription()).isNull();
-                assertThat(evtFromDb.getCreator().isEmpty()).isFalse();
+                User creatorFromDb = evtFromDb.loadCreator();
+                assertThat(creatorFromDb.isEmpty()).isFalse();
                 assertThat(evtFromDb.getCreatorRef()).isNotNull();
                 assertThat(evtFromDb.getSubscribers()).isNotNull();
                 assertThat(evtFromDb.getSubscribers().size()).isEqualTo(1);
                 Subscriber subscriber = evtFromDb.getSubscribers().iterator().next();
                 assertThat(subscriber.getId()).isNotNull();
-                assertThat(evtFromDb.getCreator()).isNotNull();
-                assertThat(evtFromDb.getCreator().getEmail()).isEqualTo(event.getCreator().getEmail());
-                assertThat(evtFromDb.getCreator().getEmail()).isEqualTo(subscriber.getEmail());
+                assertThat(creatorFromDb).isNotNull();
+                assertThat(creatorFromDb.getEmail()).isEqualTo("toto@gmail.com");
+                assertThat(creatorFromDb.getEmail()).isEqualTo(subscriber.getEmail());
                 assertThat(subscriber.getUserRef()).isNotNull();
                 assertThat(evtFromDb.getCreatorRef()).isEqualTo(subscriber.getUserRef());
 
