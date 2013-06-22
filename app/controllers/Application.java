@@ -12,6 +12,7 @@ import play.mvc.Result;
 import providers.MyUsernamePasswordAuthProvider;
 import providers.MyUsernamePasswordAuthProvider.MyLogin;
 import providers.MyUsernamePasswordAuthProvider.MySignup;
+import views.html.evenement;
 import views.html.evenementCreation;
 import views.html.index;
 import views.html.login;
@@ -58,7 +59,7 @@ public class Application extends Controller {
 		final User localUser = getLocalUser(session());
 		return ok(profile.render(localUser));
 	}
-
+	
 	public static Result login() {
 		return ok(login.render(MyUsernamePasswordAuthProvider.LOGIN_FORM));
 	}

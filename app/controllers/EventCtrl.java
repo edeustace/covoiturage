@@ -21,6 +21,7 @@ import play.mvc.BodyParser;
 import play.mvc.Controller;
 import play.mvc.Result;
 import views.html.evenement;
+import views.html.evenementParticipation;
 import controllers.decorators.Link;
 import controllers.decorators.SubscriberModel;
 import controllers.decorators.UserModelLight;
@@ -33,9 +34,11 @@ public class EventCtrl extends Controller {
 	public static Result list() {
 		return ok();
 	}
-
 	public static Result evenement(String id) {
 		return ok(evenement.render());
+	}
+	public static Result participer(String id) {
+		return ok(evenementParticipation.render());
 	}
 
 	public static Result getEvent(String id) {

@@ -51,7 +51,7 @@ POST    /login/password/forgot     controllers.Signup.doForgotPassword
 
 #PAGES
 GET     /evenement/:id                            controllers.EventCtrl.evenement(id: String)
-#GET     /evenement/:id/abonnement             controllers.EventCtrl.evenementCreation
+GET     /evenement/:id/participer             controllers.EventCtrl.participer(id: String)
 
 #API REST
 #Events
