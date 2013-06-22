@@ -1,0 +1,50 @@
+@import helper._ 
+@import helper.twitterBootstrap._
+
+@main(Messages("playauthenticate.subscribeEvent.title"),"subscribeEvent") {
+
+	<div class="row">
+		<div class="span6">
+			<h1>@Messages("playauthenticate.subscribeEvent.title")</h1>
+		</div>
+	</div>
+	<script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?libraries=places&sensor=false"></script>
+	<script type="text/javascript" src="@routes.Assets.at("js/lib/angular.js")"></script>
+	<script type="text/javascript" src="@routes.Assets.at("js/app/event/create/app.js")"></script>
+	<script type="text/javascript" src="@routes.Assets.at("js/app/event/create/controller.js")"></script>
+	
+	<div ng-controller="EventCreationCtrl" ng-app="covoiturage">
+		<div class="row" >
+			<!--Colonne de gauche-->
+			<div class="span2">
+				<fieldset>
+				<legend>Evenement</legend>
+				<label>Nom</label> 
+				<input ng-model="event.name" type="text" ></input> 
+				<label>Description</label>
+				<input ng-model="event.description" type="text" ></input> 
+				<label>adresse</label> 
+				<input ng-model="event.address" googleplace type="text" ></input>
+				</fieldset>
+			</div>
+			<div class="span2 offset2" >
+			 	<fieldset>
+					<legend>Createur</legend>
+					<label>Email</label>
+					<input ng-model="event.creator.email" type="email" required></input>
+					<label>Nom</label> 
+					<input ng-model="event.creator.name" type="text" ></input> 
+					<label>Prénom</label>
+					<input ng-model="event.creator.surname" type="text" ></input> 
+					<label>Adresse</label> 
+					<input ng-model="event.creator.address" googleplace type="text" ></input> 
+					<label>Je suis :</label> 
+					<select ng-model="event.creator.locomotion" ng-options="item.id as item.name for item in items"></select>
+				</fieldset>
+				<button class="btn btn-large btn-block btn-primary" type="button" ng-click="valider()">Valider</button>
+			</div>
+			
+		</div>
+	</div>
+
+}
