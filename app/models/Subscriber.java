@@ -25,7 +25,7 @@ public class Subscriber {
 
     private String userRef;
 
-    @JsonIgnore @EmailAlreadyUsed @NotNull @Valid
+    @JsonIgnore @EmailAlreadyUsed @Valid
     private User user;
 
     @JsonIgnore

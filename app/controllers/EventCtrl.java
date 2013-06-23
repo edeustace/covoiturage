@@ -16,6 +16,9 @@ import models.Subscriber;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.codehaus.jackson.map.ObjectMapper;
 
+import be.objectify.deadbolt.java.actions.Group;
+import be.objectify.deadbolt.java.actions.Restrict;
+
 import play.data.Form;
 import play.mvc.BodyParser;
 import play.mvc.Controller;
@@ -34,9 +37,11 @@ public class EventCtrl extends Controller {
 	public static Result list() {
 		return ok();
 	}
+	@Restrict(@Group(Application.USER_ROLE))
 	public static Result evenement(String id) {
 		return ok(evenement.render());
 	}
+	@Restrict(@Group(Application.USER_ROLE))
 	public static Result participer(String id) {
 		return ok(evenementParticipation.render());
 	}

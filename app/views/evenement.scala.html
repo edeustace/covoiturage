@@ -19,7 +19,9 @@
 		</div>
 	</div>
 	<div class="row" ng-controller="EventCtrl" ng-app="covoiturage">
-		<!--Colonne de gauche-->
+		<div class="span6">
+				<google-map center="center" fit="true" draggable="true" zoom="zoom" markers="markers" mark-click="true" style="height: 400px" class="angular-google-map" refresh="true"></google-map>
+		</div>
 		<div class="span4">
 			<br/>
 			<h2>
@@ -36,7 +38,7 @@
 				<input type="checkbox" ng:model="filterUsers" ng-true-value="CAR" ng-false-value=""/>
 				<br/>								
 				<span>Je cherche un passager</span>
-				<input type="checkbox" ng:model="filterUsers"  ng-true-value="STOP" ng-false-value=""/>
+				<input type="checkbox" ng:model="filterUsers"  ng-true-value="AUTOSTOP" ng-false-value=""/>
 				<br/>
 			    	<table id="searchTextResults" class="table">
 			      	   <tr><th>Nom</th><th>Prenom</th><th>Adresse</th><th>Type</th></tr>
@@ -48,10 +50,6 @@
 				   </tr>
 				</table>
 			</div>
-		</div>
-		<!--Centre-->
-		<div class="span6">
-				<google-map center="center" fit="true" draggable="true" zoom="zoom" markers="markers" mark-click="true" style="height: 400px" class="angular-google-map" refresh="true"></google-map>
 		</div>
 	</div>
 

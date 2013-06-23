@@ -104,6 +104,12 @@ public class Event {
         this.id = result.getSavedId();
         return this;
     }
+    
+    public Event update(){
+        WriteResult<Event, String> result = collection().save(this);
+        this.id = result.getSavedId();
+        return this;
+    }
 
     private void persistOrLoadCreatorAndCreateRef(){
     	if(creatorRef!=null){
@@ -214,6 +220,19 @@ public class Event {
         return subscribers;
     }
 
+    public Boolean containsSubscriber(Subscriber subscriber){
+        return subscribers.contains(subscriber);
+    }
+    
+    public String getIdSubscriber(Subscriber aSubscriber){
+    	for (Subscriber subscriber : this.getSubscribers()) {
+			if(subscriber.equals(aSubscriber)){
+				return subscriber.getId();
+			}
+		}
+        return null;
+    }
+    
     public Event addSubscriber(@Valid Subscriber subscriber){
         if(!subscribers.contains(subscriber)){
             subscribers.add(subscriber);

@@ -12,7 +12,6 @@ import play.mvc.Result;
 import providers.MyUsernamePasswordAuthProvider;
 import providers.MyUsernamePasswordAuthProvider.MyLogin;
 import providers.MyUsernamePasswordAuthProvider.MySignup;
-import views.html.evenement;
 import views.html.evenementCreation;
 import views.html.index;
 import views.html.login;

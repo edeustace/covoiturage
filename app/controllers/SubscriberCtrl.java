@@ -10,13 +10,14 @@ import models.Event;
 import models.Subscriber;
 
 import org.codehaus.jackson.map.ObjectMapper;
-
-import controllers.decorators.SubscriberModel;
+import org.codehaus.jackson.node.ObjectNode;
 
 import play.data.Form;
+import play.libs.Json;
 import play.mvc.BodyParser;
 import play.mvc.Controller;
 import play.mvc.Result;
+import controllers.decorators.SubscriberModel;
 
 /**
  * Created with IntelliJ IDEA.
@@ -50,13 +51,22 @@ public class SubscriberCtrl extends Controller {
             } else {
                 Subscriber subscriber = form.get();
                 Event event = Event.read(id);
+                String idSub = event.getIdSubscriber(subscriber);
+                if(idSub!=null){
+                	ObjectNode result = Json.newObject();
+                	result.put("id", idSub);
+                	result.put("message", "Déjà existant");
+                	result.put("status", "KO");
+                	return badRequest(result);
+                }
                 event.addSubscriber(subscriber);
-                event.save();
+                event.update();
                 Subscriber subsc = event.getSubscriberByMail(subscriber.getEmail());
                 SubscriberModel subscriberModel = new SubscriberModel(subsc, event.getId());
                 return ok(objectMapper.writeValueAsString(subscriberModel)).as("application/json");
             }
         } catch (Exception e){
+        	e.printStackTrace();
             return internalServerError().as("application/json");
         }
     }
@@ -75,7 +85,7 @@ public class SubscriberCtrl extends Controller {
                     return badRequest("Subscriber not exist").as("application/json");
                 }
                 event.addAndMergeSubscriber(subscriber);
-                event.save();
+                event.update();
                 Subscriber subsc = event.getSubscriberByMail(subscriber.getEmail());
                 SubscriberModel subscriberModel = new SubscriberModel(subsc, event.getId());
                 return ok(objectMapper.writeValueAsString(subscriberModel)).as("application/json");

@@ -26,7 +26,7 @@ function EventCtrl($scope, $http, marker, $location) {
 				var subscriber = event.subscribers[i];
 				if(subscriber.locomotion && subscriber.locomotion==="CAR"){
 					subscriber.picto = marker.pictoAuto;
-				}else if(subscriber.locomotion && subscriber.locomotion==="STOP"){
+				}else if(subscriber.locomotion && subscriber.locomotion==="AUTOSTOP"){
 					subscriber.picto = marker.pictoStop;			
 				}else{
 				}

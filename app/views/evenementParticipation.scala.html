@@ -10,38 +10,39 @@
 	</div>
 	<script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?libraries=places&sensor=false"></script>
 	<script type="text/javascript" src="@routes.Assets.at("js/lib/angular.js")"></script>
-	<script type="text/javascript" src="@routes.Assets.at("js/app/event/create/app.js")"></script>
-	<script type="text/javascript" src="@routes.Assets.at("js/app/event/create/controller.js")"></script>
+	<script type="text/javascript" src="@routes.Assets.at("js/app/event/subscribe/app.js")"></script>
+	<script type="text/javascript" src="@routes.Assets.at("js/app/event/subscribe/controller.js")"></script>
 	
 	<div ng-controller="EventCreationCtrl" ng-app="covoiturage">
 		<div class="row" >
 			<!--Colonne de gauche-->
 			<div class="span2">
-				<fieldset>
-				<legend>Evenement</legend>
-				<label>Nom</label> 
-				<input ng-model="event.name" type="text" ></input> 
-				<label>Description</label>
-				<input ng-model="event.description" type="text" ></input> 
-				<label>adresse</label> 
-				<input ng-model="event.address" googleplace type="text" ></input>
-				</fieldset>
+				<legend>Participer à </legend>
+				<h3>{{event.name}}</h3>
+				<p>{{event.description}}</p>				
+				<label>adresse : </label> 
+				<p>{{event.address.description}}</p>	
 			</div>
 			<div class="span2 offset2" >
 			 	<fieldset>
-					<legend>Createur</legend>
+					<legend>Participant</legend>
+					<div ng-show="message">
+						<p class="text-warning" >{{message}}</p>
+						<button class="btn btn-warning" type="button" ng-click="update()">Mettre à jour</button> ou 
+						<button class="btn btn-warning" type="button" ng-click="cancel()">Annuler</button>
+					</div>
 					<label>Email</label>
-					<input ng-model="event.creator.email" type="email" required></input>
+					<input ng-model="subscriber.email" type="email" required></input>
 					<label>Nom</label> 
-					<input ng-model="event.creator.name" type="text" ></input> 
+					<input ng-model="subscriber.name" type="text" ></input> 
 					<label>Prénom</label>
-					<input ng-model="event.creator.surname" type="text" ></input> 
+					<input ng-model="subscriber.surname" type="text" ></input> 
 					<label>Adresse</label> 
-					<input ng-model="event.creator.address" googleplace type="text" ></input> 
+					<input ng-model="subscriber.address" googleplace type="text" ></input> 
 					<label>Je suis :</label> 
-					<select ng-model="event.creator.locomotion" ng-options="item.id as item.name for item in items"></select>
+					<select ng-model="subscriber.locomotion" ng-options="item.id as item.name for item in items"></select>
 				</fieldset>
-				<button class="btn btn-large btn-block btn-primary" type="button" ng-click="valider()">Valider</button>
+				<button class="btn btn-large btn-block btn-primary" type="button" ng-click="create()">Valider</button>
 			</div>
 			
 		</div>
