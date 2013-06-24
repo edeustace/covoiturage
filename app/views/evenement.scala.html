@@ -4,7 +4,7 @@
 
 
 @main(Messages("playauthenticate.event.title"),"event") {
-<link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/google-maps.css")" />
+<link rel="stylesheet" media="screen" href="@routes.Assets.at("css/google-maps.css")" />
   <script src="http://maps.googleapis.com/maps/api/js?sensor=false&language=en"></script>
   
   <script src="@routes.Assets.at("js/lib/angular.js")"></script>
@@ -42,11 +42,14 @@
 				<br/>
 			    	<table id="searchTextResults" class="table">
 			      	   <tr><th>Nom</th><th>Prenom</th><th>Adresse</th><th>Type</th></tr>
-			      	   <tr ng-repeat="subscriber in subscribers | auto:filterUsers:markers ">
-					<td>{{subscriber.name}}</td>
-					<td>{{subscriber.surname}}</td>
-					<td>{{subscriber.address.description}}</td>
-					<td><img src="{{subscriber.picto}}" /></td>
+				      	<tr ng-repeat="subscriber in subscribers | auto:filterUsers:markers ">
+						<td>{{subscriber.name}}</td>
+						<td>{{subscriber.surname}}</td>
+						<td>{{subscriber.address.description}}</td>
+						<td><img src="{{subscriber.picto}}" /></td>
+						<td>{{subscriber.passengers.length}}</td>
+						<td>{{subscriber.car}}</td>
+						<td><button class="btn btn-warning" type="button" ng-click="subscriber.goInCar()" >Ajouter</button></td>
 				   </tr>
 				</table>
 			</div>

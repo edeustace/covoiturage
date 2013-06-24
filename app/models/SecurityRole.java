@@ -15,13 +15,12 @@
  */
 package models;
 
-import be.objectify.deadbolt.core.models.Role;
+import javax.persistence.Id;
+
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
-import play.db.ebean.Model;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import be.objectify.deadbolt.core.models.Role;
 
 /**
  * @author Steve Chaloner (steve@objectify.be)

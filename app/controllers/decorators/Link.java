@@ -12,6 +12,10 @@ import org.codehaus.jackson.annotate.JsonProperty;
 public class Link {
 
     public static String SELF = "self";
+    public static String CREATE = "create";
+    public static String UPDATE = "update";
+    public static String DELETE = "delete";
+    
 
     private String rel;
     private String href;
@@ -25,7 +29,7 @@ public class Link {
         return new Link(rel, href);
     }
 
-    @JsonProperty("ref")
+    @JsonProperty("rel")
     public String getRel() {
         return rel;
     }

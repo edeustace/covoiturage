@@ -27,7 +27,7 @@ angular.module('markerModule', [], function($provide){
 	
 		var icons = [];
 		icons["CAR"] = iconAuto;
-		icons["STOP"] = iconStop;
+		icons["AUTOSTOP"] = iconStop;
 		icons["EVENT"] = iconEvent;
 		var currentScope = null; 
 		var currentEvent = null;

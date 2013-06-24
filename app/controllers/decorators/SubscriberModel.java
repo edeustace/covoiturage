@@ -1,8 +1,12 @@
 package controllers.decorators;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import models.Address;
 import models.Subscriber;
 import models.enums.Locomotion;
+
 import org.codehaus.jackson.annotate.JsonProperty;
 
 /**
@@ -14,21 +18,25 @@ import org.codehaus.jackson.annotate.JsonProperty;
  */
 public class SubscriberModel {
 
-    private Subscriber subscriber;
+	private Subscriber subscriber;
 
-    private Link link;
+    private List<Link> links = new ArrayList<Link>();
 
     public SubscriberModel(Subscriber subscriber, String idEvent) {
         this.subscriber = subscriber;
         if(subscriber!=null){
-            String link = controllers.routes.SubscriberCtrl.getSubscriber(idEvent, subscriber.getId()).toString();
-            this.link = Link.link(Link.SELF, link);
+            String get = controllers.routes.SubscriberCtrl.getSubscriber(idEvent, subscriber.getId()).toString();
+            this.links.add(Link.link(Link.SELF, get));
+            String create = controllers.routes.SubscriberCtrl.createSubscriber(idEvent).toString();
+            this.links.add(Link.link(Link.CREATE, create));
+            String update = controllers.routes.SubscriberCtrl.updateSubscriber(idEvent, subscriber.getId()).toString();
+            this.links.add(Link.link(Link.UPDATE, update));
         }
     }
 
-    @JsonProperty("link")
-    public Link getLink() {
-        return link;
+    @JsonProperty("links")
+    public List<Link> getLink() {
+        return links;
     }
 
     @JsonProperty("user")
@@ -60,4 +68,12 @@ public class SubscriberModel {
     public Locomotion getLocomotion() {
         return subscriber.getLocomotion();
     }
+    @JsonProperty("passengers")
+    public List<String> getPassengers() {
+		return subscriber.getPassengers();
+	}
+    @JsonProperty("car")
+	public String getCar() {
+		return subscriber.getCar();
+	}
 }

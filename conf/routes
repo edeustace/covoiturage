@@ -67,6 +67,10 @@ GET     /rest/events/:id/subscribers/:idSub       controllers.SubscriberCtrl.get
 PUT     /rest/events/:id/subscribers/:idSub       controllers.SubscriberCtrl.updateSubscriber(id :String, idSub :String)
 DELETE  /rest/events/:id/subscribers/:idSub       controllers.SubscriberCtrl.deleteSubscriber(id :String, idSub :String)
 
+POST    /rest/events/:id/subscribers/:idSub/passengers              controllers.SubscriberCtrl.addPassenger(id :String, idSub :String)
+POST    /rest/events/:id/subscribers/:idSub/car              controllers.SubscriberCtrl.changeCar(id :String, idSub :String)
+
+
 #Users
 GET     /rest/users/current                   controllers.UserCtrl.getCurrentUser()
 GET     /rest/users/:id                   controllers.UserCtrl.getUser(id :String)

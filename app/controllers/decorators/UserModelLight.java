@@ -37,6 +37,11 @@ public class UserModelLight {
         return user.setId(id);
     }
 
+    @JsonProperty("id")
+    public String getId() {
+        return user.getId();
+    }
+    
     @JsonProperty("email")
     public String getEmail() {
         return user.getEmail();

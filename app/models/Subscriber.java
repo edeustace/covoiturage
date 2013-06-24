@@ -1,5 +1,8 @@
 package models;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
@@ -42,9 +45,13 @@ public class Subscriber {
     @JsonIgnore @NotNull
     private Locomotion locomotion;
 
+    private List<String> passengers = new ArrayList<String>();
+    
+    private String car; 
+    
     ///////////  CLASS METHODS /////////////////
 
-    public void merge(Subscriber other){
+	public void merge(Subscriber other){
         if(!other.isEmpty()){
             if(other.getName()!=null){
                 this.setName(other.getName());
@@ -185,4 +192,20 @@ public class Subscriber {
         this.locomotion = locomotion;
         return this;
     }
+    @JsonProperty("passengers")
+    public List<String> getPassengers() {
+		return passengers;
+	}
+    @JsonProperty("passengers")
+	public void setPassengers(List<String> passengers) {
+		this.passengers = passengers;
+	}
+    @JsonProperty("car")
+	public String getCar() {
+		return car;
+	}
+    @JsonProperty("car")
+	public void setCar(String car) {
+		this.car = car;
+	}
 }
