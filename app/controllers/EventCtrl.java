@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import models.Address;
@@ -110,19 +111,20 @@ public class EventCtrl extends Controller {
     public static class EventModel{
         private Event event;
 
-        private Link link;
+        private List<Link> links = new ArrayList<Link>();
 
         public EventModel(Event event) {
             if(event==null){
                 throw new IllegalArgumentException("Event is required");
             }
             this.event = event;
-            this.link = Link.link(Link.SELF, controllers.routes.EventCtrl.getEvent(this.event.getId()).toString());
+            this.links.add(Link.link(Link.SELF, controllers.routes.EventCtrl.getEvent(this.event.getId()).toString()));
+            this.links.add(Link.link("subscribers", controllers.routes.SubscriberCtrl.list(this.event.getId()).toString()));
         }
 
-        @JsonProperty("link")
-        public Link getLink() {
-            return link;
+        @JsonProperty("links")
+        public List<Link> getLinks() {
+            return links;
         }
 
         @JsonProperty("id")

@@ -1,7 +1,7 @@
 package models;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -45,7 +45,7 @@ public class Subscriber {
     @JsonIgnore @NotNull
     private Locomotion locomotion;
 
-    private List<String> passengers = new ArrayList<String>();
+    private Set<String> passengers = new HashSet<String>();
     
     private String car; 
     
@@ -193,11 +193,11 @@ public class Subscriber {
         return this;
     }
     @JsonProperty("passengers")
-    public List<String> getPassengers() {
+    public Set<String> getPassengers() {
 		return passengers;
 	}
     @JsonProperty("passengers")
-	public void setPassengers(List<String> passengers) {
+	public void setPassengers(Set<String> passengers) {
 		this.passengers = passengers;
 	}
     @JsonProperty("car")
