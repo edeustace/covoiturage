@@ -2,6 +2,7 @@ package controllers.decorators;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import models.Address;
 import models.Subscriber;
@@ -31,6 +32,8 @@ public class SubscriberModel {
             this.links.add(Link.link(Link.CREATE, create));
             String update = controllers.routes.SubscriberCtrl.updateSubscriber(idEvent, subscriber.getId()).toString();
             this.links.add(Link.link(Link.UPDATE, update));
+            String passengers = controllers.routes.SubscriberCtrl.addPassenger(idEvent, subscriber.getId()).toString();
+            this.links.add(Link.link("passengers", passengers));
         }
     }
 
@@ -41,10 +44,15 @@ public class SubscriberModel {
 
     @JsonProperty("user")
     public UserModelLight getUser() {
+    	
         return new UserModelLight(subscriber.getUser());
     }
+    @JsonProperty("userRef")
+    public String getUserRef() {
+		return subscriber.getUserRef();
+	}
 
-    @JsonProperty("name")
+	@JsonProperty("name")
     public String getName() {
         return subscriber.getName();
     }
@@ -69,7 +77,7 @@ public class SubscriberModel {
         return subscriber.getLocomotion();
     }
     @JsonProperty("passengers")
-    public List<String> getPassengers() {
+    public Set<String> getPassengers() {
 		return subscriber.getPassengers();
 	}
     @JsonProperty("car")

@@ -15,6 +15,7 @@ import net.vz.mongodb.jackson.MongoCollection;
 import net.vz.mongodb.jackson.ObjectId;
 import net.vz.mongodb.jackson.WriteResult;
 
+import org.apache.commons.lang3.StringUtils;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
@@ -111,6 +112,33 @@ public class Event {
         return this;
     }
 
+    public Event addPassenger(String idPassenger, String idCarOwner){
+    	if(StringUtils.isNotBlank(idPassenger)){
+    		for (Subscriber subscriber : this.getSubscribers()) {
+    			if(subscriber.getUserRef().equals(idCarOwner)){
+    	    		if(!subscriber.getPassengers().contains(idPassenger)){
+    	    			subscriber.getPassengers().add(idPassenger);
+    	        	}
+    			}else if(subscriber.getPassengers().contains(idPassenger)){
+					subscriber.getPassengers().remove(idPassenger);
+				}
+			}
+        }
+    	Subscriber passenger = this.getSubscriberById(idPassenger);
+    	passenger.setCar(idCarOwner);
+    	return this;
+    }  
+    
+    public Event deletePassenger(String idPassenger, String idCarOwner){
+    	Subscriber carOwner = this.getSubscriberById(idCarOwner);
+    	carOwner.getPassengers().remove(idPassenger);
+    	Subscriber passenger = this.getSubscriberById(idPassenger);
+    	if(passenger.getCar().equals(idCarOwner)){
+    		passenger.setCar(null);
+    	}
+    	return this;
+    }
+    
     private void persistOrLoadCreatorAndCreateRef(){
     	if(creatorRef!=null){
     		User user = User.findById(creatorRef);

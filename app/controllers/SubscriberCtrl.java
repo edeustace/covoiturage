@@ -9,6 +9,7 @@ import java.util.Collection;
 import models.Event;
 import models.Subscriber;
 
+import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.node.ObjectNode;
 
@@ -123,24 +124,42 @@ public class SubscriberCtrl extends Controller {
         }
     }
     
-    public static Result addPassenger(String id, String idSub){
+    public static Result getPassengers(String id, String idSub){
         try{
             Event event = Event.read(id);
-            String idPassenger = request().body().asText();
             Subscriber subsc = event.getSubscriberById(idSub);
-            subsc.getPassengers().add(idPassenger);
-            event.update();
-            SubscriberModel subscriberModel = new SubscriberModel(subsc, event.getId());
-            return ok(objectMapper.writeValueAsString(subscriberModel)).as("application/json");
+            return ok(objectMapper.writeValueAsString(subsc.getPassengers())).as("application/json");
         } catch (Exception e){
             return internalServerError().as("application/json");
         }
     }
+    
+    @BodyParser.Of(BodyParser.Json.class)
+    public static Result addPassenger(String id, String idSub){
+        try{
+            Event event = Event.read(id);
+            JsonNode node = request().body().asJson();
+            String idPassenger = node.get("passenger").getTextValue();
+            event.addPassenger(idPassenger, idSub);
+            event.update();
+            return ok().as("application/json");
+        } catch (Exception e){
+            return internalServerError(e.getMessage()).as("application/json");
+        }
+    }
 
-    
+    public static Result deletePassenger(String id, String idSub, String idPassenger){
+    	try{
+	    	Event event = Event.read(id);
+	    	event.deletePassenger(idPassenger, idSub);
+	    	event.update();
+	    	return ok().as("application/json");
+	    } catch (Exception e){
+	        return internalServerError(e.getMessage()).as("application/json");
+	    }
+    }
     public static Result deleteSubscriber(String id, String idSub){
-    
-    	return ok().as("application/json");
+	    return ok().as("application/json");
     }
 }
 
