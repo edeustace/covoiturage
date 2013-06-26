@@ -8,11 +8,11 @@
 function EventCtrl($scope, $http, marker, $location) {
 	var _scope = $scope;
 	var _marker = marker; 
-	
+	var _eventLinks;
     $scope.addPassengers = function(subscriber){
-    	var link = getPassengersLink(subscriber);
+    	var link = getCarLink(subscriber);
     	$http.post(link, {passenger:$scope.user.id}).success(function(subscriber){
-			var subscribersLink = getSubscriberLink($scope.event);
+			var subscribersLink = _eventLinks["subscribers"];
 			$http.get(subscribersLink).success(function (subscribers){
 				if(subscribers){
 					initSubscribers($scope, subscribers, marker);
@@ -28,9 +28,9 @@ function EventCtrl($scope, $http, marker, $location) {
     
 
     $scope.removePassengers = function(subscriber){
-    	var link = getPassengersLink(subscriber);
+    	var link = getCarLink(subscriber);
     	$http.delete(link+'/'+$scope.currentSubscriber.userRef).success(function(subscriber){
-			var subscribersLink = getSubscriberLink($scope.event);
+			var subscribersLink = _eventLinks["subscribers"];
 			$http.get(subscribersLink).success(function (subscribers){
 				if(subscribers){
 					initSubscribers($scope, subscribers, marker);
@@ -48,28 +48,32 @@ function EventCtrl($scope, $http, marker, $location) {
     var id = extractFromUrl($location.absUrl());
     $http.get('/rest/users/current').success(function(user) {
 		if(user){
+			
+			//TODO si le user courant ne fait pas parti des subscriber il faut lui proposer de s'ajouter 
+			
 			$scope.user = user;
-
 			$http.get('/rest/events/'+id).success(function(event) {
 			    if(event){
 			    	$scope.event = event;
 			    	marker.reinitMarker();
+			    	_eventLinks = getEventLinks(event);
 				   	if(event){
 				        marker.recordEvent(event);
-				   	}
-				   	if(event.subscribers){
-				   		initSubscribers($scope, event.subscribers, marker, function(subscriber){
-				   			marker.recordSubscriber(subscriber);
-				   			var idUser = $scope.user.id;
-							if(idUser == subscriber.user.id){
-								if(subscriber.locomotion=="CAR"){
-									$scope.filterUsers = "AUTOSTOP";	
-								}else if(subscriber.locomotion=="AUTOSTOP"){
-									$scope.filterUsers = "CAR";
+				   	
+					   	if(event.subscribers){
+					   		initSubscribers($scope, event.subscribers, marker, function(subscriber){
+					   			marker.recordSubscriber(subscriber);
+					   			var idUser = $scope.user.id;
+								if(idUser == subscriber.userRef){
+									if(subscriber.locomotion=="CAR"){
+										$scope.filterUsers = "AUTOSTOP";	
+									}else if(subscriber.locomotion=="AUTOSTOP"){
+										$scope.filterUsers = "CAR";
+									}
 								}
-							}
-				   		});
-			       	}
+					   		});
+				       	}
+				   	}
 					var markers = $scope.markers;
 					$scope.$watch('filterUsers', function(newValue, oldValue) {
 							if(newValue){ 
@@ -110,7 +114,7 @@ function EventCtrl($scope, $http, marker, $location) {
 			}
 			
 			var idUser = $scope.user.id;
-			if(idUser == subscriber.user.id){
+			if(idUser == subscriber.userRef){
 				$scope.currentSubscriber = subscriber;
 				subscriber.current = true;
 			}else{
@@ -133,16 +137,25 @@ function EventCtrl($scope, $http, marker, $location) {
 		}
 		return null;
     }
-    function getSubscriberLink(event){
+    function getEventLinks(event){
+    	var theLinks = {};
     	if(event.links){
-    		var subscribersLink = null;
-			for ( var i = 0; i < event.links.length; i++) {
+    		for ( var i = 0; i < event.links.length; i++) {
 				var link = event.links[i];
-				if(link.rel == "subscribers"){
+				theLinks[link.rel] = link.href;
+			}
+    	}
+    	return theLinks;
+    }
+    function getCarLink(subscriber){
+		if(subscriber.car && subscriber.car.links){
+			for ( var int = 0; int < subscriber.car.links.length; int++) {
+				var link = subscriber.car.links[int];
+				if(link && link.rel == "self"){
 					return link.href;
 				}
 			}
-    	}
+		}
 		return null;
     }
 }

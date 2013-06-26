@@ -40,6 +40,10 @@
 					<input ng-model="event.creator.address" googleplace type="text" ></input> 
 					<label>Je suis :</label> 
 					<select ng-model="event.creator.locomotion" ng-options="item.id as item.name for item in items"></select>
+					<div ng-show="event.creator.locomotion == 'CAR'">
+						<label>Nb passagers max</label> 
+						<input ng-model="event.creator.car.nbPlaces" type="text" maxlength="1"></input> 
+					</div>
 				</fieldset>
 				<button class="btn btn-large btn-block btn-primary" type="button" ng-click="valider()">Valider</button>
 			</div>

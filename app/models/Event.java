@@ -116,25 +116,29 @@ public class Event {
     	if(StringUtils.isNotBlank(idPassenger)){
     		for (Subscriber subscriber : this.getSubscribers()) {
     			if(subscriber.getUserRef().equals(idCarOwner)){
-    	    		if(!subscriber.getPassengers().contains(idPassenger)){
-    	    			subscriber.getPassengers().add(idPassenger);
+    	    		if(subscriber.getCar()!=null && !subscriber.getCar().getPassengers().contains(idPassenger)){
+    	    			subscriber.getCar().addPassenger(idPassenger);
     	        	}
-    			}else if(subscriber.getPassengers().contains(idPassenger)){
-					subscriber.getPassengers().remove(idPassenger);
+    			}else if(subscriber.getCar()!=null && subscriber.getCar().getPassengers().contains(idPassenger)){
+					subscriber.getCar().getPassengers().remove(idPassenger);
 				}
 			}
         }
     	Subscriber passenger = this.getSubscriberById(idPassenger);
-    	passenger.setCar(idCarOwner);
+    	if(passenger!=null){
+    		passenger.setCarRef(idCarOwner);
+    	}
     	return this;
     }  
     
     public Event deletePassenger(String idPassenger, String idCarOwner){
     	Subscriber carOwner = this.getSubscriberById(idCarOwner);
-    	carOwner.getPassengers().remove(idPassenger);
+    	if(carOwner.getCar()!=null && carOwner.getCar().getPassengers()!=null){
+    		carOwner.getCar().getPassengers().remove(idPassenger);	
+    	}
     	Subscriber passenger = this.getSubscriberById(idPassenger);
-    	if(passenger.getCar().equals(idCarOwner)){
-    		passenger.setCar(null);
+    	if(passenger!=null && passenger.getCarRef()!=null && passenger.getCarRef().equals(idCarOwner)){
+    		passenger.setCarRef(null);
     	}
     	return this;
     }
@@ -155,22 +159,9 @@ public class Event {
     }
 
     private void persistUsersOnSubscribers(){
-        int maxId = 0;
         for(Subscriber subscriber : getSubscribers()){
             subscriber.saveUser();
             subscriber.setUser(null);
-            if(subscriber.getId()!=null){
-                Integer id = Integer.valueOf(subscriber.getId());
-                if(id>maxId){
-                    maxId = id;
-                }
-            }
-        }
-        for(Subscriber subscriber : getSubscribers()){
-            if(subscriber.getId()==null){
-                subscriber.setId(String.valueOf(maxId));
-                maxId++;
-            }
         }
     }
 
@@ -255,7 +246,7 @@ public class Event {
     public String getIdSubscriber(Subscriber aSubscriber){
     	for (Subscriber subscriber : this.getSubscribers()) {
 			if(subscriber.equals(aSubscriber)){
-				return subscriber.getId();
+				return subscriber.getUserRef();
 			}
 		}
         return null;
@@ -292,7 +283,7 @@ public class Event {
 
     public Subscriber getSubscriberById(String id){
         for(Subscriber subscriber : subscribers){
-            if(subscriber.getId()!=null && subscriber.getId().equals(id)){
+            if(subscriber.getUserRef()!=null && subscriber.getUserRef().equals(id)){
                 return subscriber;
             }
         }

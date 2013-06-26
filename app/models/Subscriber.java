@@ -1,8 +1,5 @@
 package models;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
@@ -23,9 +20,6 @@ import org.hibernate.validator.constraints.Email;
  */
 public class Subscriber {
 
-    ///////////    FIELDS  /////////////////////
-    private String id;
-
     private String userRef;
 
     @JsonIgnore @EmailAlreadyUsed @Valid
@@ -45,9 +39,10 @@ public class Subscriber {
     @JsonIgnore @NotNull
     private Locomotion locomotion;
 
-    private Set<String> passengers = new HashSet<String>();
+    private Car car; 
+
+    private String carRef;
     
-    private String car; 
     
     ///////////  CLASS METHODS /////////////////
 
@@ -68,6 +63,12 @@ public class Subscriber {
             if(other.getLocomotion()!=null){
                 this.setLocomotion(other.getLocomotion());
             }
+            if(other.getCar()!=null){
+                this.setCar(other.getCar());
+            }
+            if(other.getCarRef()!=null){
+                this.setCarRef(other.getCarRef());
+            }
         }
     }
 
@@ -83,8 +84,8 @@ public class Subscriber {
     @Override
     public boolean equals(Object obj) {
         if(obj instanceof Subscriber){
-            if(this.id!=null && ((Subscriber) obj).getId()!=null){
-                return this.id.equals(((Subscriber)obj).getId());
+            if(this.getUserRef()!=null && ((Subscriber) obj).getUserRef()!=null){
+                return this.getUserRef().equals(((Subscriber)obj).getUserRef());
             }
             if(this.email==null){
                 return false;
@@ -129,14 +130,6 @@ public class Subscriber {
         return this;
     }
 
-    @JsonProperty("id")
-    public String getId() {
-        return id;
-    }
-    @JsonProperty("id")
-    public void setId(String id) {
-        this.id = id;
-    }
     @JsonProperty("userRef")
     public String getUserRef() {
         return userRef;
@@ -192,20 +185,20 @@ public class Subscriber {
         this.locomotion = locomotion;
         return this;
     }
-    @JsonProperty("passengers")
-    public Set<String> getPassengers() {
-		return passengers;
+    @JsonProperty("carRef")
+	public String getCarRef() {
+		return carRef;
 	}
-    @JsonProperty("passengers")
-	public void setPassengers(Set<String> passengers) {
-		this.passengers = passengers;
+    @JsonProperty("carRef")
+	public void setCarRef(String carRef) {
+		this.carRef = carRef;
 	}
     @JsonProperty("car")
-	public String getCar() {
+	public Car getCar() {
 		return car;
 	}
     @JsonProperty("car")
-	public void setCar(String car) {
+	public void setCar(Car car) {
 		this.car = car;
 	}
 }

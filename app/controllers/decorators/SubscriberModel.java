@@ -2,7 +2,6 @@ package controllers.decorators;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import models.Address;
 import models.Subscriber;
@@ -23,17 +22,20 @@ public class SubscriberModel {
 
     private List<Link> links = new ArrayList<Link>();
 
+    private String idEvent;
+    
     public SubscriberModel(Subscriber subscriber, String idEvent) {
         this.subscriber = subscriber;
+        this.idEvent = idEvent;
         if(subscriber!=null){
-            String get = controllers.routes.SubscriberCtrl.getSubscriber(idEvent, subscriber.getId()).toString();
+            String get = controllers.routes.SubscriberCtrl.getSubscriber(idEvent, subscriber.getUserRef()).toString();
             this.links.add(Link.link(Link.SELF, get));
             String create = controllers.routes.SubscriberCtrl.createSubscriber(idEvent).toString();
             this.links.add(Link.link(Link.CREATE, create));
-            String update = controllers.routes.SubscriberCtrl.updateSubscriber(idEvent, subscriber.getId()).toString();
+            String update = controllers.routes.SubscriberCtrl.updateSubscriber(idEvent, subscriber.getUserRef()).toString();
             this.links.add(Link.link(Link.UPDATE, update));
-            String passengers = controllers.routes.SubscriberCtrl.addPassenger(idEvent, subscriber.getId()).toString();
-            this.links.add(Link.link("passengers", passengers));
+            String passengers = controllers.routes.SubscriberCtrl.updateCar(idEvent, subscriber.getUserRef()).toString();
+            this.links.add(Link.link("car", passengers));
         }
     }
 
@@ -76,12 +78,16 @@ public class SubscriberModel {
     public Locomotion getLocomotion() {
         return subscriber.getLocomotion();
     }
-    @JsonProperty("passengers")
-    public Set<String> getPassengers() {
-		return subscriber.getPassengers();
-	}
+    
+    @JsonProperty("carRef")
+    public String getCarRef() {
+    	return subscriber.getCarRef();
+    }
     @JsonProperty("car")
-	public String getCar() {
-		return subscriber.getCar();
+    public CarModel getCar() {
+    	if(subscriber.getCar()==null){
+    		return null;
+    	}
+		return new CarModel(subscriber.getCar(), this.idEvent, this.subscriber.getUserRef());
 	}
 }

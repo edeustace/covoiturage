@@ -41,6 +41,10 @@
 					<input ng-model="subscriber.address" googleplace type="text" ></input> 
 					<label>Je suis :</label> 
 					<select ng-model="subscriber.locomotion" ng-options="item.id as item.name for item in items"></select>
+					<div ng-show="subscriber.locomotion == 'CAR'">
+						<label>Nb passagers max</label> 
+						<input ng-model="subscriber.car.nbPlaces" type="text" maxlength="1"></input> 
+					</div>
 				</fieldset>
 				<button class="btn btn-large btn-block btn-primary" type="button" ng-click="create()">Valider</button>
 			</div>

@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import models.Car.CarIsFullException;
 import models.Event;
 import models.Subscriber;
 
@@ -110,32 +111,18 @@ public class SubscriberCtrl extends Controller {
         }
     }
     
-    public static Result changeCar(String id, String idSub){
-        try{
-            Event event = Event.read(id);
-            String idCar = request().body().asText();
-            Subscriber subsc = event.getSubscriberById(idSub);
-            subsc.setCar(idCar);
-            event.update();
-            SubscriberModel subscriberModel = new SubscriberModel(subsc, event.getId());
-            return ok(objectMapper.writeValueAsString(subscriberModel)).as("application/json");
-        } catch (Exception e){
-            return internalServerError().as("application/json");
-        }
-    }
-    
-    public static Result getPassengers(String id, String idSub){
+    public static Result getCar(String id, String idSub){
         try{
             Event event = Event.read(id);
             Subscriber subsc = event.getSubscriberById(idSub);
-            return ok(objectMapper.writeValueAsString(subsc.getPassengers())).as("application/json");
+            return ok(objectMapper.writeValueAsString(subsc.getCar())).as("application/json");
         } catch (Exception e){
             return internalServerError().as("application/json");
         }
     }
     
     @BodyParser.Of(BodyParser.Json.class)
-    public static Result addPassenger(String id, String idSub){
+    public static Result updateCar(String id, String idSub){
         try{
             Event event = Event.read(id);
             JsonNode node = request().body().asJson();
@@ -143,6 +130,8 @@ public class SubscriberCtrl extends Controller {
             event.addPassenger(idPassenger, idSub);
             event.update();
             return ok().as("application/json");
+        } catch (CarIsFullException e){
+        	return badRequest("{message: 'La voiture est pleine'}").as("application/json");
         } catch (Exception e){
             return internalServerError(e.getMessage()).as("application/json");
         }
