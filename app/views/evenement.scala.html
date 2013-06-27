@@ -39,10 +39,14 @@
 				<address>
 				  {{currentSubscriber.address.description}}
 				</address>				
-				<p>
-				{{currentSubscriber.car}}
-				{{currentSubscriber.carRef}}
-				</p>
+				<div ng-show="currentSubscriber.locomotion == 'CAR'">
+					<label>Les passagers de ma voiture : </label>
+					<ul>
+						<li ng-repeat="passenger in currentSubscriber.car.passengers" >
+							{{refSubscribers[passenger].name}}
+						</li>
+					</ul>
+				</div>
 				<br/>
 				<span>Je cherche une voiture</span>
 				<input type="checkbox" ng:model="filterUsers" ng-true-value="CAR" ng-false-value=""/>
@@ -50,19 +54,40 @@
 				<span>Je cherche un passager</span>
 				<input type="checkbox" ng:model="filterUsers"  ng-true-value="AUTOSTOP" ng-false-value=""/>
 				<br/>
-			    	<table id="searchTextResults" class="table">
-			      	   <tr><th>Nom</th><th>Prenom</th><th>Adresse</th><th>Type</th><th>Max place</th><th>Type</th></tr>
-				      	<tr ng-repeat="subscriber in subscribers | auto:filterUsers:markers " ng-show="!subscriber.current">
+			    <table id="searchTextResults" class="table">
+					<tr>
+						<th>Nom</th>
+						<th>Prenom</th>
+						<th>Adresse</th>
+						<th>Type</th>
+						<th>places restantes</th>
+						<th>Type</th>
+						<th ng-show="currentSubscriber.locomotion == 'AUTOSTOP'">Etre passager</th>
+						<th ng-show="currentSubscriber.locomotion == 'AUTOSTOP'">Quitter cette voiture</th>
+						<th ng-show="currentSubscriber.locomotion == 'CAR'">Ajouter à ma voiture</th>
+						<th ng-show="currentSubscriber.locomotion == 'CAR'">Supprimer de ma voiture</th>
+					</tr>
+					<tr ng-repeat="subscriber in subscribers | auto:filterUsers:markers " ng-show="!subscriber.current">
 						<td>{{subscriber.name}}</td>
 						<td>{{subscriber.surname}}</td>
 						<td>{{subscriber.address.description}}</td>
 						<td><img src="{{subscriber.picto}}" /></td>
-						<td>{{subscriber.car.nbPlaces}}</td>
+						<td>{{subscriber.car.nbPlaces - subscriber.car.passengers.length}}</td>
 						<td>{{subscriber.car.passengers.length}}</td>
-						<td>{{subscriber.carRef}}</td>
-					<td><button class="btn btn-success" type="button" ng-click="addPassengers(subscriber)" >Ajouter</button></td>
-					<td><button class="btn btn-warning" type="button" ng-click="removePassengers(subscriber)" >Quitter</button></td>
-				   </tr>
+						<td ng-show="subscriber.locomotion == 'CAR' && currentSubscriber.locomotion == 'AUTOSTOP'">
+							<button class="btn btn-success" type="button" ng-click="addPassenger(subscriber, currentSubscriber)" >+</button>
+						</td>
+						<td ng-show="subscriber.locomotion == 'CAR' && currentSubscriber.locomotion == 'AUTOSTOP' && subscriber.currentCar">
+							<button class="btn btn-warning" type="button" ng-click="removePassenger(subscriber, currentSubscriber)" >-</button>
+						</td>
+						<td ng-show="subscriber.locomotion == 'AUTOSTOP' && currentSubscriber.locomotion == 'CAR'">
+							<button class="btn btn-success" type="button" ng-click="addPassenger(currentSubscriber, subscriber)" >+</button>
+						</td>
+						<td ng-show="subscriber.locomotion == 'AUTOSTOP' && currentSubscriber.locomotion == 'CAR' && subscriber.inMyCar">
+							<button class="btn btn-warning" type="button" ng-click="removePassenger(currentSubscriber, subscriber)" >-</button>
+						</td>
+						
+					</tr>
 				</table>
 			</div>
 		</div>

@@ -9,9 +9,9 @@ function EventCtrl($scope, $http, marker, $location) {
 	var _scope = $scope;
 	var _marker = marker; 
 	var _eventLinks;
-    $scope.addPassengers = function(subscriber){
-    	var link = getCarLink(subscriber);
-    	$http.post(link, {passenger:$scope.user.id}).success(function(subscriber){
+    $scope.addPassenger = function(car, passenger){
+    	var link = getCarLink(car);
+    	$http.post(link, {passenger:passenger.userRef}).success(function(subscriber){
 			var subscribersLink = _eventLinks["subscribers"];
 			$http.get(subscribersLink).success(function (subscribers){
 				if(subscribers){
@@ -25,11 +25,9 @@ function EventCtrl($scope, $http, marker, $location) {
 			alert("Error "+error);
 		});
 	}
-    
-
-    $scope.removePassengers = function(subscriber){
-    	var link = getCarLink(subscriber);
-    	$http.delete(link+'/'+$scope.currentSubscriber.userRef).success(function(subscriber){
+    $scope.removePassenger = function(car, passenger){
+    	var link = getCarLink(car);
+    	$http.delete(link+'/'+passenger.userRef).success(function(subscriber){
 			var subscribersLink = _eventLinks["subscribers"];
 			$http.get(subscribersLink).success(function (subscribers){
 				if(subscribers){
@@ -104,27 +102,57 @@ function EventCtrl($scope, $http, marker, $location) {
     }
     function initSubscribers($scope, subscribers, marker, callback){
 		var length = subscribers.length;
+		var idUser = $scope.user.id;
+		$scope.refSubscribers = {};
 	   	for(var i=0; i<length; i++){
 			var subscriber = subscribers[i];
+			$scope.refSubscribers[subscriber.userRef] = subscriber; 
 			if(subscriber.locomotion && subscriber.locomotion==="CAR"){
 				subscriber.picto = marker.pictoAuto;
 			}else if(subscriber.locomotion && subscriber.locomotion==="AUTOSTOP"){
 				subscriber.picto = marker.pictoStop;			
 			}else{
 			}
-			
-			var idUser = $scope.user.id;
 			if(idUser == subscriber.userRef){
 				$scope.currentSubscriber = subscriber;
 				subscriber.current = true;
 			}else{
+				if(subscriber.car && subscriber.car.passengers && inArray(idUser, subscriber.car.passengers)){
+					subscriber.currentCar = true;
+				}else{
+					subscriber.currentCar = false;
+				}
 				subscriber.current = false;
 			}
+
 			if(callback){
 				callback(subscriber);
 			}
    	 	}
+	   	if($scope.currentSubscriber.locomotion == 'CAR'){
+	   		for(var i=0; i<length; i++){
+	   			var subscriber = subscribers[i];
+	   			if(subscriber.carRef == $scope.currentSubscriber.userRef){
+	   				subscriber.inMyCar = true;		
+	   			}else{
+	   				subscriber.inMyCar = false;
+	   			}
+	   		}
+	   	}
+	   		
 	   	$scope.subscribers = subscribers;
+    }
+    function inArray(value, array){
+    	if(array && value){
+    		for ( var int = 0; int < array.length; int++) {
+				var arrayValue = array[int];
+				if(arrayValue == value){
+					return true;
+				}
+			}
+    	}else{
+    		return false;
+    	}
     }
     function getPassengersLink(subscriber){
 		if(subscriber.links){
