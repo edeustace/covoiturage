@@ -9,38 +9,49 @@ function EventCtrl($scope, $http, marker, $location) {
 	var _scope = $scope;
 	var _marker = marker; 
 	var _eventLinks;
+	$scope.eventLinks = {};
+	$scope.subscribersLinks = {};
+	$scope.editMode = false;
+	$scope.saveCurrentSubscriber = function(){
+		$http.put($scope.subscribersLinks[$scope.currentSubscriber.userRef].self ,$scope.currentSubscriber).success(function(){
+			$scope.setEditMode(false);
+			marker.recordSubscriber($scope.currentSubscriber);
+			reloadSubscribers();
+		}).error(function(error){
+			alert("Error "+error);
+		});
+	}
     $scope.addPassenger = function(car, passenger){
     	var link = getCarLink(car);
     	$http.post(link, {passenger:passenger.userRef}).success(function(subscriber){
-			var subscribersLink = _eventLinks["subscribers"];
-			$http.get(subscribersLink).success(function (subscribers){
-				if(subscribers){
-					initSubscribers($scope, subscribers, marker);
-					$scope.event.subscribers = subscribers;
-				}
-			}).error(function(error){
-				alert(error);
-			});
+    		reloadSubscribers();
 		}).error(function(error){
 			alert("Error "+error);
 		});
 	}
+    $scope.setEditMode = function(value){
+    	$scope.editMode = value;	
+    }
     $scope.removePassenger = function(car, passenger){
     	var link = getCarLink(car);
     	$http.delete(link+'/'+passenger.userRef).success(function(subscriber){
-			var subscribersLink = _eventLinks["subscribers"];
-			$http.get(subscribersLink).success(function (subscribers){
-				if(subscribers){
-					initSubscribers($scope, subscribers, marker);
-					$scope.event.subscribers = subscribers;
-				}
-			}).error(function(error){
-				alert(error);
-			});
+			reloadSubscribers();
 		}).error(function(error){
 			alert("Error "+error);
 		});
 	}
+    
+    function reloadSubscribers(){
+    	var subscribersLink = $scope.eventLinks.subscribers;
+		$http.get(subscribersLink).success(function (subscribers){
+			if(subscribers){
+				initSubscribers($scope, subscribers, marker);
+				$scope.event.subscribers = subscribers;
+			}
+		}).error(function(error){
+			alert(error);
+		});
+    }
     
     marker.initMaps($scope);
     var id = extractFromUrl($location.absUrl());
@@ -54,7 +65,8 @@ function EventCtrl($scope, $http, marker, $location) {
 			    if(event){
 			    	$scope.event = event;
 			    	marker.reinitMarker();
-			    	_eventLinks = getEventLinks(event);
+			    	$scope.eventLinks = buildLinks(event.links);
+			    	event.picto = $scope.eventLinks.picto;
 				   	if(event){
 				        marker.recordEvent(event);
 				   	
@@ -77,7 +89,7 @@ function EventCtrl($scope, $http, marker, $location) {
 							if(newValue){ 
 								for(var i=0;i<$scope.markers.length;i++){
 									var marker = markers[i];
-									if(!(marker.type === newValue) && (marker.type != "EVENT")){
+									if(!(marker.type === newValue) && (marker.type != "EVENT") && !marker.subscriber.current){
 										marker.visible = false; 
 									}else{
 										marker.visible = true; 
@@ -106,13 +118,9 @@ function EventCtrl($scope, $http, marker, $location) {
 		$scope.refSubscribers = {};
 	   	for(var i=0; i<length; i++){
 			var subscriber = subscribers[i];
+			$scope.subscribersLinks[subscriber.userRef] = buildLinks(subscriber.links);
 			$scope.refSubscribers[subscriber.userRef] = subscriber; 
-			if(subscriber.locomotion && subscriber.locomotion==="CAR"){
-				subscriber.picto = marker.pictoAuto;
-			}else if(subscriber.locomotion && subscriber.locomotion==="AUTOSTOP"){
-				subscriber.picto = marker.pictoStop;			
-			}else{
-			}
+			subscriber.picto = $scope.subscribersLinks[subscriber.userRef].picto;
 			if(idUser == subscriber.userRef){
 				$scope.currentSubscriber = subscriber;
 				subscriber.current = true;
@@ -154,22 +162,11 @@ function EventCtrl($scope, $http, marker, $location) {
     		return false;
     	}
     }
-    function getPassengersLink(subscriber){
-		if(subscriber.links){
-			for ( var int = 0; int < subscriber.links.length; int++) {
-				var link = subscriber.links[int];
-				if(link && link.rel == "passengers"){
-					return link.href;
-				}
-			}
-		}
-		return null;
-    }
-    function getEventLinks(event){
+    function buildLinks(links){
     	var theLinks = {};
-    	if(event.links){
-    		for ( var i = 0; i < event.links.length; i++) {
-				var link = event.links[i];
+    	if(links){
+    		for ( var i = 0; i < links.length; i++) {
+				var link = links[i];
 				theLinks[link.rel] = link.href;
 			}
     	}

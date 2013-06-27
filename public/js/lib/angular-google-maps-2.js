@@ -498,7 +498,7 @@
                 
                 var sm = scope.markers[si];
                 
-                if (floatEqual(sm.latitude, lat) && floatEqual(sm.longitude, lng)) {
+                if (sm.visible && floatEqual(sm.latitude, lat) && floatEqual(sm.longitude, lng)) {
                   // Map marker is present in scope too, don't remove
                   found = true;
                 }

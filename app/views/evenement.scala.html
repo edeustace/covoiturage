@@ -2,17 +2,16 @@
 @import helper.twitterBootstrap._
 
 
-
 @main(Messages("playauthenticate.event.title"),"event") {
 <link rel="stylesheet" media="screen" href="@routes.Assets.at("css/google-maps.css")" />
-  <script src="http://maps.googleapis.com/maps/api/js?sensor=false&language=en"></script>
+  <script src="http://maps.googleapis.com/maps/api/js?libraries=places&sensor=false&language=fr"></script>
   
-  <script src="@routes.Assets.at("js/lib/angular.js")"></script>
-  <script src="@routes.Assets.at("js/lib/angular-google-maps-2.js")"></script>
-  <script src="@routes.Assets.at("js/app/modules/markerModule.js")"></script>
-  <script src="@routes.Assets.at("js/app/event/app.js")"></script>
-  <script src="@routes.Assets.at("js/app/event/controller.js")"></script>
-  <script src="@routes.Assets.at("js/app/filters.js")"></script>
+  <script type="text/javascript" src="@routes.Assets.at("js/lib/angular.js")"></script>
+  <script type="text/javascript" src="@routes.Assets.at("js/lib/angular-google-maps-2.js")"></script>
+  <script type="text/javascript" src="@routes.Assets.at("js/app/modules/markerModule.js")"></script>
+  <script type="text/javascript" src="@routes.Assets.at("js/app/event/app.js")"></script>
+  <script type="text/javascript" src="@routes.Assets.at("js/app/event/controller.js")"></script>
+  <script type="text/javascript" src="@routes.Assets.at("js/app/filters.js")"></script>
 	<div class="row">
 		<div class="span6">
 			<h1>@Messages("playauthenticate.event.title")</h1>
@@ -36,9 +35,14 @@
 			<div>
 				<h3>Moi</h3>
 				<p>{{currentSubscriber.surname}} {{currentSubscriber.name}}</p>
-				<address>
-				  {{currentSubscriber.address.description}}
+				<address ng-show="!editMode">
+				  {{currentSubscriber.address.description}} <button ng-show="!editMode" ng-click="setEditMode(true)">Modifier</button>
 				</address>				
+				<div ng-show="editMode" >
+					<input ng-model="currentSubscriber.address" googleplace type="text" ></input>
+					<button ng-click="saveCurrentSubscriber()">Modifier</button>
+					<button ng-click="setEditMode(false)">Annuler</button>
+				</div>
 				<div ng-show="currentSubscriber.locomotion == 'CAR'">
 					<label>Les passagers de ma voiture : </label>
 					<ul>

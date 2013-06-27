@@ -17,15 +17,14 @@ import models.Subscriber;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.codehaus.jackson.map.ObjectMapper;
 
-import be.objectify.deadbolt.java.actions.Group;
-import be.objectify.deadbolt.java.actions.Restrict;
-
 import play.data.Form;
 import play.mvc.BodyParser;
 import play.mvc.Controller;
 import play.mvc.Result;
 import views.html.evenement;
 import views.html.evenementParticipation;
+import be.objectify.deadbolt.java.actions.Group;
+import be.objectify.deadbolt.java.actions.Restrict;
 import controllers.decorators.Link;
 import controllers.decorators.SubscriberModel;
 import controllers.decorators.UserModelLight;
@@ -108,6 +107,11 @@ public class EventCtrl extends Controller {
         }
     }
 
+    public static Result controllerJs(String id){
+    	return ok();
+    	//return ok(views.js.event.controller.render(id));
+    }
+    
     public static class EventModel{
         private Event event;
 
@@ -120,6 +124,7 @@ public class EventCtrl extends Controller {
             this.event = event;
             this.links.add(Link.link(Link.SELF, controllers.routes.EventCtrl.getEvent(this.event.getId()).toString()));
             this.links.add(Link.link("subscribers", controllers.routes.SubscriberCtrl.list(this.event.getId()).toString()));
+            this.links.add(Link.link("picto", controllers.routes.Assets.at("icons/arrivee.jpg").toString()));
         }
 
         @JsonProperty("links")
