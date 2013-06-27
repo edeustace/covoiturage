@@ -10,6 +10,7 @@
   <script type="text/javascript" src="@routes.Assets.at("js/lib/angular-google-maps-2.js")"></script>
   <script type="text/javascript" src="@routes.Assets.at("js/app/modules/markerModule.js")"></script>
   <script type="text/javascript" src="@routes.Assets.at("js/app/event/app.js")"></script>
+  <script type="text/javascript" src="@routes.Assets.at("js/app/directives/googleplace.js")"></script>
   <script type="text/javascript" src="@routes.Assets.at("js/app/event/controller.js")"></script>
   <script type="text/javascript" src="@routes.Assets.at("js/app/filters.js")"></script>
 	<div class="row">
@@ -36,12 +37,13 @@
 				<h3>Moi</h3>
 				<p>{{currentSubscriber.surname}} {{currentSubscriber.name}}</p>
 				<address ng-show="!editMode">
-				  {{currentSubscriber.address.description}} <button ng-show="!editMode" ng-click="setEditMode(true)">Modifier</button>
+				  {{currentSubscriber.address.description}} <button class="btn" ng-show="!editMode" ng-click="setEditMode(true)">Modifier</button>
 				</address>				
 				<div ng-show="editMode" >
+					<label>Nouvelle adresse : </label>
 					<input ng-model="currentSubscriber.address" googleplace type="text" ></input>
-					<button ng-click="saveCurrentSubscriber()">Modifier</button>
-					<button ng-click="setEditMode(false)">Annuler</button>
+					<button  class="btn btn-primary" ng-click="saveCurrentSubscriber()">Valider</button>
+					<button  class="btn" ng-click="setEditMode(false)">Annuler</button>
 				</div>
 				<div ng-show="currentSubscriber.locomotion == 'CAR'">
 					<label>Les passagers de ma voiture : </label>
