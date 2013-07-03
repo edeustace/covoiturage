@@ -66,6 +66,8 @@ POST    /rest/events/:id/subscribers/              controllers.SubscriberCtrl.cr
 GET     /rest/events/:id/subscribers/:idSub       controllers.SubscriberCtrl.getSubscriber(id :String, idSub :String)
 PUT     /rest/events/:id/subscribers/:idSub       controllers.SubscriberCtrl.updateSubscriber(id :String, idSub :String)
 DELETE  /rest/events/:id/subscribers/:idSub       controllers.SubscriberCtrl.deleteSubscriber(id :String, idSub :String)
+GET     /ws/events/:id/subscribers/:idSub       controllers.SubscriberCtrl.subscribersUpdates(id :String, idSub :String)
+
 
 GET    	/rest/events/:id/subscribers/:idSub/car              controllers.SubscriberCtrl.getCar(id :String, idSub :String)
 POST    /rest/events/:id/subscribers/:idSub/car              controllers.SubscriberCtrl.updateCar(id :String, idSub :String)

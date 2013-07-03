@@ -71,7 +71,7 @@ function EventCtrl($scope, $http, marker, $location) {
 				        marker.recordEvent(event);
 				   	
 					   	if(event.subscribers){
-					   		initSubscribers($scope, event.subscribers, marker, function(subscriber){
+					   		initSubscribers($scope, event.subscribers, function(subscriber){
 					   			marker.recordSubscriber(subscriber);
 					   			var idUser = $scope.user.id;
 								if(idUser == subscriber.userRef){
@@ -84,6 +84,35 @@ function EventCtrl($scope, $http, marker, $location) {
 					   		});
 				       	}
 				   	}
+				   	var wsUrl = jsRoutes.controllers.SubscriberCtrl.subscribersUpdates(event.id, $scope.currentSubscriber.userRef);
+				   	var ws = new WebSocket(wsUrl.webSocketURL());
+				    
+				    ws.onopen = function(){  
+				        console.log("Socket has been opened!");  
+				    };
+				    
+				    ws.onmessage = function(message) {
+				    	var newSubscriber = JSON.parse(message.data);
+				    	updateSubscriber($scope, newSubscriber, function(subscriber){
+				    		_marker.recordSubscriber(subscriber);
+				   		});
+				    	var newSubscribers = new Array();
+				    	var find = false;
+				    	for ( var indice in $scope.subscribers) {
+							if($scope.subscribers[indice].userRef == newSubscriber.userRef){
+								newSubscribers.push(newSubscriber);
+								find = true;
+							}else{
+								newSubscribers.push($scope.subscribers[indice]);
+							}
+						}
+				    	if(!find){
+				    		newSubscribers.push(newSubscriber);
+				    	}
+				    	$scope.subscribers = newSubscribers;
+				    	$scope.$apply();
+				    };
+				   	
 					var markers = $scope.markers;
 					$scope.$watch('filterUsers', function(newValue, oldValue) {
 							if(newValue){ 
@@ -112,30 +141,35 @@ function EventCtrl($scope, $http, marker, $location) {
         var index = url.lastIndexOf("/")
         return url.substring(index+1, url.length);
     }
-    function initSubscribers($scope, subscribers, marker, callback){
+    function updateSubscriber($scope, subscriber, callback){
+    	var idUser = $scope.user.id;
+    	$scope.subscribersLinks[subscriber.userRef] = buildLinks(subscriber.links);
+		$scope.refSubscribers[subscriber.userRef] = subscriber; 
+		subscriber.picto = $scope.subscribersLinks[subscriber.userRef].picto;
+		if(idUser == subscriber.userRef){
+			$scope.currentSubscriber = subscriber;
+			subscriber.current = true;
+		}else{
+			if(subscriber.car && subscriber.car.passengers && inArray(idUser, subscriber.car.passengers)){
+				subscriber.currentCar = true;
+			}else{
+				subscriber.currentCar = false;
+			}
+			subscriber.current = false;
+		}
+
+		if(callback){
+			callback(subscriber);
+		}
+    }
+    function initSubscribers($scope, subscribers, callback){
 		var length = subscribers.length;
 		var idUser = $scope.user.id;
 		$scope.refSubscribers = {};
 	   	for(var i=0; i<length; i++){
 			var subscriber = subscribers[i];
-			$scope.subscribersLinks[subscriber.userRef] = buildLinks(subscriber.links);
-			$scope.refSubscribers[subscriber.userRef] = subscriber; 
-			subscriber.picto = $scope.subscribersLinks[subscriber.userRef].picto;
-			if(idUser == subscriber.userRef){
-				$scope.currentSubscriber = subscriber;
-				subscriber.current = true;
-			}else{
-				if(subscriber.car && subscriber.car.passengers && inArray(idUser, subscriber.car.passengers)){
-					subscriber.currentCar = true;
-				}else{
-					subscriber.currentCar = false;
-				}
-				subscriber.current = false;
-			}
-
-			if(callback){
-				callback(subscriber);
-			}
+			updateSubscriber($scope, subscriber, callback)
+			
    	 	}
 	   	if($scope.currentSubscriber.locomotion == 'CAR'){
 	   		for(var i=0; i<length; i++){
@@ -147,7 +181,6 @@ function EventCtrl($scope, $http, marker, $location) {
 	   			}
 	   		}
 	   	}
-	   		
 	   	$scope.subscribers = subscribers;
     }
     function inArray(value, array){

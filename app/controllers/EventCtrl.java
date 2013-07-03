@@ -114,7 +114,6 @@ public class EventCtrl extends Controller {
     
     public static class EventModel{
         private Event event;
-
         private List<Link> links = new ArrayList<Link>();
 
         public EventModel(Event event) {

@@ -19,6 +19,8 @@ import play.libs.Json;
 import play.mvc.BodyParser;
 import play.mvc.Controller;
 import play.mvc.Result;
+import play.mvc.WebSocket;
+import actors.SubscriberActor;
 import controllers.decorators.SubscriberModel;
 
 /**
@@ -65,6 +67,7 @@ public class SubscriberCtrl extends Controller {
                 event.update();
                 Subscriber subsc = event.getSubscriberByMail(subscriber.getEmail());
                 SubscriberModel subscriberModel = new SubscriberModel(subsc, event.getId());
+                SubscriberActor.notifySubscriberUpdate(id, subscriber.getUserRef(), subscriber);
                 return ok(objectMapper.writeValueAsString(subscriberModel)).as("application/json");
             }
         } catch (Exception e){
@@ -89,6 +92,7 @@ public class SubscriberCtrl extends Controller {
                 event.addAndMergeSubscriber(subscriber);
                 event.update();
                 Subscriber subsc = event.getSubscriberByMail(subscriber.getEmail());
+                SubscriberActor.notifySubscriberUpdate(id, subsc.getUserRef(), subsc);
                 SubscriberModel subscriberModel = new SubscriberModel(subsc, event.getId());
                 return ok(objectMapper.writeValueAsString(subscriberModel)).as("application/json");
             }
@@ -147,8 +151,27 @@ public class SubscriberCtrl extends Controller {
 	        return internalServerError(e.getMessage()).as("application/json");
 	    }
     }
+    
     public static Result deleteSubscriber(String id, String idSub){
 	    return ok().as("application/json");
     }
+    
+    /**
+     * Websocket.
+     */
+    public static WebSocket<JsonNode> subscribersUpdates(final String idEvent, final String userRef) {
+        return new WebSocket<JsonNode>() {
+            // Called when the Websocket Handshake is done.
+            public void onReady(WebSocket.In<JsonNode> in, WebSocket.Out<JsonNode> out){
+                // Join the chat room.
+                try { 
+                	SubscriberActor.join(idEvent, userRef, in, out);
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
+        };
+    }
+  
 }
 
