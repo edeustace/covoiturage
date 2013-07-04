@@ -1,24 +1,30 @@
 package controllers;
 
-import com.mongodb.DB;
-import com.mongodb.Mongo;
-import models.*;
-import net.vz.mongodb.jackson.JacksonDBCollection;
-
-import org.codehaus.jackson.JsonGenerationException;
-import org.codehaus.jackson.JsonNode;
-import org.codehaus.jackson.map.JsonMappingException;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import play.libs.WS;
+import static org.fest.assertions.Assertions.assertThat;
+import static play.mvc.Http.Status.BAD_REQUEST;
+import static play.mvc.Http.Status.OK;
+import static play.test.Helpers.running;
+import static play.test.Helpers.testServer;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
 
-import static org.fest.assertions.Assertions.assertThat;
-import static play.test.Helpers.*;
+import models.Address;
+import models.Event;
+import models.Location;
+import models.User;
+import net.vz.mongodb.jackson.JacksonDBCollection;
+
+import org.codehaus.jackson.JsonNode;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+import play.libs.WS;
+
+import com.mongodb.DB;
+import com.mongodb.Mongo;
 
 /**
  * Created with IntelliJ IDEA.
@@ -125,7 +131,7 @@ public class EventCtrlTest {
                 } catch (IOException e) {}
                 assertThat(response.getStatus()).isEqualTo(OK);
                 assertThat(resp.get("name").getTextValue()).isEqualTo(event.getName());
-                WS.Response read = WS.url("http://localhost:3333"+resp.get("link").get("href").getTextValue()).get().get();
+               // WS.Response read = WS.url("http://localhost:3333"+resp.get("link").get("href").getTextValue()).get().get();
                 assertThat(response.getStatus()).isEqualTo(OK);
             }
         });

@@ -1,24 +1,30 @@
 package controllers;
 
-import com.mongodb.DB;
-import com.mongodb.Mongo;
-import models.*;
+import static org.fest.assertions.Assertions.assertThat;
+import static play.mvc.Http.Status.OK;
+import static play.test.Helpers.running;
+import static play.test.Helpers.testServer;
+
+import java.net.UnknownHostException;
+
+import models.Address;
+import models.Event;
+import models.Location;
+import models.Subscriber;
+import models.User;
 import models.enums.Locomotion;
 import net.vz.mongodb.jackson.JacksonDBCollection;
+
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
 import play.libs.WS;
 
-import java.io.IOException;
-import java.net.UnknownHostException;
-
-import static org.fest.assertions.Assertions.assertThat;
-import static play.mvc.Http.Status.OK;
-import static play.test.Helpers.running;
-import static play.test.Helpers.testServer;
+import com.mongodb.DB;
+import com.mongodb.Mongo;
 
 /**
  * Created with IntelliJ IDEA.
@@ -63,12 +69,12 @@ public class SubscriberCtrlTest {
                 JsonNode node = objectMapper.convertValue(subscriber, JsonNode.class);
                 WS.Response response = WS.url("http://localhost:3333/rest/events/"+event.getId()+"/subscribers/").post(node).get();
                 //System.out.println(response.getBody());
-                JsonNode resp = null;
-                try {
-                    resp = objectMapper.readValue(response.getBody(), JsonNode.class);
-                } catch (IOException e) {}
+                //JsonNode resp = null;
+                //try {
+                //    resp = objectMapper.readValue(response.getBody(), JsonNode.class);
+                //} catch (IOException e) {}
                 assertThat(response.getStatus()).isEqualTo(OK);
-                WS.Response read = WS.url("http://localhost:3333/rest/events/"+event.getId()).get().get();
+                //WS.Response read = WS.url("http://localhost:3333/rest/events/"+event.getId()).get().get();
                 //System.out.println(read.getBody());
                 assertThat(response.getStatus()).isEqualTo(OK);
             }

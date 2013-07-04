@@ -269,11 +269,11 @@ public class EventIntegrationTest {
         });
     }
 
-    private void validateSubscriber(Subscriber subscriber, Subscriber expected){
-        assertThat(subscriber.getUserRef()).isNotNull();
-        assertThat(User.findById(subscriber.getUserRef())).isNotNull();
-        assertThat(subscriber.getUser().getEmail()).isEqualTo(expected.getEmail());
-        assertThat(subscriber.getLocomotion()).isEqualTo(expected.getLocomotion());
-        assertThat(subscriber.getAddress()).isEqualTo(expected);
-    }
+//    private void validateSubscriber(Subscriber subscriber, Subscriber expected){
+//        assertThat(subscriber.getUserRef()).isNotNull();
+//        assertThat(User.findById(subscriber.getUserRef())).isNotNull();
+//        assertThat(subscriber.getUser().getEmail()).isEqualTo(expected.getEmail());
+//        assertThat(subscriber.getLocomotion()).isEqualTo(expected.getLocomotion());
+//        assertThat(subscriber.getAddress()).isEqualTo(expected);
+//    }
 }

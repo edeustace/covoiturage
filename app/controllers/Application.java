@@ -110,14 +110,5 @@ public class Application extends Controller {
 	public static String formatTimestamp(final long t) {
 		return new SimpleDateFormat("yyyy-dd-MM HH:mm:ss").format(new Date(t));
 	}
-	
-	public static Result javascriptRoutes() {
-	    response().setContentType("text/javascript");
-	    return ok(
-	        Routes.javascriptRouter("jsRoutes",
-		            controllers.routes.javascript.EventCtrl.createEvent()
-	        )
-	    );
-	}
 
 }

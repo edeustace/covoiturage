@@ -5,13 +5,18 @@
 
 /* Controllers */
 
-function EventCtrl($scope, $http, marker, $location) {
+function EventCtrl($scope, $http, marker, $location, $tooltip) {
 	var _scope = $scope;
 	var _marker = marker; 
 	var _eventLinks;
 	$scope.eventLinks = {};
 	$scope.subscribersLinks = {};
 	$scope.editMode = false;
+	$scope.alerts = [];
+	$scope.closeAlert = function(index) {
+		$scope.refSubscribers[$scope.alerts[index].userRef].class = null;
+	    $scope.alerts.splice(index, 1);
+	  };
 	$scope.saveCurrentSubscriber = function(){
 		$http.put($scope.subscribersLinks[$scope.currentSubscriber.userRef].self ,$scope.currentSubscriber).success(function(){
 			$scope.setEditMode(false);
@@ -20,7 +25,7 @@ function EventCtrl($scope, $http, marker, $location) {
 		}).error(function(error){
 			alert("Error "+error);
 		});
-	}
+	};
     $scope.addPassenger = function(car, passenger){
     	var link = getCarLink(car);
     	$http.post(link, {passenger:passenger.userRef}).success(function(subscriber){
@@ -28,10 +33,10 @@ function EventCtrl($scope, $http, marker, $location) {
 		}).error(function(error){
 			alert("Error "+error);
 		});
-	}
+	};
     $scope.setEditMode = function(value){
     	$scope.editMode = value;	
-    }
+    };
     $scope.removePassenger = function(car, passenger){
     	var link = getCarLink(car);
     	$http.delete(link+'/'+passenger.userRef).success(function(subscriber){
@@ -39,7 +44,7 @@ function EventCtrl($scope, $http, marker, $location) {
 		}).error(function(error){
 			alert("Error "+error);
 		});
-	}
+	};
     
     function reloadSubscribers(){
     	var subscribersLink = $scope.eventLinks.subscribers;
@@ -96,6 +101,12 @@ function EventCtrl($scope, $http, marker, $location) {
 				    	updateSubscriber($scope, newSubscriber, function(subscriber){
 				    		_marker.recordSubscriber(subscriber);
 				   		});
+				    	$scope.alerts.push({
+			    			msg : newSubscriber.surname + " " +newSubscriber.name + " a modifié ses caracteristiques", 
+			    			type : "success",
+			    			userRef : newSubscriber.userRef
+				    	});
+				    	newSubscriber.class = "success";
 				    	var newSubscribers = new Array();
 				    	var find = false;
 				    	for ( var indice in $scope.subscribers) {
@@ -157,7 +168,7 @@ function EventCtrl($scope, $http, marker, $location) {
 			}
 			subscriber.current = false;
 		}
-
+		
 		if(callback){
 			callback(subscriber);
 		}
