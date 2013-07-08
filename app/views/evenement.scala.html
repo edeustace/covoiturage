@@ -3,12 +3,14 @@
 
 
 @parentmain(Messages("playauthenticate.event.title"),"event") {
-<link rel="stylesheet" media="screen" href="@routes.Assets.at("css/google-maps.css")" />
+<link rel="stylesheet" media="screen" href="@routes.Assets.at("css/demo.css")" />
   <script src="http://maps.googleapis.com/maps/api/js?libraries=places&sensor=false&language=fr"></script>
   
+  <script type="text/javascript" src="@routes.Assets.at("js/jquery-1.9.0.min.js")"></script>
   <script type="text/javascript" src="@routes.Assets.at("js/lib/angular.js")"></script>
   <script type="text/javascript" src="@routes.Assets.at("js/lib/ui-bootstrap-tpls-0.4.0.min.js")"></script>
-  <script type="text/javascript" src="@routes.Assets.at("js/lib/angular-google-maps-2.js")"></script>
+  <script type="text/javascript" src="@routes.Assets.at("js/lib/event.js")"></script>
+  <script type="text/javascript" src="@routes.Assets.at("js/lib/ui-map.js")"></script>
   <script type="text/javascript" src="@routes.Assets.at("js/app/modules/markerModule.js")"></script>
   <script type="text/javascript" src="@routes.Assets.at("js/app/event/app.js")"></script>
   <script type="text/javascript" src="@routes.Assets.at("js/app/directives/googleplace.js")"></script>
@@ -29,7 +31,40 @@
 			  {{event.address.description}}
 			</address>
 			<br/>
-				<google-map center="center" fit="true" draggable="true" zoom="zoom" markers="markers" mark-click="true" style="height: 400px" class="angular-google-map" refresh="true"></google-map>
+				<div ng-repeat="marker in myMarkers" ui-map-marker="myMarkers[$index]"
+                     ui-event="{'map-click': 'openMarkerInfo(marker)'}">
+                </div>
+				<div ui-map-info-window="myInfoWindow">
+						<strong>{{currentInfoWindowsSubscriber.surname}} {{currentInfoWindowsSubscriber.name}}</strong>
+						<div ng-show="currentInfoWindowsSubscriber.locomotion == 'CAR'">
+							Passagers : 
+							<ul>
+								<li ng-repeat="aPassenger in currentInfoWindowsSubscriber.car.passengers" >
+									{{refSubscribers[aPassenger].surname}} {{refSubscribers[aPassenger].name}}
+								</li>
+							</ul>
+							{{currentInfoWindowsSubscriber.car.nbPlaces - currentInfoWindowsSubscriber.car.passengers.length}} places restantes
+						</div>
+						<div ng-show="currentInfoWindowsSubscriber.locomotion == 'CAR' && currentSubscriber.locomotion == 'AUTOSTOP' && !currentInfoWindowsSubscriber.currentCar" >
+							Monter 
+							<button class="btn btn-success btn-mini" type="button" ng-click="addPassenger(currentInfoWindowsSubscriber, currentSubscriber)" >+</button>
+						</div>
+						<div ng-show="currentInfoWindowsSubscriber.locomotion == 'CAR' && currentSubscriber.locomotion == 'AUTOSTOP' && currentInfoWindowsSubscriber.currentCar">
+							Descendre 
+							<button class="btn btn-warning btn-mini" type="button" ng-click="removePassenger(currentInfoWindowsSubscriber, currentSubscriber)" >-</button>
+						</div>
+						<div ng-show="currentInfoWindowsSubscriber.locomotion == 'AUTOSTOP' && currentSubscriber.locomotion == 'CAR' && !currentInfoWindowsSubscriber.inMyCar">
+							Prendre  
+							<button class="btn btn-success btn-mini" type="button" ng-click="addPassenger(currentSubscriber, currentInfoWindowsSubscriber)" >+</button>
+						</div>
+						<div ng-show="currentInfoWindowsSubscriber.locomotion == 'AUTOSTOP' && currentSubscriber.locomotion == 'CAR' && currentInfoWindowsSubscriber.inMyCar">
+							ne plus prendre 
+							<button class="btn btn-warning btn-mini" type="button" ng-click="removePassenger(currentSubscriber, currentInfoWindowsSubscriber)" >-</button>
+						</div>
+                </div>
+				<div id="map_canvas" ui-map="myMap" class="map"
+	                 ui-options="mapOptions">
+	            </div>
 		</div>
 		<div class="span4">
 			<br/>
@@ -54,6 +89,7 @@
 							{{refSubscribers[passenger].surname}} {{refSubscribers[passenger].name}}
 						</li>
 					</ul>
+					{{currentSubscriber.car.nbPlaces - currentSubscriber.car.passengers.length}} places restantes
 				</div>
 				<br/>
 				<span>Je cherche une voiture</span>
@@ -68,10 +104,9 @@
 				<table id="searchTextResults" class="table">
 					<thead>
 						<tr>
+							<th>locomotion</th>
 							<th>Nom</th>
-							<th>Prenom</th>
 							<th>Adresse</th>
-							<th>Type</th>
 							<th>places restantes</th>
 							<th ng-show="currentSubscriber.locomotion == 'AUTOSTOP'">Etre passager</th>
 							<th ng-show="currentSubscriber.locomotion == 'AUTOSTOP'">Quitter cette voiture</th>
@@ -81,10 +116,9 @@
 					</thead>
 					<tbody>
 						<tr ng-repeat="subscriber in subscribers | auto:filterUsers:markers " ng-show="!subscriber.current" class="{{subscriber.class}}">
-							<td >{{subscriber.name}}</td>
-							<td>{{subscriber.surname}}</td>
-							<td>{{subscriber.address.description}}</td>
 							<td><img ng-src="{{subscriber.picto}}" /></td>
+							<td >{{subscriber.surname}} {{subscriber.name}}</td>
+							<td>{{subscriber.address.description}}</td>
 							<td>{{subscriber.car.nbPlaces - subscriber.car.passengers.length}}</td>
 							<td ng-show="subscriber.locomotion == 'CAR' && currentSubscriber.locomotion == 'AUTOSTOP'" >
 								<button class="btn btn-success" type="button" ng-click="addPassenger(subscriber, currentSubscriber)" >+</button>

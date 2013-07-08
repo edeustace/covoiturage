@@ -30,23 +30,24 @@ angular.module('markerModule', [], function($provide){
 			placeCurrentEvent : function(){
 				currentScope.markers.push(currentEvent);	
 			}, 
-			getSubscriberMarker: function(subscriber){
+			getSubscriberMarker: function(subscriber, onClick){
 				var marker = {
 								type:subscriber.locomotion, 
 								latitude:subscriber.address.location.lat, 
 								longitude:subscriber.address.location.lng, 
 								icon: subscriber.picto, 
-								visible:true
+								visible:subscriber.visible, 
+								onClick: onClick
 							};
 				marker.subscriber = subscriber;
 				return marker;
 			},  
-			recordSubscriber : function(subscriber){
-				var markerSubsc = this.getSubscriberMarker(subscriber);
+			recordSubscriber : function(subscriber, onClick){
+				var markerSubsc = this.getSubscriberMarker(subscriber, onClick);
 				for ( var int = 0; int < currentScope.markers.length; int++) {
 					var marker = currentScope.markers[int];
 					if(marker.subscriber && marker.subscriber.userRef == subscriber.userRef){
-						currentScope.markers[int] = markerSubsc;
+						currentScope.markers[int] =  markerSubsc;
 						return;
 					}
 				}

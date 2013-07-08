@@ -5,10 +5,16 @@
 
 /* Controllers */
 
-function EventCtrl($scope, $http, marker, $location, $tooltip) {
+function EventCtrl($scope, $http, $location, $compile) {
 	var _scope = $scope;
-	var _marker = marker; 
 	var _eventLinks;
+	$scope.myMarkers = [];
+	$scope.mapOptions = {
+	          center: new google.maps.LatLng(46.65278, -1.424961),
+	          zoom: 9,
+	          mapTypeId: google.maps.MapTypeId.ROADMAP
+	        };
+	$scope.bounds = new google.maps.LatLngBounds();
 	$scope.eventLinks = {};
 	$scope.subscribersLinks = {};
 	$scope.editMode = false;
@@ -20,8 +26,9 @@ function EventCtrl($scope, $http, marker, $location, $tooltip) {
 	$scope.saveCurrentSubscriber = function(){
 		$http.put($scope.subscribersLinks[$scope.currentSubscriber.userRef].self ,$scope.currentSubscriber).success(function(){
 			$scope.setEditMode(false);
-			marker.recordSubscriber($scope.currentSubscriber);
+			addMarkerSubscriber($scope.currentSubscriber);
 			reloadSubscribers();
+			
 		}).error(function(error){
 			alert("Error "+error);
 		});
@@ -45,20 +52,36 @@ function EventCtrl($scope, $http, marker, $location, $tooltip) {
 			alert("Error "+error);
 		});
 	};
-    
+	$scope.openMarkerInfo = function(marker) {
+		$scope.currentMarker = marker;
+		$scope.currentInfoWindowsSubscriber = marker.subscriber;
+        $scope.myInfoWindow.open($scope.myMap, marker);
+        $scope.$apply();
+    };
+    function setCurrentWidowsSubscriber(){
+    	if($scope.currentInfoWindowsSubscriber){
+    		var marker = findMarkerByUserRef($scope.currentInfoWindowsSubscriber.userRef);
+    		var subscriber = $scope.refSubscribers[$scope.currentInfoWindowsSubscriber.userRef];
+    		if(marker && subscriber){
+    			$scope.currentMarker = marker;
+                $scope.currentInfoWindowsSubscriber = subscriber;
+    		}
+    	}
+    } 
     function reloadSubscribers(){
     	var subscribersLink = $scope.eventLinks.subscribers;
 		$http.get(subscribersLink).success(function (subscribers){
 			if(subscribers){
-				initSubscribers($scope, subscribers, marker);
+				initSubscribers($scope, subscribers, function(subscriber){
+		   		});
 				$scope.event.subscribers = subscribers;
+				setCurrentWidowsSubscriber();
 			}
 		}).error(function(error){
 			alert(error);
 		});
     }
     
-    marker.initMaps($scope);
     var id = extractFromUrl($location.absUrl());
     $http.get('/rest/users/current').success(function(user) {
 		if(user){
@@ -69,15 +92,12 @@ function EventCtrl($scope, $http, marker, $location, $tooltip) {
 			$http.get('/rest/events/'+id).success(function(event) {
 			    if(event){
 			    	$scope.event = event;
-			    	marker.reinitMarker();
 			    	$scope.eventLinks = buildLinks(event.links);
-			    	event.picto = $scope.eventLinks.picto;
+			    	event.picto = $scope.eventLinks.pictoFinish;
 				   	if(event){
-				        marker.recordEvent(event);
-				   	
+				        addMarkerEvent(event);
 					   	if(event.subscribers){
 					   		initSubscribers($scope, event.subscribers, function(subscriber){
-					   			marker.recordSubscriber(subscriber);
 					   			var idUser = $scope.user.id;
 								if(idUser == subscriber.userRef){
 									if(subscriber.locomotion=="CAR"){
@@ -89,6 +109,7 @@ function EventCtrl($scope, $http, marker, $location, $tooltip) {
 					   		});
 				       	}
 				   	}
+				   	$scope.myMap.fitBounds($scope.bounds);
 				   	var wsUrl = jsRoutes.controllers.SubscriberCtrl.subscribersUpdates(event.id, $scope.currentSubscriber.userRef);
 				   	var ws = new WebSocket(wsUrl.webSocketURL());
 				    
@@ -99,7 +120,7 @@ function EventCtrl($scope, $http, marker, $location, $tooltip) {
 				    ws.onmessage = function(message) {
 				    	var newSubscriber = JSON.parse(message.data);
 				    	updateSubscriber($scope, newSubscriber, function(subscriber){
-				    		_marker.recordSubscriber(subscriber);
+				    		addMarkerSubscriber(newSubscriber);
 				   		});
 				    	$scope.alerts.push({
 			    			msg : newSubscriber.surname + " " +newSubscriber.name + " a modifié ses caracteristiques", 
@@ -124,23 +145,20 @@ function EventCtrl($scope, $http, marker, $location, $tooltip) {
 				    	$scope.$apply();
 				    };
 				   	
-					var markers = $scope.markers;
 					$scope.$watch('filterUsers', function(newValue, oldValue) {
-							if(newValue){ 
-								for(var i=0;i<$scope.markers.length;i++){
-									var marker = markers[i];
-									if(!(marker.type === newValue) && (marker.type != "EVENT") && !marker.subscriber.current){
-										marker.visible = false; 
-									}else{
-										marker.visible = true; 
-									}
-								}		
+						for(var i=0;i<$scope.myMarkers.length;i++){
+							var marker = $scope.myMarkers[i];
+							if(newValue){
+								if(!(marker.type === newValue) && (marker.type != "EVENT") && !marker.subscriber.current){
+									marker.setVisible(false); 
+								}else{
+									marker.setVisible(true); 
+								}
 							}else{
-								for(var i=0;i<$scope.markers.length;i++){
-									var marker = markers[i];
-									marker.visible = true; 
-								}		
-							}	
+								marker.setVisible(true);
+							}
+						}
+							
 					});
 			    }
 		   });
@@ -148,6 +166,68 @@ function EventCtrl($scope, $http, marker, $location, $tooltip) {
 	}).error(function(error){
 		alert('error : '+error);
 	});
+    
+    function addMarkerEvent(event){
+    	$scope.mapOptions.center = new google.maps.LatLng(event.address.location.lat, event.address.location.lng);
+    	
+    	var marker = new google.maps.Marker({
+            map: $scope.myMap,
+            position: new google.maps.LatLng(event.address.location.lat, event.address.location.lng),
+            icon:event.picto, 
+            visible : true
+          });
+    	marker.type = "EVENT";
+    	$scope.myMarkers.push(marker);
+    	$scope.bounds.extend(marker.getPosition());
+    }
+    function addMarkerSubscriber(subscriber){
+    	var marker = findMarkerByLatLng(subscriber.address.location.lat, subscriber.address.location.lng);
+    	if(marker){
+    		marker.setVisible(subscriber.visible);
+    		marker.setIcon(subscriber.picto);
+    		marker.setVisible(subscriber.visible);
+    	}else{
+    		marker = findMarkerByUserRef(subscriber.address.location.lat, subscriber.address.location.lng);
+    		if(marker){
+    			marker.setPosition(new google.maps.LatLng(subscriber.address.location.lat, subscriber.address.location.lng));
+    			marker.setVisible(subscriber.visible);
+    			marker.setIcon(subscriber.picto);
+    		}else{
+	        	marker = new google.maps.Marker({
+	                map: $scope.myMap,
+	                position: new google.maps.LatLng(subscriber.address.location.lat, subscriber.address.location.lng),
+	                icon:subscriber.picto, 
+	                visible : subscriber.visible
+	              });
+	        	marker.type = subscriber.locomotion;
+	        	$scope.myMarkers.push(marker);
+	        	$scope.bounds.extend(marker.getPosition());
+    		}
+    	}
+    	marker.type = subscriber.locomotion;
+    	marker.subscriber = subscriber;
+    }
+    function findMarkerByLatLng(lat, lng) {
+		for ( var i = 0; i < $scope.myMarkers.length; i++) {
+			var pos = $scope.myMarkers[i].getPosition();
+			if (floatEqual(pos.lat(), lat)
+					&& floatEqual(pos.lng(), lng)) {
+				return $scope.myMarkers[i];
+			}
+		}
+
+		return null;
+	};
+	function findMarkerByUserRef(ref) {
+		for ( var i = 0; i < $scope.myMarkers.length; i++) {
+			var subscriber = $scope.myMarkers[i].subscriber;
+			if(subscriber && subscriber.userRef == ref){
+				return $scope.myMarkers[i];
+			}
+		}
+		return null;
+	}
+	
     function extractFromUrl(url){
         var index = url.lastIndexOf("/")
         return url.substring(index+1, url.length);
@@ -159,18 +239,23 @@ function EventCtrl($scope, $http, marker, $location, $tooltip) {
 		subscriber.picto = $scope.subscribersLinks[subscriber.userRef].picto;
 		if(idUser == subscriber.userRef){
 			$scope.currentSubscriber = subscriber;
+			$scope.currentSubscriber.visible=true;
 			subscriber.current = true;
 		}else{
-			if(subscriber.car && subscriber.car.passengers && inArray(idUser, subscriber.car.passengers)){
-				subscriber.currentCar = true;
-			}else{
-				subscriber.currentCar = false;
-			}
 			subscriber.current = false;
-		}
-		
-		if(callback){
-			callback(subscriber);
+			if($scope.filterUsers == "AUTOSTOP"){
+				if(subscriber.locomotion!="AUTOSTOP"){
+					subscriber.visible = false;	
+				}else{
+					subscriber.visible = true;
+				}
+			}else if($scope.filterUsers == "CAR"){
+				if(subscriber.locomotion!="CAR"){
+					subscriber.visible = false;	
+				}else{
+					subscriber.visible = true;
+				}
+			}
 		}
     }
     function initSubscribers($scope, subscribers, callback){
@@ -182,16 +267,42 @@ function EventCtrl($scope, $http, marker, $location, $tooltip) {
 			updateSubscriber($scope, subscriber, callback)
 			
    	 	}
-	   	if($scope.currentSubscriber.locomotion == 'CAR'){
-	   		for(var i=0; i<length; i++){
-	   			var subscriber = subscribers[i];
-	   			if(subscriber.carRef == $scope.currentSubscriber.userRef){
+   		for(var i=0; i<length; i++){
+   			var subscriber = subscribers[i];
+   			if(subscriber.locomotion=='AUTOSTOP'){
+   				if(subscriber.carRef == $scope.currentSubscriber.userRef){
 	   				subscriber.inMyCar = true;		
+	   				subscriber.picto = $scope.eventLinks.pictoStopLight;
 	   			}else{
 	   				subscriber.inMyCar = false;
-	   			}
-	   		}
-	   	}
+	   				subscriber.picto = $scope.eventLinks.pictoStop;
+	   			}	
+   			}else if(subscriber.locomotion=='CAR'){
+   				if($scope.currentSubscriber.locomotion=='AUTOSTOP' && $scope.currentSubscriber.carRef == subscriber.userRef){
+   					subscriber.picto = $scope.eventLinks.pictoCarLight;
+   					subscriber.currentCar = true;
+   				}else{
+   					subscriber.picto = $scope.eventLinks.pictoCar;
+   					subscriber.currentCar = false;
+   				}
+   			}else{
+   				subscriber.picto = $scope.eventLinks.pictoDontKnow;
+   			}
+   			addMarkerSubscriber(subscriber);
+   		}
+   		
+   		if($scope.currentSubscriber.locomotion=='CAR'){
+   			$scope.currentSubscriber.picto = $scope.eventLinks.pictoCarLight;	
+   		}else if($scope.currentSubscriber.locomotion=='AUTOSTOP'){
+   			$scope.currentSubscriber.picto = $scope.eventLinks.pictoStopLight;
+   		}
+   		
+   		if(callback){
+		   		for(var i=0; i<length; i++){
+		   			var subscriber = subscribers[i];
+		   			callback(subscriber);
+		   		}
+			}
 	   	$scope.subscribers = subscribers;
     }
     function inArray(value, array){
@@ -227,6 +338,9 @@ function EventCtrl($scope, $http, marker, $location, $tooltip) {
 		}
 		return null;
     }
+    function floatEqual(f1, f2) {
+		return (Math.abs(f1 - f2) < 0.000001);
+	}
 }
 //EventCtrl.$inject = ['$scope','register'];
 

@@ -2,4 +2,4 @@
 
 /* App Module */
 
-var app = angular.module('covoiturage', ['google-maps', 'covoiturageFilter', 'markerModule', 'ui.bootstrap', 'ui.bootstrap.tooltip', 'ui.bootstrap.transition']);
+var app = angular.module('covoiturage', ['ui.map',  'covoiturageFilter', 'markerModule', 'ui.bootstrap']);
