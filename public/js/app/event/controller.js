@@ -19,6 +19,8 @@ function EventCtrl($scope, $http, $location, $compile) {
 	$scope.subscribersLinks = {};
 	$scope.editMode = false;
 	$scope.alerts = [];
+	$scope.directionsDisplay = new google.maps.DirectionsRenderer();
+	$scope.directionsService = new google.maps.DirectionsService();
 	$scope.closeAlert = function(index) {
 		$scope.refSubscribers[$scope.alerts[index].userRef].class = null;
 	    $scope.alerts.splice(index, 1);
@@ -58,6 +60,36 @@ function EventCtrl($scope, $http, $location, $compile) {
         $scope.myInfoWindow.open($scope.myMap, marker);
         $scope.$apply();
     };
+    function traceDirections(){
+    	if($scope.currentSubscriber.locomotion == "CAR"){
+    		$scope.directionsDisplay.setMap($scope.myMap);
+    		var start = new google.maps.LatLng($scope.currentSubscriber.address.location.lat, $scope.currentSubscriber.address.location.lng);
+    		var end = new google.maps.LatLng($scope.event.address.location.lat, $scope.event.address.location.lng);
+    		var waypts = [];
+    		  if($scope.currentSubscriber.car.passengers){
+    		  for (var i = 0; i < $scope.currentSubscriber.car.passengers.length; i++) {
+    			  var passenger = $scope.refSubscribers[$scope.currentSubscriber.car.passengers[i]];
+    			  var loc = new google.maps.LatLng(passenger.address.location.lat, passenger.address.location.lng)
+    		      waypts.push({
+    		    	  location:loc, 
+    		          stopover:false
+    		      });
+    		    }
+    		  }
+    		var request = {
+    		      origin:start,
+    		      destination:end,
+    		      waypoints: waypts,
+    		      optimizeWaypoints: true,
+    		      travelMode: google.maps.DirectionsTravelMode.DRIVING
+    		  };
+    		  $scope.directionsService.route(request, function(response, status) {
+    		    if (status == google.maps.DirectionsStatus.OK) {
+    		    	$scope.directionsDisplay.setDirections(response);
+    		    }
+    		  });
+    	}
+    }
     function setCurrentWidowsSubscriber(){
     	if($scope.currentInfoWindowsSubscriber){
     		var marker = findMarkerByUserRef($scope.currentInfoWindowsSubscriber.userRef);
@@ -110,6 +142,7 @@ function EventCtrl($scope, $http, $location, $compile) {
 				       	}
 				   	}
 				   	$scope.myMap.fitBounds($scope.bounds);
+				   	traceDirections();
 				   	var wsUrl = jsRoutes.controllers.SubscriberCtrl.subscribersUpdates(event.id, $scope.currentSubscriber.userRef);
 				   	var ws = new WebSocket(wsUrl.webSocketURL());
 				    

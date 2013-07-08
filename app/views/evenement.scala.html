@@ -2,11 +2,10 @@
 @import helper.twitterBootstrap._
 
 
-@parentmain(Messages("playauthenticate.event.title"),"event") {
-<link rel="stylesheet" media="screen" href="@routes.Assets.at("css/demo.css")" />
+@main(Messages("playauthenticate.event.title"),"event") {
+  <link rel="stylesheet" media="screen" href="@routes.Assets.at("css/demo.css")" />
   <script src="http://maps.googleapis.com/maps/api/js?libraries=places&sensor=false&language=fr"></script>
   
-  <script type="text/javascript" src="@routes.Assets.at("js/jquery-1.9.0.min.js")"></script>
   <script type="text/javascript" src="@routes.Assets.at("js/lib/angular.js")"></script>
   <script type="text/javascript" src="@routes.Assets.at("js/lib/ui-bootstrap-tpls-0.4.0.min.js")"></script>
   <script type="text/javascript" src="@routes.Assets.at("js/lib/event.js")"></script>
@@ -108,10 +107,8 @@
 							<th>Nom</th>
 							<th>Adresse</th>
 							<th>places restantes</th>
-							<th ng-show="currentSubscriber.locomotion == 'AUTOSTOP'">Etre passager</th>
-							<th ng-show="currentSubscriber.locomotion == 'AUTOSTOP'">Quitter cette voiture</th>
-							<th ng-show="currentSubscriber.locomotion == 'CAR'">Ajouter à ma voiture</th>
-							<th ng-show="currentSubscriber.locomotion == 'CAR'">Supprimer de ma voiture</th>
+							<th ng-show="currentSubscriber.locomotion == 'AUTOSTOP'">Monter/Descendre</th>
+							<th ng-show="currentSubscriber.locomotion == 'CAR'">Prendre/Ne plus prendre</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -120,13 +117,13 @@
 							<td >{{subscriber.surname}} {{subscriber.name}}</td>
 							<td>{{subscriber.address.description}}</td>
 							<td>{{subscriber.car.nbPlaces - subscriber.car.passengers.length}}</td>
-							<td ng-show="subscriber.locomotion == 'CAR' && currentSubscriber.locomotion == 'AUTOSTOP'" >
+							<td ng-show="subscriber.locomotion == 'CAR' && currentSubscriber.locomotion == 'AUTOSTOP' && !subscriber.currentCar" >
 								<button class="btn btn-success" type="button" ng-click="addPassenger(subscriber, currentSubscriber)" >+</button>
 							</td>
 							<td ng-show="subscriber.locomotion == 'CAR' && currentSubscriber.locomotion == 'AUTOSTOP' && subscriber.currentCar">
 								<button class="btn btn-warning" type="button" ng-click="removePassenger(subscriber, currentSubscriber)" >-</button>
 							</td>
-							<td ng-show="subscriber.locomotion == 'AUTOSTOP' && currentSubscriber.locomotion == 'CAR'">
+							<td ng-show="subscriber.locomotion == 'AUTOSTOP' && currentSubscriber.locomotion == 'CAR' && !subscriber.inMyCar">
 								<button class="btn btn-success" type="button" ng-click="addPassenger(currentSubscriber, subscriber)" >+</button>
 							</td>
 							<td ng-show="subscriber.locomotion == 'AUTOSTOP' && currentSubscriber.locomotion == 'CAR' && subscriber.inMyCar">
