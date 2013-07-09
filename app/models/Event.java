@@ -119,8 +119,13 @@ public class Event {
     	    		if(subscriber.getCar()!=null && !subscriber.getCar().getPassengers().contains(idPassenger)){
     	    			subscriber.getCar().addPassenger(idPassenger);
     	        	}
-    			}else if(subscriber.getCar()!=null && subscriber.getCar().getPassengers().contains(idPassenger)){
-					subscriber.getCar().getPassengers().remove(idPassenger);
+    			}else {
+    				if(subscriber.getCar()!=null && subscriber.getCar().getPassengers().contains(idPassenger)){
+    					subscriber.getCar().getPassengers().remove(idPassenger);
+    				}
+					if(subscriber.getCar()!=null && subscriber.getCar().getWaiting().contains(idPassenger)){
+						subscriber.getCar().getWaiting().remove(idPassenger);
+					}
 				}
 			}
         }

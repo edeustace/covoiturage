@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import models.Car;
 import models.Car.CarIsFullException;
 import models.Event;
 import models.Subscriber;
@@ -133,6 +134,8 @@ public class SubscriberCtrl extends Controller {
             String idPassenger = node.get("passenger").getTextValue();
             event.addPassenger(idPassenger, idSub);
             event.update();
+            Subscriber subsc = event.getSubscriberById(idSub);
+            SubscriberActor.notifySubscriberUpdate(id, subsc.getUserRef(), subsc);
             return ok().as("application/json");
         } catch (CarIsFullException e){
         	return badRequest("{message: 'La voiture est pleine'}").as("application/json");
@@ -141,11 +144,49 @@ public class SubscriberCtrl extends Controller {
         }
     }
 
+    public static Result addToWaitingList(String id, String idSub){
+        try{
+            Event event = Event.read(id);
+            JsonNode node = request().body().asJson();
+            String idPassenger = node.get("passenger").getTextValue();
+            Subscriber subsc = event.getSubscriberById(idSub);
+            Car car = subsc.getCar();
+            if(car!=null){
+            	if(!car.getWaiting().contains(idPassenger)){
+            		car.getWaiting().add(idPassenger);	
+            	}
+            }
+            event.update();
+            SubscriberActor.notifySubscriberUpdate(id, subsc.getUserRef(), subsc);
+            return ok().as("application/json");
+        } catch (Exception e){
+            return internalServerError(e.getMessage()).as("application/json");
+        }
+    }
+    public static Result removeFromWaitingList(String id, String idSub, String idPassenger){
+        try{
+            Event event = Event.read(id);
+            Subscriber subsc = event.getSubscriberById(idSub);
+            Car car = subsc.getCar();
+            if(car!=null){
+            	car.getWaiting().remove(idPassenger);
+            }
+            event.update();
+            SubscriberActor.notifySubscriberUpdate(id, subsc.getUserRef(), subsc);
+            return ok().as("application/json");
+        } catch (CarIsFullException e){
+        	return badRequest("{message: 'La voiture est pleine'}").as("application/json");
+        } catch (Exception e){
+            return internalServerError(e.getMessage()).as("application/json");
+        }
+    }
     public static Result deletePassenger(String id, String idSub, String idPassenger){
     	try{
 	    	Event event = Event.read(id);
 	    	event.deletePassenger(idPassenger, idSub);
 	    	event.update();
+	    	Subscriber subsc = event.getSubscriberById(idSub);
+	    	SubscriberActor.notifySubscriberUpdate(id, subsc.getUserRef(), subsc);
 	    	return ok().as("application/json");
 	    } catch (Exception e){
 	        return internalServerError(e.getMessage()).as("application/json");

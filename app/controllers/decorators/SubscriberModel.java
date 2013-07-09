@@ -36,16 +36,6 @@ public class SubscriberModel {
             this.links.add(Link.link(Link.UPDATE, update));
             String passengers = controllers.routes.SubscriberCtrl.updateCar(idEvent, subscriber.getUserRef()).toString();
             this.links.add(Link.link("car", passengers));
-            if(Locomotion.CAR.equals(this.subscriber.getLocomotion())){
-                String picto = controllers.routes.Assets.at("icons/auto.jpg").toString();
-                this.links.add(Link.link("picto", picto));            	
-            }else if(Locomotion.AUTOSTOP.equals(this.subscriber.getLocomotion())){
-                String picto = controllers.routes.Assets.at("icons/autostop.jpg").toString();
-                this.links.add(Link.link("picto", picto));
-            }else{
-            	String picto = controllers.routes.Assets.at("icons/autostop.jpg").toString();
-                this.links.add(Link.link("picto", picto));
-            }
         }
     }
 

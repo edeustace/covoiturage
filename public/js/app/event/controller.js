@@ -35,9 +35,17 @@ function EventCtrl($scope, $http, $location, $compile) {
 			alert("Error "+error);
 		});
 	};
-    $scope.addPassenger = function(car, passenger){
+	$scope.validatePassenger = function(car, passenger){
     	var link = getCarLink(car);
-    	$http.post(link, {passenger:passenger.userRef}).success(function(subscriber){
+    	$http.post(link, {passenger:passenger}).success(function(subscriber){
+    		reloadSubscribers();
+		}).error(function(error){
+			alert("Error "+error);
+		});
+	};
+    $scope.addPassenger = function(car, passenger){
+    	var link = getWaitingsLink(car);
+    	$http.post(link, {passenger:passenger}).success(function(subscriber){
     		reloadSubscribers();
 		}).error(function(error){
 			alert("Error "+error);
@@ -48,7 +56,15 @@ function EventCtrl($scope, $http, $location, $compile) {
     };
     $scope.removePassenger = function(car, passenger){
     	var link = getCarLink(car);
-    	$http.delete(link+'/'+passenger.userRef).success(function(subscriber){
+    	$http.delete(link+'/'+passenger).success(function(subscriber){
+			reloadSubscribers();
+		}).error(function(error){
+			alert("Error "+error);
+		});
+	};
+    $scope.removeWaitingGuy = function(car, passenger){
+    	var link = getWaitingsLink(car);
+    	$http.delete(link+'/'+passenger).success(function(subscriber){
 			reloadSubscribers();
 		}).error(function(error){
 			alert("Error "+error);
@@ -142,7 +158,6 @@ function EventCtrl($scope, $http, $location, $compile) {
 				       	}
 				   	}
 				   	$scope.myMap.fitBounds($scope.bounds);
-				   	traceDirections();
 				   	var wsUrl = jsRoutes.controllers.SubscriberCtrl.subscribersUpdates(event.id, $scope.currentSubscriber.userRef);
 				   	var ws = new WebSocket(wsUrl.webSocketURL());
 				    
@@ -152,30 +167,7 @@ function EventCtrl($scope, $http, $location, $compile) {
 				    
 				    ws.onmessage = function(message) {
 				    	var newSubscriber = JSON.parse(message.data);
-				    	updateSubscriber($scope, newSubscriber, function(subscriber){
-				    		addMarkerSubscriber(newSubscriber);
-				   		});
-				    	$scope.alerts.push({
-			    			msg : newSubscriber.surname + " " +newSubscriber.name + " a modifié ses caracteristiques", 
-			    			type : "success",
-			    			userRef : newSubscriber.userRef
-				    	});
-				    	newSubscriber.class = "success";
-				    	var newSubscribers = new Array();
-				    	var find = false;
-				    	for ( var indice in $scope.subscribers) {
-							if($scope.subscribers[indice].userRef == newSubscriber.userRef){
-								newSubscribers.push(newSubscriber);
-								find = true;
-							}else{
-								newSubscribers.push($scope.subscribers[indice]);
-							}
-						}
-				    	if(!find){
-				    		newSubscribers.push(newSubscriber);
-				    	}
-				    	$scope.subscribers = newSubscribers;
-				    	$scope.$apply();
+				    	reloadSubscribers();
 				    };
 				   	
 					$scope.$watch('filterUsers', function(newValue, oldValue) {
@@ -306,16 +298,31 @@ function EventCtrl($scope, $http, $location, $compile) {
    				if(subscriber.carRef == $scope.currentSubscriber.userRef){
 	   				subscriber.inMyCar = true;		
 	   				subscriber.picto = $scope.eventLinks.pictoStopLight;
-	   			}else{
+   				}else if($scope.currentSubscriber.car && 
+   						$scope.currentSubscriber.car.waitings && 
+   						$scope.currentSubscriber.car.waitings.length>0 && 
+							inArray(subscriber, $scope.currentSubscriber.car.waitings)){
+						subscriber.picto = $scope.eventLinks.pictoCar;
+	   					subscriber.waitingForMyCar = true;
+				}else{
 	   				subscriber.inMyCar = false;
 	   				subscriber.picto = $scope.eventLinks.pictoStop;
 	   			}	
    			}else if(subscriber.locomotion=='CAR'){
-   				if($scope.currentSubscriber.locomotion=='AUTOSTOP' && $scope.currentSubscriber.carRef == subscriber.userRef){
-   					subscriber.picto = $scope.eventLinks.pictoCarLight;
-   					subscriber.currentCar = true;
+   				if($scope.currentSubscriber.locomotion=='AUTOSTOP'){
+   					if($scope.currentSubscriber.carRef == subscriber.userRef){
+   						subscriber.picto = $scope.eventLinks.pictoCarLight;
+   	   					subscriber.currentCar = true;	
+   					}else if(subscriber.car && subscriber.car.waitings && subscriber.car.waitings.length>0 && 
+   							inArray($scope.currentSubscriber.userRef, subscriber.car.waitings)){
+   						subscriber.picto = $scope.eventLinks.pictoCar;
+   	   					subscriber.possibleCar = true;
+   					}else{
+   	   					subscriber.picto = $scope.eventLinks.pictoCarDark;
+   	   					subscriber.currentCar = false;
+   	   				}
    				}else{
-   					subscriber.picto = $scope.eventLinks.pictoCar;
+   					subscriber.picto = $scope.eventLinks.pictoCarDark;
    					subscriber.currentCar = false;
    				}
    			}else{
@@ -337,6 +344,7 @@ function EventCtrl($scope, $http, $location, $compile) {
 		   		}
 			}
 	   	$scope.subscribers = subscribers;
+	   	traceDirections();
     }
     function inArray(value, array){
     	if(array && value){
@@ -365,6 +373,17 @@ function EventCtrl($scope, $http, $location, $compile) {
 			for ( var int = 0; int < subscriber.car.links.length; int++) {
 				var link = subscriber.car.links[int];
 				if(link && link.rel == "self"){
+					return link.href;
+				}
+			}
+		}
+		return null;
+    }
+    function getWaitingsLink(subscriber){
+		if(subscriber.car && subscriber.car.links){
+			for ( var int = 0; int < subscriber.car.links.length; int++) {
+				var link = subscriber.car.links[int];
+				if(link && link.rel == "waitings"){
 					return link.href;
 				}
 			}
