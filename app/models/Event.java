@@ -132,6 +132,7 @@ public class Event {
     	Subscriber passenger = this.getSubscriberById(idPassenger);
     	if(passenger!=null){
     		passenger.setCarRef(idCarOwner);
+    		passenger.getPossibleCars().remove(idCarOwner);
     	}
     	return this;
     }  

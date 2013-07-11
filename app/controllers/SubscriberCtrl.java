@@ -197,6 +197,40 @@ public class SubscriberCtrl extends Controller {
 	    return ok().as("application/json");
     }
     
+    public static Result addPossibleCar(String id, String idSub){
+        try{
+            Event event = Event.read(id);
+            JsonNode node = request().body().asJson();
+            String idCar = node.get("car").getTextValue();
+            Subscriber subsc = event.getSubscriberById(idSub);
+            if(subsc!=null){
+            	if(!subsc.getPossibleCars().contains(idCar)){
+            		subsc.getPossibleCars().add(idCar);	
+            	}
+            }
+            event.update();
+            SubscriberActor.notifySubscriberUpdate(id, subsc.getUserRef(), subsc);
+            return ok().as("application/json");
+        } catch (Exception e){
+            return internalServerError(e.getMessage()).as("application/json");
+        }
+    }
+    
+    public static Result deletePossibleCar(String id, String idSub, String idCar){
+        try{
+            Event event = Event.read(id);
+            Subscriber subsc = event.getSubscriberById(idSub);
+            if(subsc!=null){
+            	subsc.getPossibleCars().remove(idCar);
+            }
+            event.update();
+            SubscriberActor.notifySubscriberUpdate(id, subsc.getUserRef(), subsc);
+            return ok().as("application/json");
+        } catch (Exception e){
+            return internalServerError(e.getMessage()).as("application/json");
+        }
+    }
+    
     /**
      * Websocket.
      */

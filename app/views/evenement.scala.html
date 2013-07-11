@@ -44,21 +44,30 @@
 							</ul>
 							{{currentInfoWindowsSubscriber.car.nbPlaces - currentInfoWindowsSubscriber.car.passengers.length}} places restantes
 						</div>
-						<div ng-show="currentInfoWindowsSubscriber.locomotion == 'CAR' && currentSubscriber.locomotion == 'AUTOSTOP' && !currentInfoWindowsSubscriber.currentCar" >
-							Monter 
-							<button class="btn btn-success btn-mini" type="button" ng-click="addPassenger(currentInfoWindowsSubscriber, currentSubscriber)" >+</button>
+						<div ng-show="currentSubscriber.locomotion == 'AUTOSTOP' && currentInfoWindowsSubscriber.normalCar" >
+							<button class="btn btn-success btn-mini" type="button" ng-click="askForSeat(currentInfoWindowsSubscriber, currentSubscriber.userRef)" >Monter</button>
 						</div>
-						<div ng-show="currentInfoWindowsSubscriber.locomotion == 'CAR' && currentSubscriber.locomotion == 'AUTOSTOP' && currentInfoWindowsSubscriber.currentCar">
-							Descendre 
-							<button class="btn btn-warning btn-mini" type="button" ng-click="removePassenger(currentInfoWindowsSubscriber, currentSubscriber)" >-</button>
+						<div ng-show="currentSubscriber.locomotion == 'AUTOSTOP' && currentInfoWindowsSubscriber.currentCar" >
+							<button class="btn btn-warning btn-mini" type="button" ng-click="removePassenger(currentInfoWindowsSubscriber, currentSubscriber.userRef)" >Descendre</button>
 						</div>
-						<div ng-show="currentInfoWindowsSubscriber.locomotion == 'AUTOSTOP' && currentSubscriber.locomotion == 'CAR' && !currentInfoWindowsSubscriber.inMyCar">
-							Prendre  
-							<button class="btn btn-success btn-mini" type="button" ng-click="addPassenger(currentSubscriber, currentInfoWindowsSubscriber)" >+</button>
+						<div ng-show="currentSubscriber.locomotion == 'AUTOSTOP' && currentInfoWindowsSubscriber.iAskHim" >
+							<button class="btn btn-warning btn-mini" type="button" ng-click="removeWaitingGuy(currentInfoWindowsSubscriber, currentSubscriber.userRef)" >Descendre</button>
 						</div>
-						<div ng-show="currentInfoWindowsSubscriber.locomotion == 'AUTOSTOP' && currentSubscriber.locomotion == 'CAR' && currentInfoWindowsSubscriber.inMyCar">
-							ne plus prendre 
-							<button class="btn btn-warning btn-mini" type="button" ng-click="removePassenger(currentSubscriber, currentInfoWindowsSubscriber)" >-</button>
+						<div ng-show="currentSubscriber.locomotion == 'AUTOSTOP' && currentInfoWindowsSubscriber.heAskMeToBeInHisCar">
+							<button class="btn btn-warning btn-mini" type="button" ng-click="removePossibleCar(currentSubscriber, currentInfoWindowsSubscriber.userRef)" >Descendre</button>
+						</div>
+						<!-- AUTOSTOP -->
+						<div ng-show="currentSubscriber.locomotion == 'CAR' && currentInfoWindowsSubscriber.free">
+							<button class="btn btn-success btn-mini" type="button" ng-click="proposeSeat(currentInfoWindowsSubscriber, currentSubscriber.userRef)" >Prendre</button>
+						</div>
+						<div ng-show="currentSubscriber.locomotion == 'CAR' && currentInfoWindowsSubscriber.requestedByMe">
+							<button class="btn btn-warning btn-mini" type="button" ng-click="removePossibleCar(currentInfoWindowsSubscriber, currentSubscriber.userRef)" >Ne plus prendre</button>
+						</div>
+						<div ng-show="currentSubscriber.locomotion == 'CAR' && currentInfoWindowsSubscriber.waitingForMyCar">
+							<button class="btn btn-warning btn-mini" type="button" ng-click="removeWaitingGuy(currentSubscriber, currentInfoWindowsSubscriber.userRef)" >Ne plus prendre</button>
+						</div>
+						<div ng-show="currentSubscriber.locomotion == 'CAR' && currentInfoWindowsSubscriber.inMyCar">
+							<button class="btn btn-warning btn-mini" type="button" ng-click="removePassenger(currentSubscriber, currentInfoWindowsSubscriber.userRef)" >Ne plus prendre</button>
 						</div>
                 </div>
 				<div id="map_canvas" ui-map="myMap" class="map"
@@ -82,13 +91,28 @@
 					<button  class="btn" ng-click="setEditMode(false)">Annuler</button>
 				</div>
 				<div ng-show="currentSubscriber.locomotion == 'AUTOSTOP'">
-					<strong>Mes demandes en attente :</strong> 
-					<ul>
-						<li ng-repeat="subscriber in subscribers" ng-show="subscriber.possibleCar">
-							{{subscriber.surname}} {{subscriber.name}} 
-							<button class="btn btn-warning btn-mini" type="button" ng-click="removeWaitingGuy(subscriber, currentSubscriber.userRef)" >Annuler</button>
-						</li>
-					</ul>
+					<div ng-show="currentSubscriber.carRef">
+						<strong>Ma voiture :</strong>
+						{{refSubscribers[currentSubscriber.carRef].surname}} {{refSubscribers[currentSubscriber.carRef].name}}
+					</div>
+					<div ng-show="!currentSubscriber.carRef">
+						<strong>Mes demandes en attente :</strong> 
+						<ul>
+							<li ng-repeat="subscriber in subscribers" ng-show="subscriber.iAskHim">
+								{{subscriber.surname}} {{subscriber.name}} 
+								<button class="btn btn-warning btn-mini" type="button" ng-click="removeWaitingGuy(subscriber, currentSubscriber.userRef)" >Annuler</button>
+							</li>
+						</ul>
+						<strong ng-show="currentSubscriber.possibleCars.length > 0">Les utilisateurs suivants me proposent leur voiture :</strong> 
+						<ul >
+							<li ng-repeat="subscriber in subscribers" ng-show="subscriber.heAskMeToBeInHisCar">
+								{{subscriber.surname}} {{subscriber.name}} 
+								<button class="btn btn-success btn-mini" type="button" ng-click="validatePassenger(subscriber, currentSubscriber.userRef)" >Accepter</button>
+								<button class="btn btn-warning btn-mini" type="button" ng-click="removePossibleCar(currentSubscriber, subscriber.userRef)" >Refuser</button>
+							</li>
+						</ul>
+					</div>
+					
 				</div>
 				<div ng-show="currentSubscriber.locomotion == 'CAR'">
 					<div ng-show="currentSubscriber.car &&  currentSubscriber.car.passengers">
@@ -108,6 +132,15 @@
 							<li ng-repeat="passenger in currentSubscriber.car.waitings" >
 								{{refSubscribers[passenger].surname}} {{refSubscribers[passenger].name}}
 								<button class="btn btn-success btn-mini" type="button" ng-click="validatePassenger(currentSubscriber, passenger)" >Valider</button>
+							</li>
+						</ul>
+					</div>
+					<div >
+						<strong>Mes propositions : </strong>
+						<ul>
+							<li ng-repeat="subscriber in subscribers" ng-show="subscriber.requestedByMe">
+								{{subscriber.surname}} {{subscriber.name}} 
+								<button class="btn btn-warning btn-mini" type="button" ng-click="removePossibleCar(subscriber, currentSubscriber.userRef)" >Annuler</button>
 							</li>
 						</ul>
 					</div>
@@ -139,23 +172,31 @@
 							<td >{{subscriber.surname}} {{subscriber.name}}</td>
 							<td>{{subscriber.address.description}}</td>
 							<td>{{subscriber.car.nbPlaces - subscriber.car.passengers.length}}</td>
-							<td ng-show="subscriber.locomotion == 'CAR' && currentSubscriber.locomotion == 'AUTOSTOP' && !subscriber.currentCar" >
-								<button class="btn btn-success" type="button" ng-click="addPassenger(subscriber, currentSubscriber.userRef)" >+</button>
+							<!-- CAR -->
+							<td ng-show="currentSubscriber.locomotion == 'AUTOSTOP' && subscriber.normalCar" >
+								<button class="btn btn-success" type="button" ng-click="askForSeat(subscriber, currentSubscriber.userRef)" >+</button>
 							</td>
-							<td ng-show="subscriber.locomotion == 'CAR' && currentSubscriber.locomotion == 'AUTOSTOP' && subscriber.currentCar">
+							<td ng-show="currentSubscriber.locomotion == 'AUTOSTOP' && subscriber.currentCar" >
 								<button class="btn btn-warning" type="button" ng-click="removePassenger(subscriber, currentSubscriber.userRef)" >-</button>
 							</td>
-							<td ng-show="subscriber.locomotion == 'CAR' && currentSubscriber.locomotion == 'AUTOSTOP' && subscriber.possibleCar">
+							<td ng-show="currentSubscriber.locomotion == 'AUTOSTOP' && subscriber.iAskHim" >
 								<button class="btn btn-warning" type="button" ng-click="removeWaitingGuy(subscriber, currentSubscriber.userRef)" >-</button>
 							</td>
-							<td ng-show="subscriber.locomotion == 'AUTOSTOP' && currentSubscriber.locomotion == 'CAR' && !subscriber.inMyCar">
-								<button class="btn btn-success" type="button" ng-click="addPassenger(currentSubscriber, subscriber.userRef)" >+</button>
+							<td ng-show="currentSubscriber.locomotion == 'AUTOSTOP' && subscriber.heAskMeToBeInHisCar">
+								<button class="btn btn-warning" type="button" ng-click="removePossibleCar(currentSubscriber, subscriber.userRef)" >-</button>
 							</td>
-							<td ng-show="subscriber.locomotion == 'AUTOSTOP' && currentSubscriber.locomotion == 'CAR' && subscriber.inMyCar">
-								<button class="btn btn-warning" type="button" ng-click="removePassenger(currentSubscriber, subscriber.userRef)" >-</button>
+							<!-- AUTOSTOP -->
+							<td ng-show="currentSubscriber.locomotion == 'CAR' && subscriber.free">
+								<button class="btn btn-success" type="button" ng-click="proposeSeat(subscriber, currentSubscriber.userRef)" >+</button>
 							</td>
-							<td ng-show="subscriber.locomotion == 'AUTOSTOP' && currentSubscriber.locomotion == 'CAR' && subscriber.waitingForMyCar">
+							<td ng-show="currentSubscriber.locomotion == 'CAR' && subscriber.requestedByMe">
+								<button class="btn btn-warning" type="button" ng-click="removePossibleCar(subscriber, currentSubscriber.userRef)" >-</button>
+							</td>
+							<td ng-show="currentSubscriber.locomotion == 'CAR' && subscriber.waitingForMyCar">
 								<button class="btn btn-warning" type="button" ng-click="removeWaitingGuy(currentSubscriber, subscriber.userRef)" >-</button>
+							</td>
+							<td ng-show="currentSubscriber.locomotion == 'CAR' && subscriber.inMyCar">
+								<button class="btn btn-warning" type="button" ng-click="removePassenger(currentSubscriber, subscriber.userRef)" >-</button>
 							</td>
 						</tr>
 					</tbody>

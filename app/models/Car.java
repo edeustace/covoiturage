@@ -18,7 +18,7 @@ public class Car {
 		if(getNbPlaces().equals(this.getPassengers().size())){
 			throw new CarIsFullException();
 		}
-		if(this!=null && !this.getPassengers().contains(passenger) && this.getWaiting().contains(passenger)){
+		if(this!=null && !this.getPassengers().contains(passenger)){
 			this.getWaiting().remove(passenger);
 			this.getPassengers().add(passenger);
     	}

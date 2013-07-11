@@ -127,6 +127,7 @@ public class EventCtrl extends Controller {
             this.links.add(Link.link("pictoCarDark", controllers.routes.Assets.at("icons/car_dark.png").toString()));
             this.links.add(Link.link("pictoCar", controllers.routes.Assets.at("icons/car_classic.png").toString()));
             this.links.add(Link.link("pictoCarLight", controllers.routes.Assets.at("icons/car_light.png").toString()));
+            this.links.add(Link.link("pictoStopDark", controllers.routes.Assets.at("icons/pedestriancrossing_dark.png").toString()));
             this.links.add(Link.link("pictoStop", controllers.routes.Assets.at("icons/pedestriancrossing_classic.png").toString()));
             this.links.add(Link.link("pictoStopLight", controllers.routes.Assets.at("icons/pedestriancrossing_light.png").toString()));
             this.links.add(Link.link("pictoDontKnow", controllers.routes.Assets.at("icons/symbol_blank_jaune_dark.png").toString()));

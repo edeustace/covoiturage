@@ -25,6 +25,7 @@ function EventCtrl($scope, $http, $location, $compile) {
 		$scope.refSubscribers[$scope.alerts[index].userRef].class = null;
 	    $scope.alerts.splice(index, 1);
 	  };
+	
 	$scope.saveCurrentSubscriber = function(){
 		$http.put($scope.subscribersLinks[$scope.currentSubscriber.userRef].self ,$scope.currentSubscriber).success(function(){
 			$scope.setEditMode(false);
@@ -35,29 +36,22 @@ function EventCtrl($scope, $http, $location, $compile) {
 			alert("Error "+error);
 		});
 	};
-	$scope.validatePassenger = function(car, passenger){
-    	var link = getCarLink(car);
-    	$http.post(link, {passenger:passenger}).success(function(subscriber){
-    		reloadSubscribers();
-		}).error(function(error){
-			alert("Error "+error);
-		});
+	//Interaction car / passenger
+	$scope.getPropositions = function(){
+		var result = new Array();
+		for ( var indice in $scope.subscribers) {
+			var subscriber = $scope.subscribers[indice];
+			if(subscriber.heAskMeToBeInHisCar){
+				result.push(subscriber);
+			}
+		}
+		return result;
 	};
-    $scope.addPassenger = function(car, passenger){
-    	var link = getWaitingsLink(car);
-    	$http.post(link, {passenger:passenger}).success(function(subscriber){
+	//CAR OWNER 
+    $scope.proposeSeat = function(passenger, carRef){
+    	var link = getPossibleCarLink(passenger);
+    	$http.post(link, {car:carRef}).success(function(subscriber){
     		reloadSubscribers();
-		}).error(function(error){
-			alert("Error "+error);
-		});
-	};
-    $scope.setEditMode = function(value){
-    	$scope.editMode = value;	
-    };
-    $scope.removePassenger = function(car, passenger){
-    	var link = getCarLink(car);
-    	$http.delete(link+'/'+passenger).success(function(subscriber){
-			reloadSubscribers();
 		}).error(function(error){
 			alert("Error "+error);
 		});
@@ -70,6 +64,45 @@ function EventCtrl($scope, $http, $location, $compile) {
 			alert("Error "+error);
 		});
 	};
+	$scope.validatePassenger = function(car, passenger){
+    	var link = getCarLink(car);
+    	$http.post(link, {passenger:passenger}).success(function(subscriber){
+    		reloadSubscribers();
+		}).error(function(error){
+			alert("Error "+error);
+		});
+	};
+	$scope.removePassenger = function(car, passenger){
+    	var link = getCarLink(car);
+    	$http.delete(link+'/'+passenger).success(function(subscriber){
+			reloadSubscribers();
+		}).error(function(error){
+			alert("Error "+error);
+		});
+	};
+	
+	//AUTOSTOPER 
+	$scope.askForSeat = function(car, passenger){
+    	var link = getWaitingsLink(car);
+    	$http.post(link, {passenger:passenger}).success(function(subscriber){
+    		reloadSubscribers();
+		}).error(function(error){
+			alert("Error "+error);
+		});
+	};
+	$scope.removePossibleCar = function(passenger, carRef){
+		var link = getPossibleCarLink(passenger);
+    	$http.delete(link+'/'+carRef).success(function(subscriber){
+    		reloadSubscribers();
+		}).error(function(error){
+			alert("Error "+error);
+		});
+	};
+    $scope.setEditMode = function(value){
+    	$scope.editMode = value;	
+    };
+    
+
 	$scope.openMarkerInfo = function(marker) {
 		$scope.currentMarker = marker;
 		$scope.currentInfoWindowsSubscriber = marker.subscriber;
@@ -77,33 +110,41 @@ function EventCtrl($scope, $http, $location, $compile) {
         $scope.$apply();
     };
     function traceDirections(){
+    	var car = null;
     	if($scope.currentSubscriber.locomotion == "CAR"){
-    		$scope.directionsDisplay.setMap($scope.myMap);
-    		var start = new google.maps.LatLng($scope.currentSubscriber.address.location.lat, $scope.currentSubscriber.address.location.lng);
-    		var end = new google.maps.LatLng($scope.event.address.location.lat, $scope.event.address.location.lng);
-    		var waypts = [];
-    		  if($scope.currentSubscriber.car.passengers){
-    		  for (var i = 0; i < $scope.currentSubscriber.car.passengers.length; i++) {
-    			  var passenger = $scope.refSubscribers[$scope.currentSubscriber.car.passengers[i]];
-    			  var loc = new google.maps.LatLng(passenger.address.location.lat, passenger.address.location.lng)
-    		      waypts.push({
-    		    	  location:loc, 
-    		          stopover:false
-    		      });
-    		    }
-    		  }
-    		var request = {
-    		      origin:start,
-    		      destination:end,
-    		      waypoints: waypts,
-    		      optimizeWaypoints: true,
-    		      travelMode: google.maps.DirectionsTravelMode.DRIVING
-    		  };
-    		  $scope.directionsService.route(request, function(response, status) {
-    		    if (status == google.maps.DirectionsStatus.OK) {
-    		    	$scope.directionsDisplay.setDirections(response);
-    		    }
-    		  });
+    		car = $scope.currentSubscriber;
+    	}else if($scope.currentSubscriber.locomotion == "AUTOSTOP"){
+    		if($scope.currentSubscriber.carRef){
+    			car = $scope.refSubscribers[$scope.currentSubscriber.carRef];	
+    		}
+    	}
+    	if(car){
+			$scope.directionsDisplay.setMap($scope.myMap);
+			var start = new google.maps.LatLng(car.address.location.lat, car.address.location.lng);
+			var end = new google.maps.LatLng($scope.event.address.location.lat, $scope.event.address.location.lng);
+			var waypts = [];
+			  if(car.car.passengers){
+			  for (var i = 0; i < car.car.passengers.length; i++) {
+				  var passenger = $scope.refSubscribers[car.car.passengers[i]];
+				  var loc = new google.maps.LatLng(passenger.address.location.lat, passenger.address.location.lng)
+			      waypts.push({
+			    	  location:loc, 
+			          stopover:false
+			      });
+			    }
+			  }
+			var request = {
+			      origin:start,
+			      destination:end,
+			      waypoints: waypts,
+			      optimizeWaypoints: true,
+			      travelMode: google.maps.DirectionsTravelMode.DRIVING
+			  };
+			  $scope.directionsService.route(request, function(response, status) {
+			    if (status == google.maps.DirectionsStatus.OK) {
+			    	$scope.directionsDisplay.setDirections(response);
+			    }
+			  });
     	}
     }
     function setCurrentWidowsSubscriber(){
@@ -294,39 +335,44 @@ function EventCtrl($scope, $http, $location, $compile) {
    	 	}
    		for(var i=0; i<length; i++){
    			var subscriber = subscribers[i];
-   			if(subscriber.locomotion=='AUTOSTOP'){
+   			if($scope.currentSubscriber.locomotion=='CAR' && subscriber.locomotion=='AUTOSTOP'){
    				if(subscriber.carRef == $scope.currentSubscriber.userRef){
-	   				subscriber.inMyCar = true;		
 	   				subscriber.picto = $scope.eventLinks.pictoStopLight;
-   				}else if($scope.currentSubscriber.car && 
-   						$scope.currentSubscriber.car.waitings && 
-   						$scope.currentSubscriber.car.waitings.length>0 && 
-							inArray(subscriber, $scope.currentSubscriber.car.waitings)){
-						subscriber.picto = $scope.eventLinks.pictoCar;
-	   					subscriber.waitingForMyCar = true;
+	   				subscriber.inMyCar = true;
+   				}else if($scope.currentSubscriber.car.waitings && $scope.currentSubscriber.car.waitings.length>0 && inArray(subscriber.userRef, $scope.currentSubscriber.car.waitings)){
+					subscriber.picto = $scope.eventLinks.pictoStop;
+		   			subscriber.waitingForMyCar = true;
+   				}else if(inArray($scope.currentSubscriber.userRef, subscriber.possibleCars)){
+   					subscriber.picto = $scope.eventLinks.pictoStop;
+   					subscriber.requestedByMe = true;
 				}else{
-	   				subscriber.inMyCar = false;
-	   				subscriber.picto = $scope.eventLinks.pictoStop;
+	   				subscriber.picto = $scope.eventLinks.pictoStopDark;
+					subscriber.free = true;
 	   			}	
-   			}else if(subscriber.locomotion=='CAR'){
-   				if($scope.currentSubscriber.locomotion=='AUTOSTOP'){
-   					if($scope.currentSubscriber.carRef == subscriber.userRef){
-   						subscriber.picto = $scope.eventLinks.pictoCarLight;
-   	   					subscriber.currentCar = true;	
-   					}else if(subscriber.car && subscriber.car.waitings && subscriber.car.waitings.length>0 && 
-   							inArray($scope.currentSubscriber.userRef, subscriber.car.waitings)){
-   						subscriber.picto = $scope.eventLinks.pictoCar;
-   	   					subscriber.possibleCar = true;
-   					}else{
-   	   					subscriber.picto = $scope.eventLinks.pictoCarDark;
-   	   					subscriber.currentCar = false;
-   	   				}
-   				}else{
+   			}else if($scope.currentSubscriber.locomotion=='AUTOSTOP' && subscriber.locomotion=='CAR'){
+				if($scope.currentSubscriber.carRef == subscriber.userRef){
+					subscriber.picto = $scope.eventLinks.pictoCarLight;
+   					subscriber.currentCar = true;	
+				}else if(subscriber.car && subscriber.car.waitings && subscriber.car.waitings.length>0 && 
+						inArray($scope.currentSubscriber.userRef, subscriber.car.waitings)){
+					subscriber.picto = $scope.eventLinks.pictoCar;
+   					subscriber.iAskHim = true;
+				}else if(subscriber.userRef &&  
+						inArray(subscriber.userRef, $scope.currentSubscriber.possibleCars)){
+					subscriber.picto = $scope.eventLinks.pictoCar;
+   					subscriber.heAskMeToBeInHisCar = true;
+				}else{
    					subscriber.picto = $scope.eventLinks.pictoCarDark;
-   					subscriber.currentCar = false;
+   					subscriber.normalCar = true;
    				}
-   			}else{
+   			}else if($scope.currentSubscriber.locomotion=='CAR'){
+   				subscriber.picto = $scope.eventLinks.pictoCarDark;
+   			}else if($scope.currentSubscriber.locomotion=='AUTOSTOP'){
+   				subscriber.picto = $scope.eventLinks.pictoStopDark;
+   				
+			}else{
    				subscriber.picto = $scope.eventLinks.pictoDontKnow;
+   				subscriber.dontKnow = true;
    			}
    			addMarkerSubscriber(subscriber);
    		}
@@ -384,6 +430,17 @@ function EventCtrl($scope, $http, $location, $compile) {
 			for ( var int = 0; int < subscriber.car.links.length; int++) {
 				var link = subscriber.car.links[int];
 				if(link && link.rel == "waitings"){
+					return link.href;
+				}
+			}
+		}
+		return null;
+    }
+    function getPossibleCarLink(subscriber){
+		if(subscriber.links){
+			for ( var int = 0; int < subscriber.links.length; int++) {
+				var link = subscriber.links[int];
+				if(link && link.rel == "addPossibleCar"){
 					return link.href;
 				}
 			}

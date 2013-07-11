@@ -76,6 +76,8 @@ DELETE  /rest/events/:id/subscribers/:idSub/car/:idPassenger              contro
 POST    /rest/events/:id/subscribers/:idSub/waitings              controllers.SubscriberCtrl.addToWaitingList(id :String, idSub :String)
 DELETE  /rest/events/:id/subscribers/:idSub/waitings/:idPassenger              controllers.SubscriberCtrl.removeFromWaitingList(id :String, idSub :String, idPassenger :String)
 
+POST    /rest/events/:id/subscribers/:idSub/possiblecars              controllers.SubscriberCtrl.addPossibleCar(id :String, idSub :String)
+DELETE  /rest/events/:id/subscribers/:idSub/possiblecars/:idCar              controllers.SubscriberCtrl.deletePossibleCar(id :String, idSub :String, idCar :String)
 
 #Users
 GET     /rest/users/current                   controllers.UserCtrl.getCurrentUser()

@@ -28,14 +28,12 @@ public class SubscriberModel {
         this.subscriber = subscriber;
         this.idEvent = idEvent;
         if(subscriber!=null){
-            String get = controllers.routes.SubscriberCtrl.getSubscriber(idEvent, subscriber.getUserRef()).toString();
-            this.links.add(Link.link(Link.SELF, get));
-            String create = controllers.routes.SubscriberCtrl.createSubscriber(idEvent).toString();
-            this.links.add(Link.link(Link.CREATE, create));
-            String update = controllers.routes.SubscriberCtrl.updateSubscriber(idEvent, subscriber.getUserRef()).toString();
-            this.links.add(Link.link(Link.UPDATE, update));
-            String passengers = controllers.routes.SubscriberCtrl.updateCar(idEvent, subscriber.getUserRef()).toString();
-            this.links.add(Link.link("car", passengers));
+            this.links.add(Link.link(Link.SELF, controllers.routes.SubscriberCtrl.getSubscriber(idEvent, subscriber.getUserRef()).toString()));
+            this.links.add(Link.link(Link.CREATE, controllers.routes.SubscriberCtrl.createSubscriber(idEvent).toString()));
+            this.links.add(Link.link(Link.UPDATE, controllers.routes.SubscriberCtrl.updateSubscriber(idEvent, subscriber.getUserRef()).toString()));
+            this.links.add(Link.link("car", controllers.routes.SubscriberCtrl.updateCar(idEvent, subscriber.getUserRef()).toString()));
+            this.links.add(Link.link("addPossibleCar", controllers.routes.SubscriberCtrl.addPossibleCar(idEvent, subscriber.getUserRef()).toString()));
+            this.links.add(Link.link("deletePossibleCar", controllers.routes.SubscriberCtrl.addPossibleCar(idEvent, subscriber.getUserRef()).toString()));
         }
     }
 
@@ -58,8 +56,11 @@ public class SubscriberModel {
     public String getName() {
         return subscriber.getName();
     }
-
-    @JsonProperty("surname")
+	@JsonProperty("possibleCars")
+    public List<String> getPossibleCars() {
+		return subscriber.getPossibleCars();
+	}
+	@JsonProperty("surname")
     public String getSurname() {
         return subscriber.getSurname();
     }

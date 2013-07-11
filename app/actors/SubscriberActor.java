@@ -114,10 +114,12 @@ public class SubscriberActor extends UntypedActor{
 	
 	public void notifyAll(String idEvent, String userRef, Subscriber message){
 		Map<String, Out<JsonNode>> users = events.get(idEvent);
-		for (String ref : users.keySet()) {
-			Out<JsonNode> socket = users.get(ref);
-			SubscriberModel model = new SubscriberModel(message, idEvent);
-			socket.write(mapper.convertValue(model, JsonNode.class));
+		if(users!=null){
+			for (String ref : users.keySet()) {
+				Out<JsonNode> socket = users.get(ref);
+				SubscriberModel model = new SubscriberModel(message, idEvent);
+				socket.write(mapper.convertValue(model, JsonNode.class));
+			}
 		}
 	}
 	
