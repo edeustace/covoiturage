@@ -6,7 +6,11 @@
 /* Controllers */
 
 function EventCtrl($scope, $http, $location, $compile) {
-	var _scope = $scope;
+	$scope.items = [
+	                  { id: "CAR", name: 'en voiture' },
+	                  { id: "AUTOSTOP", name: 'à pied' },
+	                  { id: "DONT_KNOW_YET", name: 'Je ne sais pas encore' }
+                  ];
 	var _eventLinks;
 	$scope.myMarkers = [];
 	$scope.mapOptions = {
@@ -123,7 +127,7 @@ function EventCtrl($scope, $http, $location, $compile) {
 			var start = new google.maps.LatLng(car.address.location.lat, car.address.location.lng);
 			var end = new google.maps.LatLng($scope.event.address.location.lat, $scope.event.address.location.lng);
 			var waypts = [];
-			  if(car.car.passengers){
+			if(car && car.car && car.car.passengers){
 			  for (var i = 0; i < car.car.passengers.length; i++) {
 				  var passenger = $scope.refSubscribers[car.car.passengers[i]];
 				  var loc = new google.maps.LatLng(passenger.address.location.lat, passenger.address.location.lng)
@@ -339,7 +343,7 @@ function EventCtrl($scope, $http, $location, $compile) {
    				if(subscriber.carRef == $scope.currentSubscriber.userRef){
 	   				subscriber.picto = $scope.eventLinks.pictoStopLight;
 	   				subscriber.inMyCar = true;
-   				}else if($scope.currentSubscriber.car.waitings && $scope.currentSubscriber.car.waitings.length>0 && inArray(subscriber.userRef, $scope.currentSubscriber.car.waitings)){
+   				}else if($scope.currentSubscriber.car && $scope.currentSubscriber.car.waitings && $scope.currentSubscriber.car.waitings.length>0 && inArray(subscriber.userRef, $scope.currentSubscriber.car.waitings)){
 					subscriber.picto = $scope.eventLinks.pictoStop;
 		   			subscriber.waitingForMyCar = true;
    				}else if(inArray($scope.currentSubscriber.userRef, subscriber.possibleCars)){

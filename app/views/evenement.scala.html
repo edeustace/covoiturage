@@ -90,6 +90,32 @@
 					<button  class="btn btn-primary" ng-click="saveCurrentSubscriber()">Valider</button>
 					<button  class="btn" ng-click="setEditMode(false)">Annuler</button>
 				</div>
+				<div ng-show="!currentSubscriber"  >
+				 	<fieldset>
+						<legend>Participant</legend>
+						<div ng-show="message">
+							<p class="text-warning" >{{message}}</p>
+							<button class="btn btn-warning" type="button" ng-click="update()">Mettre à jour</button> ou 
+							<button class="btn btn-warning" type="button" ng-click="cancel()">Annuler</button>
+						</div>
+						<label>Email</label>
+						<input ng-model="subscriber.email" type="email" required></input>
+						<label>Nom</label> 
+						<input ng-model="subscriber.name" type="text" ></input> 
+						<label>Prénom</label>
+						<input ng-model="subscriber.surname" type="text" ></input> 
+						<label>Adresse</label> 
+						<input ng-model="subscriber.address" googleplace type="text" ></input> 
+						<label>Je suis :</label> 
+						<select ng-model="subscriber.locomotion" ng-options="item.id as item.name for item in items"></select>
+						<div ng-show="subscriber.locomotion == 'CAR'">
+							<label>Nb passagers max</label> 
+							<input ng-model="subscriber.car.nbPlaces" type="text" maxlength="1"></input> 
+						</div>
+					</fieldset>
+					<button class="btn btn-large btn-block btn-primary" type="button" ng-click="create()">Valider</button>
+				</div>
+				
 				<div ng-show="currentSubscriber.locomotion == 'AUTOSTOP'">
 					<div ng-show="currentSubscriber.carRef">
 						<strong>Ma voiture :</strong>

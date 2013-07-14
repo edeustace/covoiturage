@@ -44,4 +44,17 @@
     	<li><a href="@routes.Account.changePassword">@Messages("playauthenticate.profile.password_change")</a></li>
     </ul>
     </p>
+    
+  <script type="text/javascript" src="@routes.Assets.at("js/lib/angular.js")"></script>
+  <script type="text/javascript" src="@routes.Assets.at("js/lib/ui-bootstrap-tpls-0.4.0.min.js")"></script>
+  <script type="text/javascript" src="@routes.Assets.at("js/app/user/app.js")"></script>
+  <script type="text/javascript" src="@routes.Assets.at("js/app/user/controller.js")"></script>
+  <h2>Mes participations :</h2>
+  <div ng-controller="UserCtrl" ng-app="covoiturage">
+  	<ul>
+  		<li ng-repeat="event in events" >
+  			{{event.name}} - {{event.description}} <a ng-href="{{event.links.page}}" >Voir</a>
+  		</li>
+  	</ul>
+  </div>  
 }

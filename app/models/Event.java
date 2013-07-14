@@ -4,12 +4,15 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 
 import javax.persistence.Id;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
 import models.validators.EmailAlreadyUsed;
+import net.vz.mongodb.jackson.DBCursor;
+import net.vz.mongodb.jackson.DBQuery;
 import net.vz.mongodb.jackson.JacksonDBCollection;
 import net.vz.mongodb.jackson.MongoCollection;
 import net.vz.mongodb.jackson.ObjectId;
@@ -194,6 +197,15 @@ public class Event {
         return collection;
     }
 
+    public static List<Event> listByUser(String idUser){
+    	DBCursor<Event> cursor = collection().find(DBQuery.is("subscribers.userRef", idUser));
+    	List<Event> result = new ArrayList<>();
+    	while(cursor.hasNext()){
+    		result.add(cursor.next());
+    	}
+    	return result;
+    }
+    
     public static Event read(String id){
         return collection().findOneById(id);
     }
