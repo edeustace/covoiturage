@@ -36,6 +36,11 @@ public class SubscriberActor extends UntypedActor{
 		subActorRef.tell(message, null);
 	}
 	
+	public static void notifySendDemand(final String idEvent, final String from, final String to, final String type, final String message){
+		Demand msg = new Demand(idEvent, from, to, type, message);
+		subActorRef.tell(msg, null);
+	}
+	
 	public static void join(final String idEvent, final String userRef, WebSocket.In<JsonNode> in, WebSocket.Out<JsonNode> out) throws Exception{
         
         // Send the Join message to the room
@@ -88,25 +93,24 @@ public class SubscriberActor extends UntypedActor{
             	event = new HashMap<String, Out<JsonNode>>();
             	events.put(join.idEvent, event);
             } 
+            if(event.containsKey(join.userRef)){
+            	event.remove(join.userRef);
+            }
             event.put(join.userRef, join.socket);
             getSender().tell("OK", getSelf());
             
         } else if(message instanceof SubscriberMessage)  {
-            
-            // Received a Talk message
         	SubscriberMessage subscriber = (SubscriberMessage)message;
-            
             notifyAll(subscriber.idEvent, subscriber.userRef, subscriber.subscriber);
-            
         } else if(message instanceof Quit)  {
-            
-            // Received a Quit message
             Quit quit = (Quit)message;
-            
             Map<String, Out<JsonNode>> event = events.get(quit.idEvent);
             if(event!=null){
             	event.remove(quit.userRef);
             }
+        } else if(message instanceof Demand)  {
+        	Demand demand = (Demand)message;
+            notifyOne(demand.idEvent, demand.fromUserRef, demand.toUserRef, demand.type, demand.message);
         } else {
             unhandled(message);
         }
@@ -119,6 +123,23 @@ public class SubscriberActor extends UntypedActor{
 				Out<JsonNode> socket = users.get(ref);
 				SubscriberModel model = new SubscriberModel(message, idEvent);
 				socket.write(mapper.convertValue(model, JsonNode.class));
+			}
+		}
+	}
+	
+	public void notifyOne(String idEvent, String from, String to, String type, String message){
+		Map<String, Out<JsonNode>> users = events.get(idEvent);
+		if(users!=null){
+			for (String ref : users.keySet()) {
+				if(to!=null && to.equals(ref)){
+					Out<JsonNode> socket = users.get(ref);
+					ObjectNode node = mapper.createObjectNode();
+					node.put("type", type);
+					node.put("message", message);
+					node.put("from", from);
+					node.put("to", to);
+					socket.write(node);					
+				}
 			}
 		}
 	}
@@ -173,4 +194,22 @@ public class SubscriberActor extends UntypedActor{
 		
 	}
 
+	public static class Demand{
+		public final String idEvent;
+		public final String fromUserRef;
+		public final String toUserRef;
+		public final String type;
+		public final String message;
+		
+		public Demand(String idEvent, String fromUserRef, String toUserRef, String type,
+				String message) {
+			super();
+			this.idEvent = idEvent;
+			this.fromUserRef = fromUserRef;
+			this.toUserRef = toUserRef;
+			this.type = type;
+			this.message = message;
+		}
+		
+	}
 }

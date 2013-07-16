@@ -36,7 +36,9 @@ public class Event {
     ///////////    FIELDS  /////////////////////
     private String id;
 
-    @NotNull
+    private String version = "1";
+
+	@NotNull
     private String name;
 
     private String description;
@@ -386,6 +388,15 @@ public class Event {
         this.creatorRef = creatorRef;
         return this;
     }
+    @JsonProperty("version")
+    public String getVersion() {
+		return version;
+	}
+    @JsonProperty("version")
+	public Event setVersion(String version) {
+		this.version = version;
+		return this;
+	}
 }
 
 

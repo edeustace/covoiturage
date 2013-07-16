@@ -18,9 +18,10 @@
   <script type="text/javascript" src="@routes.Application.jsRoutes()"></script>
   <div ng-controller="EventCtrl" ng-app="covoiturage">
 
-	<div class="row" >
-		
-		<div class="span6">
+	<div class="row-fluid" >
+		<div class="span2">
+		</div>
+		<div class="span4">
 			<h1>
 			{{event.name}}
 			</h1>
@@ -29,6 +30,7 @@
 			<address>
 			  {{event.address.description}}
 			</address>
+			<alert ng-repeat="alert in alerts" type="alert.type" close="closeAlert($index)">{{alert.msg}}</alert>
 			<br/>
 				<div ng-repeat="marker in myMarkers" ui-map-marker="myMarkers[$index]"
                      ui-event="{'map-click': 'openMarkerInfo(marker)'}">
@@ -45,7 +47,7 @@
 							{{currentInfoWindowsSubscriber.car.nbPlaces - currentInfoWindowsSubscriber.car.passengers.length}} places restantes
 						</div>
 						<div ng-show="currentSubscriber.locomotion == 'AUTOSTOP' && currentInfoWindowsSubscriber.normalCar" >
-							<button class="btn btn-success btn-mini" type="button" ng-click="askForSeat(currentInfoWindowsSubscriber, currentSubscriber.userRef)" >Monter</button>
+							<button class="btn btn-success btn-mini" type="button" ng-click="askForSeat(currentInfoWindowsSubscriber)" >Monter</button>
 						</div>
 						<div ng-show="currentSubscriber.locomotion == 'AUTOSTOP' && currentInfoWindowsSubscriber.currentCar" >
 							<button class="btn btn-warning btn-mini" type="button" ng-click="removePassenger(currentInfoWindowsSubscriber, currentSubscriber.userRef)" >Descendre</button>
@@ -120,6 +122,7 @@
 					<div ng-show="currentSubscriber.carRef">
 						<strong>Ma voiture :</strong>
 						{{refSubscribers[currentSubscriber.carRef].surname}} {{refSubscribers[currentSubscriber.carRef].name}}
+						<button class="btn btn-warning btn-mini" type="button" ng-click="removePassenger(refSubscribers[currentSubscriber.carRef], currentSubscriber.userRef)" >Annuler</button>
 					</div>
 					<div ng-show="!currentSubscriber.carRef">
 						<strong>Mes demandes en attente :</strong> 
@@ -158,6 +161,7 @@
 							<li ng-repeat="passenger in currentSubscriber.car.waitings" >
 								{{refSubscribers[passenger].surname}} {{refSubscribers[passenger].name}}
 								<button class="btn btn-success btn-mini" type="button" ng-click="validatePassenger(currentSubscriber, passenger)" >Valider</button>
+								<button class="btn btn-warning btn-mini" type="button" ng-click="removeWaitingGuy(currentSubscriber, passenger)" >Annuler</button>
 							</li>
 						</ul>
 					</div>
@@ -180,7 +184,7 @@
 				<br/>
 				
 				
-				<alert ng-repeat="alert in alerts" type="alert.type" close="closeAlert($index)">{{alert.msg}}</alert>
+				
 				<table id="searchTextResults" class="table">
 					<thead>
 						<tr>
@@ -200,7 +204,7 @@
 							<td>{{subscriber.car.nbPlaces - subscriber.car.passengers.length}}</td>
 							<!-- CAR -->
 							<td ng-show="currentSubscriber.locomotion == 'AUTOSTOP' && subscriber.normalCar" >
-								<button class="btn btn-success" type="button" ng-click="askForSeat(subscriber, currentSubscriber.userRef)" >+</button>
+								<button class="btn btn-success" type="button" ng-click="askForSeat(subscriber)" >+</button>
 							</td>
 							<td ng-show="currentSubscriber.locomotion == 'AUTOSTOP' && subscriber.currentCar" >
 								<button class="btn btn-warning" type="button" ng-click="removePassenger(subscriber, currentSubscriber.userRef)" >-</button>
@@ -213,7 +217,7 @@
 							</td>
 							<!-- AUTOSTOP -->
 							<td ng-show="currentSubscriber.locomotion == 'CAR' && subscriber.free">
-								<button class="btn btn-success" type="button" ng-click="proposeSeat(subscriber, currentSubscriber.userRef)" >+</button>
+								<button class="btn btn-success" type="button" ng-click="proposeSeat(subscriber)" >+</button>
 							</td>
 							<td ng-show="currentSubscriber.locomotion == 'CAR' && subscriber.requestedByMe">
 								<button class="btn btn-warning" type="button" ng-click="removePossibleCar(subscriber, currentSubscriber.userRef)" >-</button>
@@ -228,6 +232,8 @@
 					</tbody>
 				</table>
 			</div>
+		</div>
+		<div class="span2">
 		</div>
 	</div>
 	</div>

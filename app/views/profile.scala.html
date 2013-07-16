@@ -5,52 +5,45 @@
 @main(Messages("playauthenticate.profile.title"),"profile") {
     
     <h1>@Messages("playauthenticate.profile.title")</h1>
-    <p>
-    Your name is @localUser.getName() and your email address is @localUser.getEmail()!
-    <i>
-    @if(!localUser.getEmailValidated()) {
-      (<a href="@routes.Account.verifyEmail">unverified - click to verify</a>)
-    } else {
-      (verified)
-    }</i>
-    <br />
-    Your first name is @localUser.getSurname() and your last name is @localUser.getName()
-    <br/>
-    @defining(localUser.getProviders()) { providers =>
-        @if(providers.size() > 0) {
-        @if(providers.size() ==1) {
-            @Messages("playauthenticate.profile.providers_one")
-        } else {
-            @Messages("playauthenticate.profile.providers_many",providers.size().toString())
-        }
-        @for(p <- providers) {
-            @_providerIcon(p)
-        }
-        <br/>
-        }
-    }
     
-    <br/>
-    @currentAuth() { auth =>
-        @Messages("playauthenticate.profile.logged") @_providerIcon(auth.getProvider())<br/>
-        @if(auth.expires() != -1){
-            @Messages("playauthenticate.profile.session", auth.getId(), Application.formatTimestamp(auth.expires()))
-        } else {
-            @Messages("playauthenticate.profile.session_endless", auth.getId())
-        }
-    }
-    <br/>
-    <ul>
-    	<li><a href="@routes.Account.changePassword">@Messages("playauthenticate.profile.password_change")</a></li>
-    </ul>
+    
     </p>
-    
+  <script src="http://maps.googleapis.com/maps/api/js?libraries=places&sensor=false&language=fr"></script>  
   <script type="text/javascript" src="@routes.Assets.at("js/lib/angular.js")"></script>
   <script type="text/javascript" src="@routes.Assets.at("js/lib/ui-bootstrap-tpls-0.4.0.min.js")"></script>
   <script type="text/javascript" src="@routes.Assets.at("js/app/user/app.js")"></script>
+  <script type="text/javascript" src="@routes.Assets.at("js/app/directives/googleplace.js")"></script>
   <script type="text/javascript" src="@routes.Assets.at("js/app/user/controller.js")"></script>
-  <h2>Mes participations :</h2>
+  
   <div ng-controller="UserCtrl" ng-app="covoiturage">
+  	<alert ng-repeat="alert in alerts" type="alert.type" close="closeAlert($index)">{{alert.msg}}</alert>
+  	<div>
+		<label>Email</label>
+		<div class="input-prepend">
+		<span class="add-on"><i class="icon-envelope"></i></span>
+		<input ng-model="user.email" class="span3"  type="email" required></input>
+		</div>
+		<label>Nom</label> 
+		<div class="input-prepend">
+		<span class="add-on"><i class="icon-asterisk"></i></span>
+		<input ng-model="user.name" type="text" ></input> 
+		</div>
+		<label>Prénom</label>
+		<div class="input-prepend">
+		<span class="add-on"><i class="icon-asterisk"></i></span>
+		<input ng-model="user.surname" type="text" ></input> 
+		</div>
+		<label>Adresse : {{user.address.description}}</label> 
+		<div class="input-prepend">
+		<span class="add-on"><i class="icon-globe"></i></span>
+		<input ng-model="user.address" googleplace type="text" ></input>
+		</div>
+		<ul>
+	    	<li><a href="@routes.Account.changePassword">@Messages("playauthenticate.profile.password_change")</a></li>
+	    </ul> 
+	    <button class="btn btn-primary" type="button" ng-click="saveUser()" >Sauvegarder</button>
+  	</div>
+  	<h2>Mes participations :</h2>
   	<ul>
   		<li ng-repeat="event in events" >
   			{{event.name}} - {{event.description}} <a ng-href="{{event.links.page}}" >Voir</a>

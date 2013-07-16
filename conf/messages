@@ -126,7 +126,7 @@ playauthenticate.navigation.signup=S'enregister
 playauthenticate.handler.loginfirst=Vous devez vous connecter pour accéder à: ''{0}''
 
 # play-authenticate: Profile
-playauthenticate.profile.title=Profile d'utilisateur
+playauthenticate.profile.title= Mon profile
 playauthenticate.profile.mail=Votre nom est {0} et votre adresse email {1}!
 playauthenticate.profile.unverified=non vérifiée - cliquer pour vérifier
 playauthenticate.profile.verified=vérifiée

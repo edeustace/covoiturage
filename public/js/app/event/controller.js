@@ -26,7 +26,7 @@ function EventCtrl($scope, $http, $location, $compile) {
 	$scope.directionsDisplay = new google.maps.DirectionsRenderer();
 	$scope.directionsService = new google.maps.DirectionsService();
 	$scope.closeAlert = function(index) {
-		$scope.refSubscribers[$scope.alerts[index].userRef].class = null;
+		//$scope.refSubscribers[$scope.alerts[index].userRef].class = null;
 	    $scope.alerts.splice(index, 1);
 	  };
 	
@@ -52,10 +52,12 @@ function EventCtrl($scope, $http, $location, $compile) {
 		return result;
 	};
 	//CAR OWNER 
-    $scope.proposeSeat = function(passenger, carRef){
+    $scope.proposeSeat = function(passenger){
+    	var carRef = $scope.currentSubscriber.userRef;
     	var link = getPossibleCarLink(passenger);
     	$http.post(link, {car:carRef}).success(function(subscriber){
     		reloadSubscribers();
+    		$scope.myInfoWindow.close();
 		}).error(function(error){
 			alert("Error "+error);
 		});
@@ -64,6 +66,7 @@ function EventCtrl($scope, $http, $location, $compile) {
     	var link = getWaitingsLink(car);
     	$http.delete(link+'/'+passenger).success(function(subscriber){
 			reloadSubscribers();
+			$scope.myInfoWindow.close();
 		}).error(function(error){
 			alert("Error "+error);
 		});
@@ -72,6 +75,7 @@ function EventCtrl($scope, $http, $location, $compile) {
     	var link = getCarLink(car);
     	$http.post(link, {passenger:passenger}).success(function(subscriber){
     		reloadSubscribers();
+    		$scope.myInfoWindow.close();
 		}).error(function(error){
 			alert("Error "+error);
 		});
@@ -80,16 +84,19 @@ function EventCtrl($scope, $http, $location, $compile) {
     	var link = getCarLink(car);
     	$http.delete(link+'/'+passenger).success(function(subscriber){
 			reloadSubscribers();
+			$scope.myInfoWindow.close();
 		}).error(function(error){
 			alert("Error "+error);
 		});
 	};
 	
 	//AUTOSTOPER 
-	$scope.askForSeat = function(car, passenger){
+	$scope.askForSeat = function(car){
+		var passenger = $scope.currentSubscriber.userRef;
     	var link = getWaitingsLink(car);
     	$http.post(link, {passenger:passenger}).success(function(subscriber){
     		reloadSubscribers();
+    		$scope.myInfoWindow.close();
 		}).error(function(error){
 			alert("Error "+error);
 		});
@@ -98,6 +105,7 @@ function EventCtrl($scope, $http, $location, $compile) {
 		var link = getPossibleCarLink(passenger);
     	$http.delete(link+'/'+carRef).success(function(subscriber){
     		reloadSubscribers();
+    		$scope.myInfoWindow.close();
 		}).error(function(error){
 			alert("Error "+error);
 		});
@@ -149,6 +157,9 @@ function EventCtrl($scope, $http, $location, $compile) {
 			    	$scope.directionsDisplay.setDirections(response);
 			    }
 			  });
+    	}else{
+    		$scope.directionsDisplay.setMap(null);
+    		$scope.myMap.fitBounds($scope.bounds);
     	}
     }
     function setCurrentWidowsSubscriber(){
@@ -210,8 +221,13 @@ function EventCtrl($scope, $http, $location, $compile) {
 				        console.log("Socket has been opened!");  
 				    };
 				    
-				    ws.onmessage = function(message) {
-				    	var newSubscriber = JSON.parse(message.data);
+				    ws.onmessage = function(wsMsg) {
+				    	if(wsMsg && wsMsg.data){
+				    		var message = JSON.parse(wsMsg.data);
+				    		if(message.type && message.message){
+				    			$scope.alerts.push({type:message.type, msg:message.message});
+				    		}
+				    	}
 				    	reloadSubscribers();
 				    };
 				   	
