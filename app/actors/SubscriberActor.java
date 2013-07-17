@@ -6,6 +6,7 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import java.util.HashMap;
 import java.util.Map;
 
+import models.Notification;
 import models.Subscriber;
 
 import org.codehaus.jackson.JsonNode;
@@ -36,8 +37,8 @@ public class SubscriberActor extends UntypedActor{
 		subActorRef.tell(message, null);
 	}
 	
-	public static void notifySendDemand(final String idEvent, final String from, final String to, final String type, final String message){
-		Demand msg = new Demand(idEvent, from, to, type, message);
+	public static void sendNotification(final String idEvent, final String from, final String to, final String type, final String message){
+		Notification msg = new Notification(idEvent, from, to, type, message);
 		subActorRef.tell(msg, null);
 	}
 	
@@ -108,9 +109,9 @@ public class SubscriberActor extends UntypedActor{
             if(event!=null){
             	event.remove(quit.userRef);
             }
-        } else if(message instanceof Demand)  {
-        	Demand demand = (Demand)message;
-            notifyOne(demand.idEvent, demand.fromUserRef, demand.toUserRef, demand.type, demand.message);
+        } else if(message instanceof Notification)  {
+        	Notification notification = (Notification)message;
+            notifyOne(notification);
         } else {
             unhandled(message);
         }
@@ -127,20 +128,17 @@ public class SubscriberActor extends UntypedActor{
 		}
 	}
 	
-	public void notifyOne(String idEvent, String from, String to, String type, String message){
-		Map<String, Out<JsonNode>> users = events.get(idEvent);
+	public void notifyOne(Notification notification){
+		Map<String, Out<JsonNode>> users = events.get(notification.idEvent);
 		if(users!=null){
-			for (String ref : users.keySet()) {
-				if(to!=null && to.equals(ref)){
-					Out<JsonNode> socket = users.get(ref);
-					ObjectNode node = mapper.createObjectNode();
-					node.put("type", type);
-					node.put("message", message);
-					node.put("from", from);
-					node.put("to", to);
-					socket.write(node);					
-				}
+			Out<JsonNode> socket = users.get(notification.to);
+			if(socket!=null){
+				socket.write(mapper.convertValue(notification, JsonNode.class));
+			}else{
+				notification.save();
 			}
+		}else{
+			notification.save();
 		}
 	}
 	
@@ -190,25 +188,6 @@ public class SubscriberActor extends UntypedActor{
 			super();
 			this.socket = socket;
 			this.request = request;
-		}
-		
-	}
-
-	public static class Demand{
-		public final String idEvent;
-		public final String fromUserRef;
-		public final String toUserRef;
-		public final String type;
-		public final String message;
-		
-		public Demand(String idEvent, String fromUserRef, String toUserRef, String type,
-				String message) {
-			super();
-			this.idEvent = idEvent;
-			this.fromUserRef = fromUserRef;
-			this.toUserRef = toUserRef;
-			this.type = type;
-			this.message = message;
 		}
 		
 	}

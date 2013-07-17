@@ -26,7 +26,10 @@ function EventCtrl($scope, $http, $location, $compile) {
 	$scope.directionsDisplay = new google.maps.DirectionsRenderer();
 	$scope.directionsService = new google.maps.DirectionsService();
 	$scope.closeAlert = function(index) {
-		//$scope.refSubscribers[$scope.alerts[index].userRef].class = null;
+		if($scope.alerts[index].notification && $scope.alerts[index].notification.id){
+			var link = $scope.subscribersLinks[$scope.currentSubscriber.userRef].notifications;
+			$http.delete(link+'/'+$scope.alerts[index].notification.id);
+		}
 	    $scope.alerts.splice(index, 1);
 	  };
 	
@@ -231,6 +234,14 @@ function EventCtrl($scope, $http, $location, $compile) {
 				    	reloadSubscribers();
 				    };
 				   	
+				    if($scope.subscribersLinks[$scope.currentSubscriber.userRef] && $scope.subscribersLinks[$scope.currentSubscriber.userRef].notifications){
+					    $http.get($scope.subscribersLinks[$scope.currentSubscriber.userRef].notifications).success(function(notifications) {
+					    	for ( var int = 0; int < notifications.length; int++) {
+								var notification = notifications[int];
+								$scope.alerts.push({type:notification.type, msg:notification.message, notification:notification});
+							}
+					    });
+				    }
 					$scope.$watch('filterUsers', function(newValue, oldValue) {
 						for(var i=0;i<$scope.myMarkers.length;i++){
 							var marker = $scope.myMarkers[i];

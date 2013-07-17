@@ -6,10 +6,12 @@ import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import models.Car;
 import models.Car.CarIsFullException;
 import models.Event;
+import models.Notification;
 import models.Subscriber;
 import models.User;
 import models.enums.Locomotion;
@@ -18,9 +20,6 @@ import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.node.ObjectNode;
 
-import com.feth.play.module.pa.PlayAuthenticate;
-import com.feth.play.module.pa.user.AuthUser;
-
 import play.data.Form;
 import play.libs.Json;
 import play.mvc.BodyParser;
@@ -28,6 +27,10 @@ import play.mvc.Controller;
 import play.mvc.Result;
 import play.mvc.WebSocket;
 import actors.SubscriberActor;
+
+import com.feth.play.module.pa.PlayAuthenticate;
+import com.feth.play.module.pa.user.AuthUser;
+
 import controllers.decorators.SubscriberModel;
 
 /**
@@ -148,11 +151,11 @@ public class SubscriberCtrl extends Controller {
             if(sub.getLocomotion().equals(Locomotion.CAR)){
             	MessageFormat msg = new MessageFormat("{0} {1} a validé votre demande et vous serez son passager");
             	msg.format(args);
-                SubscriberActor.notifySendDemand(id, from, to, "success", msg.format(args));	
+                SubscriberActor.sendNotification(id, from, to, "success", msg.format(args));	
             }else if(sub.getLocomotion().equals(Locomotion.AUTOSTOP)){
             	MessageFormat msg = new MessageFormat("{0} {1} a validé votre demande et sera votre passager");
             	msg.format(args);
-                SubscriberActor.notifySendDemand(id, from, to, "success", msg.format(args));
+                SubscriberActor.sendNotification(id, from, to, "success", msg.format(args));
             }
             
             return ok().as("application/json");
@@ -175,13 +178,13 @@ public class SubscriberCtrl extends Controller {
             if(sub.getLocomotion().equals(Locomotion.CAR)){
             	MessageFormat msg = new MessageFormat("vous ne faites plus parti de la voiture de {0} {1}");
             	msg.format(args);
-                SubscriberActor.notifySendDemand(id, from, to, "error", msg.format(args));	
+                SubscriberActor.sendNotification(id, from, to, "error", msg.format(args));	
             }else if(sub.getLocomotion().equals(Locomotion.AUTOSTOP)){
             	MessageFormat msg = new MessageFormat("{0} {1} ne fait plus parti de votre voiture");
             	msg.format(args);
-                SubscriberActor.notifySendDemand(id, from, to, "error", msg.format(args));
+                SubscriberActor.sendNotification(id, from, to, "error", msg.format(args));
             }
-            SubscriberActor.notifySendDemand(id, from, to, "deletePassenger", "");
+            SubscriberActor.sendNotification(id, from, to, "deletePassenger", "");
 	    	return ok().as("application/json");
 	    } catch (Exception e){
 	        return internalServerError(e.getMessage()).as("application/json");
@@ -208,7 +211,7 @@ public class SubscriberCtrl extends Controller {
             String[] args = {sub.getSurname(), sub.getName()};
         	MessageFormat msg = new MessageFormat("{0} {1} souhaite être passager de votre voiture");
         	msg.format(args);
-            SubscriberActor.notifySendDemand(id, from, to, "success", msg.format(args));	
+            SubscriberActor.sendNotification(id, from, to, "success", msg.format(args));	
             return ok().as("application/json");
         } catch (Exception e){
             return internalServerError(e.getMessage()).as("application/json");
@@ -230,7 +233,7 @@ public class SubscriberCtrl extends Controller {
             String[] args = {sub.getSurname(), sub.getName()};
         	MessageFormat msg = new MessageFormat("{0} {1} a décliné votre proposition être passager de votre voiture");
         	msg.format(args);
-            SubscriberActor.notifySendDemand(id, from, to, "error", msg.format(args));
+            SubscriberActor.sendNotification(id, from, to, "error", msg.format(args));
             return ok().as("application/json");
         } catch (CarIsFullException e){
         	return badRequest("{message: 'La voiture est pleine'}").as("application/json");
@@ -263,7 +266,7 @@ public class SubscriberCtrl extends Controller {
             String[] args = {sub.getSurname(), sub.getName()};
         	MessageFormat msg = new MessageFormat("{0} {1} vous propose d'être passager de sa voiture");
         	msg.format(args);
-            SubscriberActor.notifySendDemand(id, from, to, "success", msg.format(args));
+            SubscriberActor.sendNotification(id, from, to, "success", msg.format(args));
             return ok().as("application/json");
         } catch (Exception e){
             return internalServerError(e.getMessage()).as("application/json");
@@ -284,11 +287,25 @@ public class SubscriberCtrl extends Controller {
             String[] args = {sub.getSurname(), sub.getName()};
         	MessageFormat msg = new MessageFormat("{0} {1} a décliné votre proposition d'être passager de sa voiture");
         	msg.format(args);
-            SubscriberActor.notifySendDemand(id, from, to, "error", msg.format(args));
+            SubscriberActor.sendNotification(id, from, to, "error", msg.format(args));
             return ok().as("application/json");
         } catch (Exception e){
             return internalServerError(e.getMessage()).as("application/json");
         }
+    }
+    
+    public static Result listNotifications(String idEvent, String idSub){
+    	List<Notification> result = Notification.listNotifications(idEvent, idSub);
+    	try {
+			return ok(objectMapper.writeValueAsString(result)).as("application/json");
+		} catch (IOException e) {
+			return internalServerError(e.getMessage()).as("application/json");
+		}
+    }
+    
+    public static Result deleteNotifications(String id, String idSub, String idNotifications){
+    	Notification.delete(idNotifications);
+    	return ok().as("application/json");
     }
     
     /**
