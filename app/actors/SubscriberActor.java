@@ -130,15 +130,14 @@ public class SubscriberActor extends UntypedActor{
 	
 	public void notifyOne(Notification notification){
 		Map<String, Out<JsonNode>> users = events.get(notification.idEvent);
+		notification.save();
 		if(users!=null){
 			Out<JsonNode> socket = users.get(notification.to);
 			if(socket!=null){
 				socket.write(mapper.convertValue(notification, JsonNode.class));
 			}else{
-				notification.save();
+				
 			}
-		}else{
-			notification.save();
 		}
 	}
 	

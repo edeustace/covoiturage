@@ -226,9 +226,9 @@ function EventCtrl($scope, $http, $location, $compile) {
 				    
 				    ws.onmessage = function(wsMsg) {
 				    	if(wsMsg && wsMsg.data){
-				    		var message = JSON.parse(wsMsg.data);
-				    		if(message.type && message.message){
-				    			$scope.alerts.push({type:message.type, msg:message.message});
+				    		var notification = JSON.parse(wsMsg.data);
+				    		if(notification.type && notification.message){
+				    			$scope.alerts.push({type:notification.type, msg:notification.message, notification:notification});
 				    		}
 				    	}
 				    	reloadSubscribers();
