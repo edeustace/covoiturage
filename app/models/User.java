@@ -54,6 +54,8 @@ public class User implements Subject {
 
     private String id;
 
+    private String version = "1";
+    
     @NotNull @Email
     private String email;
 
@@ -74,6 +76,8 @@ public class User implements Subject {
     
     private Locomotion locomotion;
 
+    private List<String> contacts = new ArrayList<>();
+    
 	private List<LinkedAccount> linkedAccounts = new ArrayList<LinkedAccount>();
 
     private java.util.List<SecurityRole> roles = new ArrayList<SecurityRole>();
@@ -139,6 +143,17 @@ public class User implements Subject {
         }
         return this;
     }
+    
+    public void mergeContact(List<String> contacts){
+    	if(contacts!=null){
+    		for (String contact : contacts) {
+				if(!this.contacts.contains(contact)){
+					this.contacts.add(contact);
+				}
+			}
+    	}
+    }
+    
     public User save(){
         WriteResult<User, String> result = collection().save(this);
         this.id = result.getSavedObject().id;
@@ -429,4 +444,23 @@ public class User implements Subject {
 		this.locomotion = locomotion;
 		return this;
 	}
+    @JsonProperty("version")
+	public String getVersion() {
+		return version;
+	}
+    @JsonProperty("version")
+	public User setVersion(String version) {
+		this.version = version;
+		return this;
+	}
+    @JsonProperty("contacts")
+	public List<String> getContacts() {
+		return contacts;
+	}
+    @JsonProperty("contacts")
+	public User setContacts(List<String> contacts) {
+		this.contacts = contacts;
+		return this;
+	}
+    
 }

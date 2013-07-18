@@ -25,6 +25,10 @@ import views.html.evenement;
 import views.html.evenementParticipation;
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
+
+import com.feth.play.module.mail.Mailer;
+import com.feth.play.module.mail.Mailer.Mail.Body;
+
 import controllers.decorators.Link;
 import controllers.decorators.SubscriberModel;
 import controllers.decorators.UserModelLight;
@@ -45,7 +49,7 @@ public class EventCtrl extends Controller {
 	public static Result participer(String id) {
 		return ok(evenementParticipation.render());
 	}
-
+	@Restrict(@Group(Application.USER_ROLE))
 	public static Result getEvent(String id) {
 	    Event event = Event.read(id);
         try {
@@ -62,7 +66,17 @@ public class EventCtrl extends Controller {
             if(form.hasErrors()){
                 return buildErrors(form);
             } else {
-                Event event = form.get().save();
+                Event event = form.get();
+                event.save();
+                
+                if(event.getContacts()!=null && !event.getContacts().isEmpty()){
+                	Mailer mailer = Mailer.getDefaultMailer();
+                	final Body body = new Body("polopopopo");
+                	String subject = "Evenement";
+                	for (String email : event.getContacts()) {
+                		mailer.sendMail(subject, body, email);
+					}
+                }
                 String link = controllers.routes.EventCtrl.getEvent(event.getId()).toString();
                 LigthEvent responseBody = new LigthEvent(event, Link.link(Link.SELF, link));
                 return ok(objectMapper.writeValueAsString(responseBody)).as("application/json");
@@ -71,7 +85,7 @@ public class EventCtrl extends Controller {
             return internalServerError().as("application/json");
         }
 	}
-
+	@Restrict(@Group(Application.USER_ROLE))
     @BodyParser.Of(BodyParser.Json.class)
 	public static Result updateEvent(String id) throws IOException {
         try{
@@ -91,7 +105,7 @@ public class EventCtrl extends Controller {
             return internalServerError().as("application/json");
         }
 	}
-
+	@Restrict(@Group(Application.USER_ROLE))
 	public static Result deleteEvent(String id) {
 		String json = "{message:toto}";
 		return ok(json).as("application/json");

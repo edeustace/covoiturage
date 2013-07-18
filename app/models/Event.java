@@ -47,7 +47,11 @@ public class Event {
 
     private Date toDate;
 
-    @NotNull @Valid
+    private List<String> contacts;
+    
+    private Boolean contactsOnly;
+
+	@NotNull @Valid
     private Address address;
 
     @Valid @NotNull
@@ -55,7 +59,7 @@ public class Event {
 
     private String creatorRef;
 
-    @JsonIgnore @NotNull @Valid @EmailAlreadyUsed
+    @JsonIgnore @Valid @EmailAlreadyUsed
     private User creator;
 
     ///////////  CLASS METHODS /////////////////
@@ -158,8 +162,11 @@ public class Event {
     	if(creatorRef!=null){
     		User user = User.findById(creatorRef);
     		user.mergeIfNull(creator);
-    		creator = user;
-    		creator.save();
+    		user.mergeContact(this.getContacts());
+    		user.save();
+    		if(creator!=null && !creator.isEmpty()){
+    			creator = user;	
+    		}
     	}else if(creator!=null){
             if(creator.getId()==null){
             	creator.setLastLogin(new Date());
@@ -200,7 +207,7 @@ public class Event {
     }
 
     public static List<Event> listByUser(String idUser){
-    	DBCursor<Event> cursor = collection().find(DBQuery.is("subscribers.userRef", idUser));
+    	DBCursor<Event> cursor = collection().find(DBQuery.or(DBQuery.is("subscribers.userRef", idUser), DBQuery.is("creatorRef", idUser)));
     	List<Event> result = new ArrayList<>();
     	while(cursor.hasNext()){
     		result.add(cursor.next());
@@ -326,7 +333,7 @@ public class Event {
     }
 
     private void addCreatorAsSubscriber(){
-        if(creator!=null && subscribers!=null && !subscribers.contains(creator)){
+        if(creator!=null && !creator.isEmpty() && subscribers!=null && !subscribers.contains(creator)){
             Subscriber subscriberCreator = Subscriber
                     .subscriber().setAddress(creator.getAddress())
                     .setName(creator.getName()).setSurname(creator.getSurname())
@@ -397,6 +404,22 @@ public class Event {
 		this.version = version;
 		return this;
 	}
+    @JsonProperty("contacts")
+    public List<String> getContacts() {
+		return contacts;
+	}
+    @JsonProperty("contacts")
+	public Event setContacts(List<String> contacts) {
+		this.contacts = contacts;
+		return this;
+	}
+    @JsonProperty("contactsOnly")
+	public Boolean getContactsOnly() {
+		return contactsOnly;
+	}
+    @JsonProperty("contactsOnly")
+	public Event setContactsOnly(Boolean contactsOnly) {
+		this.contactsOnly = contactsOnly;
+		return this;
+	}
 }
-
-

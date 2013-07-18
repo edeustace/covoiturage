@@ -10,7 +10,6 @@
   <script type="text/javascript" src="@routes.Assets.at("js/lib/ui-bootstrap-tpls-0.4.0.min.js")"></script>
   <script type="text/javascript" src="@routes.Assets.at("js/lib/event.js")"></script>
   <script type="text/javascript" src="@routes.Assets.at("js/lib/ui-map.js")"></script>
-  <script type="text/javascript" src="@routes.Assets.at("js/app/modules/markerModule.js")"></script>
   <script type="text/javascript" src="@routes.Assets.at("js/app/event/app.js")"></script>
   <script type="text/javascript" src="@routes.Assets.at("js/app/directives/googleplace.js")"></script>
   <script type="text/javascript" src="@routes.Assets.at("js/app/event/controller.js")"></script>
@@ -76,7 +75,28 @@
 	                 ui-options="mapOptions">
 	            </div>
 		</div>
-		<div class="span4">
+		<div ng-show="!currentSubscriber"  class="span4">
+		 	<fieldset>
+				<legend>Vous ne participez pas encore :</legend>
+				<label>Email</label>
+				<input ng-model="newSubscriber.email" type="email" required></input>
+				<label>Nom</label> 
+				<input ng-model="newSubscriber.name" type="text" ></input> 
+				<label>Prénom</label>
+				<input ng-model="newSubscriber.surname" type="text" ></input> 
+				<label>Point de départ</label> 
+				<input ng-model="newSubscriber.address" googleplace type="text" ></input> 
+				<label>Je suis :</label> 
+				<select ng-model="newSubscriber.locomotion" ng-options="item.id as item.name for item in items"></select>
+				<div ng-show="newSubscriber.locomotion == 'CAR'">
+					<label>Nb passagers max</label> 
+					<input ng-model="newSubscriber.car.nbPlaces" type="text" maxlength="1"></input> 
+				</div>
+			</fieldset>
+			<button class="btn btn-primary" type="button" ng-click="subscribe()">Participer</button>
+		</div>
+		
+		<div ng-show="currentSubscriber" class="span4">
 			<br/>
 			
 			
@@ -97,31 +117,7 @@
 					<button  class="btn btn-primary" ng-click="saveCurrentSubscriber()">Valider</button>
 					<button  class="btn" ng-click="setEditMode(false)">Annuler</button>
 				</div>
-				<div ng-show="!currentSubscriber"  >
-				 	<fieldset>
-						<legend>Participant</legend>
-						<div ng-show="message">
-							<p class="text-warning" >{{message}}</p>
-							<button class="btn btn-warning" type="button" ng-click="update()">Mettre à jour</button> ou 
-							<button class="btn btn-warning" type="button" ng-click="cancel()">Annuler</button>
-						</div>
-						<label>Email</label>
-						<input ng-model="subscriber.email" type="email" required></input>
-						<label>Nom</label> 
-						<input ng-model="subscriber.name" type="text" ></input> 
-						<label>Prénom</label>
-						<input ng-model="subscriber.surname" type="text" ></input> 
-						<label>Adresse</label> 
-						<input ng-model="subscriber.address" googleplace type="text" ></input> 
-						<label>Je suis :</label> 
-						<select ng-model="subscriber.locomotion" ng-options="item.id as item.name for item in items"></select>
-						<div ng-show="subscriber.locomotion == 'CAR'">
-							<label>Nb passagers max</label> 
-							<input ng-model="subscriber.car.nbPlaces" type="text" maxlength="1"></input> 
-						</div>
-					</fieldset>
-					<button class="btn btn-large btn-block btn-primary" type="button" ng-click="create()">Valider</button>
-				</div>
+				
 				
 				<div ng-show="currentSubscriber.locomotion == 'AUTOSTOP'">
 					<div ng-show="currentSubscriber.carRef">
@@ -191,7 +187,7 @@
 				
 				
 				
-				<table id="searchTextResults" class="table">
+				<table id="searchTextResults" class="table table-hover">
 					<thead>
 						<tr>
 							<th>locomotion</th>
@@ -203,7 +199,7 @@
 						</tr>
 					</thead>
 					<tbody>
-						<tr ng-repeat="subscriber in subscribers | auto:filterUsers:markers " ng-show="!subscriber.current" class="{{subscriber.class}}">
+						<tr ng-repeat="subscriber in subscribers | auto:filterUsers:markers " ng-show="!subscriber.current" class="{{subscriber.class}}" ng-click="openSubscriberInfo(subscriber)">
 							<td><img ng-src="{{subscriber.picto}}" /></td>
 							<td >{{subscriber.surname}} {{subscriber.name}}</td>
 							<td>{{subscriber.address.description}}</td>
