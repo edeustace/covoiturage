@@ -60,6 +60,9 @@ POST    /rest/events                       controllers.EventCtrl.createEvent
 PUT     /rest/events/:id                   controllers.EventCtrl.updateEvent(id :String)
 DELETE  /rest/events/:id                   controllers.EventCtrl.deleteEvent(id :String)
 
+#Contacts
+POST    /rest/events/:id/contacts/              controllers.EventCtrl.addContacts(id :String)
+
 #Subscribers
 GET     /rest/events/:id/subscribers/              controllers.SubscriberCtrl.list(id :String)
 POST    /rest/events/:id/subscribers/              controllers.SubscriberCtrl.createSubscriber(id :String)

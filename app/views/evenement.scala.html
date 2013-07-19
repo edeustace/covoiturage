@@ -29,6 +29,26 @@
 			<address>
 			  {{event.address.description}}
 			</address>
+			
+			<accordion>
+			 <accordion-group heading="Contacts" >
+			 	<ul>
+			 		<li ng-repeat="contact in event.contacts" >{{contact}}</li>
+			 	</ul>
+			 	
+    		</accordion-group>
+			</accordion>
+			<alert ng-repeat="newContact in newContacts" type="'info'" close="remove($index)">{{newContact}}</alert>
+     		<div class="controls">
+				<div class="input-prepend input-append">
+			      <span class="add-on"><i class="icon-envelope"></i></span>
+			      <input ng-model="addedContact" placeholder="email1;email2..." type="text"></input>
+				  <button class="btn" type="button"  ng-click="addContact()">Ajouter</button>
+				</div>
+				<br/> 
+			</div>
+			<button class="btn" type="button"  ng-click="send()">Envoyer</button>
+			
 			<alert ng-repeat="alert in alerts" type="alert.type" close="closeAlert($index)">{{alert.msg}}</alert>
 			<br/>
 				<div ng-repeat="marker in myMarkers" ui-map-marker="myMarkers[$index]"

@@ -176,6 +176,20 @@ public class Event {
         }
     }
 
+    public void addContactsAndSave(List<String> contactsToAdd){
+    	for (String string : contactsToAdd) {
+			if(!this.getContacts().contains(string)){
+				this.getContacts().add(string);
+			}
+		}
+    	if(creatorRef!=null){
+    		User user = User.findById(creatorRef);
+    		user.mergeContact(this.getContacts());
+    		user.save();
+    	}
+    	this.save();
+    }
+    
     private void persistUsersOnSubscribers(){
         for(Subscriber subscriber : getSubscribers()){
             subscriber.saveUser();

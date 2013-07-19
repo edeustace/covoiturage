@@ -48,6 +48,48 @@ function EventCtrl($scope, $http, $location, $compile) {
 			alert("une erreur s'est produite");
 		}
 	};
+	$scope.addContact = function(){	
+		if(!$scope.newContacts){
+			$scope.newContacts = new Array();
+		}
+		if($scope.addedContact.indexOf(";")>0){
+			var reg=new RegExp("[ ,;]+", "g");
+			var emails = $scope.addedContact.split(reg);
+			for ( var int = 0; int < emails.length; int++) {
+				var email = emails[int];
+				if(validerEmail(email)){
+					$scope.newContacts.push(email);	
+				}
+			}
+		}else{
+			if(validerEmail($scope.addedContact)){
+				$scope.newContacts.push($scope.addedContact);	
+			}
+		}
+		$scope.addedContact = null;
+	};
+	function validerEmail(mailtest){
+		var reg = new RegExp('^[a-z0-9]+([_|\.|-]{1}[a-z0-9]+)*@[a-z0-9]+([_|\.|-]{1}[a-z0-9]+)*[\.]{1}[a-z]{2,6}$', 'i');
+		if(reg.test(mailtest)){
+			return(true);
+		}else{
+			return(false);
+		}
+	}
+	$scope.send = function(){
+		$http.post($scope.eventLinks.contacts, {contacts:$scope.newContacts}).success(function(){
+			for ( var int = 0; int < $scope.newContacts.length; int++) {
+				var contact = $scope.newContacts[int];
+				$scope.event.contacts.push(contact);
+			}
+			$scope.newContacts = new Array();
+		}).error(function(error){
+			alert("Error "+error);
+		});
+	};
+	$scope.remove = function(index){
+		$scope.newContacts.splice(index, 1);
+	};
 	$scope.closeAlert = function(index) {
 		if($scope.alerts[index].notification && $scope.alerts[index].notification.id){
 			if($scope.currentSubscriber){

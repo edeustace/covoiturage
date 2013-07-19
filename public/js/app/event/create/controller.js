@@ -13,15 +13,35 @@ function EventCreationCtrl($scope, $http, $location) {
 	                  { id: "AUTOSTOP", name: 'à pied' },
 	                  { id: "DONT_KNOW_YET", name: 'Je ne sais pas encore' }
                     ];
-	$scope.addContact = function(){
-		if($scope.event){
-			if(!$scope.event.contacts){
-				$scope.event.contacts = new Array();
+	$scope.addContact = function(){	
+		if(!$scope.event){
+			$scope.event.contacts = new Array();
+		}
+		if($scope.contact.indexOf(";")>0){
+			var reg=new RegExp("[ ,;]+", "g");
+			var emails = $scope.contact.split(reg);
+			for ( var int = 0; int < emails.length; int++) {
+				var email = emails[int];
+				if(validerEmail(email)){
+					$scope.event.contacts.push(email);	
+				}
 			}
-			$scope.event.contacts.push($scope.contact);
-			$scope.contact = null;
+		}else{
+			if(validerEmail($scope.contact)){
+				$scope.event.contacts.push($scope.addedContact);	
+			}
+		}
+		$scope.contact = null;
+	};
+	function validerEmail(mailtest){
+		var reg = new RegExp('^[a-z0-9]+([_|\.|-]{1}[a-z0-9]+)*@[a-z0-9]+([_|\.|-]{1}[a-z0-9]+)*[\.]{1}[a-z]{2,6}$', 'i');
+		if(reg.test(mailtest)){
+			return(true);
+		}else{
+			return(false);
 		}
 	}
+	
 	$scope.remove = function(index){
 		$scope.event.contacts.splice(index, 1);
 	}

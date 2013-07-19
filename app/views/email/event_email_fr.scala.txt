@@ -1,0 +1,6 @@
+@(eventUrl: String, eventName: String, name: String, surname: String) 
+
+Bonjour,
+
+@surname @name vous invite à covoiturer pour l'événement @eventName
+Accéder au lien @eventUrl pour participer !

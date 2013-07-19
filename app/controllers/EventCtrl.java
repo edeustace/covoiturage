@@ -3,6 +3,8 @@ package controllers;
 import static play.data.Form.form;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -13,11 +15,15 @@ import java.util.Map;
 import models.Address;
 import models.Event;
 import models.Subscriber;
+import models.User;
 
+import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.codehaus.jackson.map.ObjectMapper;
 
+import play.Logger;
 import play.data.Form;
+import play.i18n.Lang;
 import play.mvc.BodyParser;
 import play.mvc.Controller;
 import play.mvc.Result;
@@ -68,15 +74,7 @@ public class EventCtrl extends Controller {
             } else {
                 Event event = form.get();
                 event.save();
-                
-                if(event.getContacts()!=null && !event.getContacts().isEmpty()){
-                	Mailer mailer = Mailer.getDefaultMailer();
-                	final Body body = new Body("polopopopo");
-                	String subject = "Evenement";
-                	for (String email : event.getContacts()) {
-                		mailer.sendMail(subject, body, email);
-					}
-                }
+                sendMail(event, event.getContacts());
                 String link = controllers.routes.EventCtrl.getEvent(event.getId()).toString();
                 LigthEvent responseBody = new LigthEvent(event, Link.link(Link.SELF, link));
                 return ok(objectMapper.writeValueAsString(responseBody)).as("application/json");
@@ -85,6 +83,72 @@ public class EventCtrl extends Controller {
             return internalServerError().as("application/json");
         }
 	}
+	
+	private static void sendMail(Event event, List<String> contacts){
+		if(contacts!=null && !contacts.isEmpty()){
+        	Mailer mailer = Mailer.getDefaultMailer();
+        	final Lang lang = Lang.preferred(request().acceptLanguages());
+        	final String langCode = lang.code();
+        	
+        	User user = User.findById(event.getCreatorRef());
+        	String url = controllers.routes.EventCtrl.evenement(event.getId()).absoluteURL(request()).toString();
+        	final String html = getEmailTemplate(
+    				"views.html.email.event_email", langCode, url,
+    				event.getName(), user.getName(), user.getSurname());
+    		final String text = getEmailTemplate(
+    				"views.txt.email.event_email", langCode, url,
+    				event.getName(), user.getName(), user.getSurname());
+        	final Body body = new Body(text, html);
+        	String subject = user.getSurname() + " " + user.getName() + " vous invite à covoiturer !";
+        	for (String email : contacts) {
+        		mailer.sendMail(subject, body, email);
+			}
+        }
+	}
+	
+	private static String getEmailTemplate(final String template,
+			final String langCode, final String url, final String eventName,
+			final String name, final String surname) {
+		Class<?> cls = null;
+		String ret = null;
+		try {
+			cls = Class.forName(template + "_" + langCode);
+		} catch (ClassNotFoundException e) {
+			Logger.warn("Template: '"
+					+ template
+					+ "_"
+					+ langCode
+					+ "' was not found! Trying to use English fallback template instead.");
+		}
+		if (cls == null) {
+			try {
+				cls = Class.forName(template + "_"
+						+ "fr");
+			} catch (ClassNotFoundException e) {
+				Logger.error("Fallback template: '" + template + "_"
+						+ "fr"
+						+ "' was not found either!");
+			}
+		}
+		if (cls != null) {
+			Method htmlRender = null;
+			try {
+				htmlRender = cls.getMethod("render", String.class,
+						String.class, String.class, String.class);
+				ret = htmlRender.invoke(null, url, eventName, name, surname)
+						.toString();
+
+			} catch (NoSuchMethodException e) {
+				e.printStackTrace();
+			} catch (IllegalAccessException e) {
+				e.printStackTrace();
+			} catch (InvocationTargetException e) {
+				e.printStackTrace();
+			}
+		}
+		return ret;
+	}
+	
 	@Restrict(@Group(Application.USER_ROLE))
     @BodyParser.Of(BodyParser.Json.class)
 	public static Result updateEvent(String id) throws IOException {
@@ -105,6 +169,30 @@ public class EventCtrl extends Controller {
             return internalServerError().as("application/json");
         }
 	}
+	
+	@Restrict(@Group(Application.USER_ROLE))
+    @BodyParser.Of(BodyParser.Json.class)
+	public static Result addContacts(String id) throws IOException {
+        try{
+        	JsonNode node = request().body().asJson();
+        	JsonNode jsonContacts = node.get("contacts");
+        	List<String> contacts = new ArrayList<>();
+        	if(jsonContacts.isArray()){
+        		for (JsonNode jsonNode : jsonContacts) {
+        			contacts.add(jsonNode.asText());
+				}
+        	}
+            Event event = Event.read(id);
+            event.addContactsAndSave(contacts);
+            sendMail(event, contacts);
+            String link = controllers.routes.EventCtrl.getEvent(event.getId()).toString();
+            LigthEvent responseBody = new LigthEvent(event, Link.link(Link.SELF, link));
+            return ok(objectMapper.writeValueAsString(responseBody)).as("application/json");
+        }catch (Exception e){
+            return internalServerError().as("application/json");
+        }
+	}	
+	
 	@Restrict(@Group(Application.USER_ROLE))
 	public static Result deleteEvent(String id) {
 		String json = "{message:toto}";
@@ -138,6 +226,7 @@ public class EventCtrl extends Controller {
             this.links.add(Link.link(Link.SELF, controllers.routes.EventCtrl.getEvent(this.event.getId()).toString()));
             this.links.add(Link.link("page", controllers.routes.EventCtrl.evenement(this.event.getId()).toString()));
             this.links.add(Link.link("subscribers", controllers.routes.SubscriberCtrl.list(this.event.getId()).toString()));
+            this.links.add(Link.link("contacts", controllers.routes.EventCtrl.addContacts(this.event.getId()).toString()));
             this.links.add(Link.link("pictoFinish", controllers.routes.Assets.at("icons/finish.png").toString()));
             this.links.add(Link.link("pictoCarDark", controllers.routes.Assets.at("icons/car_dark.png").toString()));
             this.links.add(Link.link("pictoCar", controllers.routes.Assets.at("icons/car_classic.png").toString()));
@@ -198,6 +287,12 @@ public class EventCtrl extends Controller {
         public UserModelLight getCreator() {
             return new UserModelLight(event.loadCreator());
         }
+        @JsonProperty("contacts")
+		public List<String> getContacts() {
+			return event.getContacts();
+		}
+        
+        
     }
 
     public static class LigthEvent{
