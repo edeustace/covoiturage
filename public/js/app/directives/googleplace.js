@@ -1,5 +1,7 @@
 
-app.directive('googleplace', function() {
+
+angular.module('googleplace', [])
+.directive('googleplace', function() {
 
 	return {
 		require : 'ngModel',

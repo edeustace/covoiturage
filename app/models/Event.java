@@ -47,7 +47,7 @@ public class Event {
 
     private Date toDate;
 
-    private List<String> contacts;
+    private List<String> contacts = new ArrayList<>();
     
     private Boolean contactsOnly;
 
@@ -176,10 +176,12 @@ public class Event {
         }
     }
 
-    public void addContactsAndSave(List<String> contactsToAdd){
+    public List<String> addContactsAndSave(List<String> contactsToAdd){
+    	List<String> addedcontacts = new ArrayList<>();
     	for (String string : contactsToAdd) {
 			if(!this.getContacts().contains(string)){
 				this.getContacts().add(string);
+				addedcontacts.add(string);
 			}
 		}
     	if(creatorRef!=null){
@@ -188,6 +190,7 @@ public class Event {
     		user.save();
     	}
     	this.save();
+    	return addedcontacts;
     }
     
     private void persistUsersOnSubscribers(){

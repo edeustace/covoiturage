@@ -5,7 +5,7 @@
 
 /* Controllers */
 
-function EventCtrl($scope, $http, $location, $compile) {
+function EventCtrl($scope, $http, $location, $compile, mailUtils, mapService) {
 	//////////////  ATTRIBUTS  ///////////////////
 	$scope.items = [
 	                  { id: "CAR", name: 'en voiture' },
@@ -49,43 +49,18 @@ function EventCtrl($scope, $http, $location, $compile) {
 		}
 	};
 	$scope.addContact = function(){	
-		if(!$scope.newContacts){
-			$scope.newContacts = new Array();
-		}
-		if($scope.addedContact.indexOf(";")>0){
-			var reg=new RegExp("[ ,;]+", "g");
-			var emails = $scope.addedContact.split(reg);
-			for ( var int = 0; int < emails.length; int++) {
-				var email = emails[int];
-				if(validerEmail(email)){
-					$scope.newContacts.push(email);	
-				}
-			}
-		}else{
-			if(validerEmail($scope.addedContact)){
-				$scope.newContacts.push($scope.addedContact);	
-			}
-		}
-		$scope.addedContact = null;
-	};
-	function validerEmail(mailtest){
-		var reg = new RegExp('^[a-z0-9]+([_|\.|-]{1}[a-z0-9]+)*@[a-z0-9]+([_|\.|-]{1}[a-z0-9]+)*[\.]{1}[a-z]{2,6}$', 'i');
-		if(reg.test(mailtest)){
-			return(true);
-		}else{
-			return(false);
-		}
-	}
-	$scope.send = function(){
+		$scope.newContacts = mailUtils.pushMails($scope.addedContact, $scope.newContacts);
 		$http.post($scope.eventLinks.contacts, {contacts:$scope.newContacts}).success(function(){
 			for ( var int = 0; int < $scope.newContacts.length; int++) {
 				var contact = $scope.newContacts[int];
 				$scope.event.contacts.push(contact);
 			}
+			$scope.addedContact = null;
 			$scope.newContacts = new Array();
 		}).error(function(error){
 			alert("Error "+error);
 		});
+		
 	};
 	$scope.remove = function(index){
 		$scope.newContacts.splice(index, 1);
@@ -104,7 +79,7 @@ function EventCtrl($scope, $http, $location, $compile) {
 		if($scope.currentSubscriber){
 			$http.put($scope.subscribersLinks[$scope.currentSubscriber.userRef].self ,$scope.currentSubscriber).success(function(){
 				$scope.setEditMode(false);
-				addMarkerSubscriber($scope.currentSubscriber);
+				mapService.addMarkerSubscriber(currentSubscriber, $scope);
 				reloadSubscribers($scope);
 				
 			}).error(function(error){
@@ -197,7 +172,7 @@ function EventCtrl($scope, $http, $location, $compile) {
     };
     
     $scope.openSubscriberInfo = function(subscriber) {
-    	var marker = findMarkerByLatLng(subscriber.address.location.lat, subscriber.address.location.lng);
+    	var marker = mapService.findMarkerByLatLng($scope.myMarkers, subscriber.address.location.lat, subscriber.address.location.lng);
     	$scope.openMarkerInfo(marker);
     };
 	$scope.openMarkerInfo = function(marker) {
@@ -221,7 +196,7 @@ function EventCtrl($scope, $http, $location, $compile) {
 			    	$scope.eventLinks = buildLinks(event.links);
 			    	event.picto = $scope.eventLinks.pictoFinish;
 				   	if(event){
-				        addMarkerEvent(event);
+				        mapService.addMarkerEvent(event, $scope);
 					   	if(event.subscribers){
 					   		initSubscribers($scope, event.subscribers, function(subscriber){
 					   			var idUser = $scope.user.id;
@@ -294,52 +269,12 @@ function EventCtrl($scope, $http, $location, $compile) {
 	});
     
     /////////   PRIVATE   ////////////////
-    function traceDirections($scope){
-    	var car = null;
-    	if($scope.currentSubscriber && $scope.currentSubscriber.locomotion == "CAR"){
-    		car = $scope.currentSubscriber;
-    	}else if($scope.currentSubscriber && $scope.currentSubscriber.locomotion == "AUTOSTOP"){
-    		if($scope.currentSubscriber.carRef){
-    			car = $scope.refSubscribers[$scope.currentSubscriber.carRef];	
-    		}
-    	}
-    	if(car){
-			$scope.directionsDisplay.setMap($scope.myMap);
-			var start = new google.maps.LatLng(car.address.location.lat, car.address.location.lng);
-			var end = new google.maps.LatLng($scope.event.address.location.lat, $scope.event.address.location.lng);
-			var waypts = [];
-			if(car && car.car && car.car.passengers){
-			  for (var i = 0; i < car.car.passengers.length; i++) {
-				  var passenger = $scope.refSubscribers[car.car.passengers[i]];
-				  var loc = new google.maps.LatLng(passenger.address.location.lat, passenger.address.location.lng)
-			      waypts.push({
-			    	  location:loc, 
-			          stopover:false
-			      });
-			    }
-			  }
-			var request = {
-			      origin:start,
-			      destination:end,
-			      waypoints: waypts,
-			      optimizeWaypoints: true,
-			      travelMode: google.maps.DirectionsTravelMode.DRIVING
-			  };
-			  $scope.directionsService.route(request, function(response, status) {
-			    if (status == google.maps.DirectionsStatus.OK) {
-			    	$scope.directionsDisplay.setDirections(response);
-			    }
-			  });
-    	}else{
-    		$scope.directionsDisplay.setMap(null);
-    		$scope.myMap.fitBounds($scope.bounds);
-    	}
-    }
+    
     
     
     function setCurrentWidowsSubscriber(){
     	if($scope.currentInfoWindowsSubscriber){
-    		var marker = findMarkerByUserRef($scope.currentInfoWindowsSubscriber.userRef);
+    		var marker = mapService.findMarkerByUserRef($scope.currentInfoWindowsSubscriber.userRef);
     		var subscriber = $scope.refSubscribers[$scope.currentInfoWindowsSubscriber.userRef];
     		if(marker && subscriber){
     			$scope.currentMarker = marker;
@@ -360,67 +295,7 @@ function EventCtrl($scope, $http, $location, $compile) {
 			alert(error);
 		});
     }
-    function addMarkerEvent(event){
-    	$scope.mapOptions.center = new google.maps.LatLng(event.address.location.lat, event.address.location.lng);
-    	
-    	var marker = new google.maps.Marker({
-            map: $scope.myMap,
-            position: new google.maps.LatLng(event.address.location.lat, event.address.location.lng),
-            icon:event.picto, 
-            visible : true
-          });
-    	marker.type = "EVENT";
-    	$scope.myMarkers.push(marker);
-    	$scope.bounds.extend(marker.getPosition());
-    }
-    function addMarkerSubscriber(subscriber){
-    	var marker = findMarkerByLatLng(subscriber.address.location.lat, subscriber.address.location.lng);
-    	if(marker){
-    		marker.setVisible(subscriber.visible);
-    		marker.setIcon(subscriber.picto);
-    		marker.setVisible(subscriber.visible);
-    	}else{
-    		marker = findMarkerByUserRef(subscriber.address.location.lat, subscriber.address.location.lng);
-    		if(marker){
-    			marker.setPosition(new google.maps.LatLng(subscriber.address.location.lat, subscriber.address.location.lng));
-    			marker.setVisible(subscriber.visible);
-    			marker.setIcon(subscriber.picto);
-    		}else{
-	        	marker = new google.maps.Marker({
-	                map: $scope.myMap,
-	                position: new google.maps.LatLng(subscriber.address.location.lat, subscriber.address.location.lng),
-	                icon:subscriber.picto, 
-	                visible : subscriber.visible
-	              });
-	        	marker.type = subscriber.locomotion;
-	        	$scope.myMarkers.push(marker);
-	        	$scope.bounds.extend(marker.getPosition());
-    		}
-    	}
-    	marker.type = subscriber.locomotion;
-    	marker.subscriber = subscriber;
-    }
-    function findMarkerByLatLng(lat, lng) {
-		for ( var i = 0; i < $scope.myMarkers.length; i++) {
-			var pos = $scope.myMarkers[i].getPosition();
-			if (floatEqual(pos.lat(), lat)
-					&& floatEqual(pos.lng(), lng)) {
-				return $scope.myMarkers[i];
-			}
-		}
-
-		return null;
-	};
-	function findMarkerByUserRef(ref) {
-		for ( var i = 0; i < $scope.myMarkers.length; i++) {
-			var subscriber = $scope.myMarkers[i].subscriber;
-			if(subscriber && subscriber.userRef == ref){
-				return $scope.myMarkers[i];
-			}
-		}
-		return null;
-	}
-	
+   	
     function extractFromUrl(url){
         var index = url.lastIndexOf("/")
         return url.substring(index+1, url.length);
@@ -505,7 +380,7 @@ function EventCtrl($scope, $http, $location, $compile) {
    				subscriber.dontKnow = true;
    			}
 
-   			addMarkerSubscriber(subscriber);
+   			mapService.addMarkerSubscriber(subscriber, $scope);
    		}
    		
    		if($scope.currentSubscriber && $scope.currentSubscriber.locomotion=='CAR'){
@@ -521,7 +396,7 @@ function EventCtrl($scope, $http, $location, $compile) {
 		   		}
 			}
 	   	$scope.subscribers = subscribers;
-	   	traceDirections($scope);
+	   	mapService.traceDirections($scope);
     }
     function inArray(value, array){
     	if(array && value){

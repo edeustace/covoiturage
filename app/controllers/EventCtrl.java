@@ -183,7 +183,7 @@ public class EventCtrl extends Controller {
 				}
         	}
             Event event = Event.read(id);
-            event.addContactsAndSave(contacts);
+            contacts = event.addContactsAndSave(contacts);
             sendMail(event, contacts);
             String link = controllers.routes.EventCtrl.getEvent(event.getId()).toString();
             LigthEvent responseBody = new LigthEvent(event, Link.link(Link.SELF, link));
