@@ -42,7 +42,7 @@ public class MyDeadboltHandler extends AbstractDeadboltHandler {
 	@Override
 	public DynamicResourceHandler getDynamicResourceHandler(
 			final Http.Context context) {
-		return null;
+		return new EventPermissionHandler();
 	}
 
 	@Override

@@ -27,6 +27,20 @@ function EventCtrl($scope, $http, $location, $compile, mailUtils, mapService) {
 	$scope.directionsService = new google.maps.DirectionsService();
 	
 	//////////////  SCOPE METHODS  ///////////////////	
+	$scope.securised = function(){
+		$http.put($scope.eventLinks.securised, {value:true}).success(function(){
+			$scope.event.contactsOnly = true;
+		}).error(function(error){
+			alert("Error "+error);
+		});
+	};
+	$scope.unSecurised = function(){
+		$http.put($scope.eventLinks.securised, {value:false}).success(function(){
+			$scope.event.contactsOnly = false;
+		}).error(function(error){
+			alert("Error "+error);
+		});
+	};
 	$scope.subscribe = function(){
 		if($scope.newSubscriber && $scope.newSubscriber.userRef){
 			$http.post($scope.eventLinks.subscribers, $scope.newSubscriber).success(function(data){

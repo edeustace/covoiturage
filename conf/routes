@@ -62,6 +62,7 @@ DELETE  /rest/events/:id                   controllers.EventCtrl.deleteEvent(id 
 
 #Contacts
 POST    /rest/events/:id/contacts/              controllers.EventCtrl.addContacts(id :String)
+PUT    /rest/events/:id/securised/              controllers.EventCtrl.securised(id :String)
 
 #Subscribers
 GET     /rest/events/:id/subscribers/              controllers.SubscriberCtrl.list(id :String)

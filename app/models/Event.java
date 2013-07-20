@@ -49,7 +49,7 @@ public class Event {
 
     private List<String> contacts = new ArrayList<>();
     
-    private Boolean contactsOnly;
+    private Boolean contactsOnly = Boolean.FALSE;
 
 	@NotNull @Valid
     private Address address;

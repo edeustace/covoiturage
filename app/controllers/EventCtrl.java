@@ -29,8 +29,10 @@ import play.mvc.Controller;
 import play.mvc.Result;
 import views.html.evenement;
 import views.html.evenementParticipation;
+import be.objectify.deadbolt.java.actions.Dynamic;
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
+import be.objectify.deadbolt.java.actions.SubjectPresent;
 
 import com.feth.play.module.mail.Mailer;
 import com.feth.play.module.mail.Mailer.Mail.Body;
@@ -39,6 +41,7 @@ import controllers.decorators.Link;
 import controllers.decorators.SubscriberModel;
 import controllers.decorators.UserModelLight;
 
+@SubjectPresent
 public class EventCtrl extends Controller {
 
     private static ObjectMapper objectMapper = new ObjectMapper();
@@ -47,6 +50,8 @@ public class EventCtrl extends Controller {
 	public static Result list() {
 		return ok();
 	}
+	
+	@Dynamic(value="event")
 	@Restrict(@Group(Application.USER_ROLE))
 	public static Result evenement(String id) {
 		return ok(evenement.render());
@@ -174,6 +179,7 @@ public class EventCtrl extends Controller {
     @BodyParser.Of(BodyParser.Json.class)
 	public static Result addContacts(String id) throws IOException {
         try{
+        	
         	JsonNode node = request().body().asJson();
         	JsonNode jsonContacts = node.get("contacts");
         	List<String> contacts = new ArrayList<>();
@@ -186,6 +192,23 @@ public class EventCtrl extends Controller {
             contacts = event.addContactsAndSave(contacts);
             sendMail(event, contacts);
             String link = controllers.routes.EventCtrl.getEvent(event.getId()).toString();
+            LigthEvent responseBody = new LigthEvent(event, Link.link(Link.SELF, link));
+            return ok(objectMapper.writeValueAsString(responseBody)).as("application/json");
+        }catch (Exception e){
+            return internalServerError().as("application/json");
+        }
+	}	
+	
+	@Restrict(@Group(Application.USER_ROLE))
+    @BodyParser.Of(BodyParser.Json.class)
+	public static Result securised(String id) throws IOException {
+        try{
+        	JsonNode node = request().body().asJson();
+        	Boolean securised = node.get("value").getBooleanValue();
+        	Event event = Event.read(id);
+            event.setContactsOnly(securised);
+            event.save();
+        	String link = controllers.routes.EventCtrl.getEvent(event.getId()).toString();
             LigthEvent responseBody = new LigthEvent(event, Link.link(Link.SELF, link));
             return ok(objectMapper.writeValueAsString(responseBody)).as("application/json");
         }catch (Exception e){
@@ -227,6 +250,7 @@ public class EventCtrl extends Controller {
             this.links.add(Link.link("page", controllers.routes.EventCtrl.evenement(this.event.getId()).toString()));
             this.links.add(Link.link("subscribers", controllers.routes.SubscriberCtrl.list(this.event.getId()).toString()));
             this.links.add(Link.link("contacts", controllers.routes.EventCtrl.addContacts(this.event.getId()).toString()));
+            this.links.add(Link.link("securised", controllers.routes.EventCtrl.securised(this.event.getId()).toString()));
             this.links.add(Link.link("pictoFinish", controllers.routes.Assets.at("icons/finish.png").toString()));
             this.links.add(Link.link("pictoCarDark", controllers.routes.Assets.at("icons/car_dark.png").toString()));
             this.links.add(Link.link("pictoCar", controllers.routes.Assets.at("icons/car_classic.png").toString()));
@@ -290,6 +314,10 @@ public class EventCtrl extends Controller {
         @JsonProperty("contacts")
 		public List<String> getContacts() {
 			return event.getContacts();
+		}
+        @JsonProperty("contactsOnly")
+		public Boolean getContactsOnly() {
+			return event.getContactsOnly();
 		}
         
         
