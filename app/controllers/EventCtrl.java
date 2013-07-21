@@ -45,8 +45,8 @@ import controllers.decorators.UserModelLight;
 public class EventCtrl extends Controller {
 
     private static ObjectMapper objectMapper = new ObjectMapper();
-    private static Form<Event> eventForm = form(Event.class);
-    
+        private static Form<Event> eventForm = form(Event.class);
+
 	public static Result list() {
 		return ok();
 	}

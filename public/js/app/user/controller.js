@@ -8,14 +8,28 @@
 function UserCtrl($scope, $http) {
 	$scope.alerts = [];
 	$scope.saveUser = function(){
-		$scope.alerts.push({ type: 'success', msg: 'votre compte a été modifié'});
-//		$http.post('/rest/users', $scope.user).success(function(user) {
-//			$scope.alerts.push("votre compte a été modifié");		
-//		});
+	  	$http.put('/rest/users/'+$scope.user.id, $scope.user).success(function(events) {
+            $scope.alerts.push({ type: 'success', msg: 'votre compte a été modifié'});
+	  	}).error(function(data){
+	  	    if(data.errors){
+                var obj = JSON.parse(JSON.stringify(data.errors));
+                var someErrors = data.errors;
+                for(var anError in someErrors){
+                    var msgs = someErrors[anError];
+                    for(var i in msgs){
+                        $scope.alerts.push({ type: 'error', msg: msgs[i]});
+                    }
+                }
+            }else{
+                $scope.alerts.push({ type: 'error', msg: data});
+            }
+	  	});
 	};
 	$scope.closeAlert = function(index) {
 		$scope.alerts.splice(index, 1);
 	};
+
+
 	$http.get('/rest/users/current').success(function(user) {
 		if(user){
 			$scope.user = user;

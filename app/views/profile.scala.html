@@ -10,9 +10,9 @@
     </p>
   <script src="http://maps.googleapis.com/maps/api/js?libraries=places&sensor=false&language=fr"></script>  
   <script type="text/javascript" src="@routes.Assets.at("js/lib/angular.js")"></script>
-  <script type="text/javascript" src="@routes.Assets.at("js/lib/ui-bootstrap-tpls-0.4.0.min.js")"></script>
-  <script type="text/javascript" src="@routes.Assets.at("js/app/user/app.js")"></script>
+  <script type="text/javascript" src="@routes.Assets.at("js/app/directives/ui-bootstrap-tpls-0.4.0.min.js")"></script>
   <script type="text/javascript" src="@routes.Assets.at("js/app/directives/googleplace.js")"></script>
+  <script type="text/javascript" src="@routes.Assets.at("js/app/user/app.js")"></script>
   <script type="text/javascript" src="@routes.Assets.at("js/app/user/controller.js")"></script>
   
   <div ng-controller="UserCtrl" ng-app="covoiturage">
@@ -25,12 +25,12 @@
 		</div>
 		<label>Nom</label> 
 		<div class="input-prepend">
-		<span class="add-on"><i class="icon-asterisk"></i></span>
+		<span class="add-on"><i class="icon-user"></i></span>
 		<input ng-model="user.name" type="text" ></input> 
 		</div>
 		<label>Prénom</label>
 		<div class="input-prepend">
-		<span class="add-on"><i class="icon-asterisk"></i></span>
+		<span class="add-on"><i class="icon-user"></i></span>
 		<input ng-model="user.surname" type="text" ></input> 
 		</div>
 		<label>Adresse : {{user.address.description}}</label> 

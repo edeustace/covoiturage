@@ -90,6 +90,7 @@ DELETE  /rest/events/:id/subscribers/:idSub/notifications/:idNotif              
 #Users
 GET     /rest/users/current                   controllers.UserCtrl.getCurrentUser()
 GET     /rest/users/:id                   controllers.UserCtrl.getUser(id :String)
+PUT     /rest/users/:id                   controllers.UserCtrl.updateUser(id :String)
 GET     /rest/users/:id/events                   controllers.UserCtrl.listEvent(id :String)
 
 

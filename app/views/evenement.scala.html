@@ -12,6 +12,7 @@
   <script type="text/javascript" src="@routes.Assets.at("js/app/directives/ui-map.js")"></script>
   <script type="text/javascript" src="@routes.Assets.at("js/app/directives/googleplace.js")"></script>
   <script type="text/javascript" src="@routes.Assets.at("js/app/modules/mailUtils.js")"></script>
+  <script type="text/javascript" src="@routes.Assets.at("js/app/modules/eventService.js")"></script>
   <script type="text/javascript" src="@routes.Assets.at("js/app/modules/mapService.js")"></script>
   <script type="text/javascript" src="@routes.Assets.at("js/app/event/app.js")"></script>
   <script type="text/javascript" src="@routes.Assets.at("js/app/event/controller.js")"></script>
@@ -50,8 +51,8 @@
 				<br/> 
 			</div>
 			
-			<button class="btn" type="button"  ng-show="!event.contactsOnly" ng-click="securised()">securiser</button>
-			<button class="btn" type="button"  ng-show="event.contactsOnly" ng-click="unSecurised()">ne plus securiser</button>
+			<button class="btn" type="button"  ng-show="!event.contactsOnly" ng-click="securise()">securiser</button>
+			<button class="btn" type="button"  ng-show="event.contactsOnly" ng-click="unSecurise()">ne plus securiser</button>
 			
 			<alert ng-repeat="alert in alerts" type="alert.type" close="closeAlert($index)">{{alert.msg}}</alert>
 			<br/>
