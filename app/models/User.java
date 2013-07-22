@@ -73,7 +73,7 @@ public class User implements Subject {
     
     private Locomotion locomotion;
 
-    private List<String> contacts = new ArrayList<>();
+    private List<String> contacts = new ArrayList<String>();
     
 	private List<LinkedAccount> linkedAccounts = new ArrayList<LinkedAccount>();
 
@@ -160,7 +160,7 @@ public class User implements Subject {
 
     
     public void changePassword(final UsernamePasswordAuthUser authUser,
-                               final boolean tate) {
+                               final boolean create) {
         LinkedAccount a = this.getAccountByProvider(authUser.getProvider());
         if (a == null) {
             if (create) {
@@ -220,8 +220,7 @@ public class User implements Subject {
     }
 
     public static User getUserwithEmail(String email){
-        User user = collection().findOne(DBQuery.is("email",email));
-        return user;
+        return collection().findOne(DBQuery.is("email",email));
     }
 
     public static User create(final AuthUser authUser) {
