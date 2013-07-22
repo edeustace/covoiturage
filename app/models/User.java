@@ -10,6 +10,7 @@ import java.util.Set;
 import javax.persistence.Id;
 import javax.validation.constraints.NotNull;
 
+import com.feth.play.module.pa.user.*;
 import models.enums.Locomotion;
 import net.vz.mongodb.jackson.DBCursor;
 import net.vz.mongodb.jackson.DBQuery;
@@ -27,10 +28,6 @@ import play.modules.mongodb.jackson.MongoDB;
 import be.objectify.deadbolt.core.models.Subject;
 
 import com.feth.play.module.pa.providers.password.UsernamePasswordAuthUser;
-import com.feth.play.module.pa.user.AuthUser;
-import com.feth.play.module.pa.user.AuthUserIdentity;
-import com.feth.play.module.pa.user.EmailIdentity;
-import com.feth.play.module.pa.user.FirstLastNameIdentity;
 
 @MongoCollection(name="users")
 public class User implements Subject {
@@ -163,7 +160,7 @@ public class User implements Subject {
 
     
     public void changePassword(final UsernamePasswordAuthUser authUser,
-                               final boolean create) {
+                               final boolean tate) {
         LinkedAccount a = this.getAccountByProvider(authUser.getProvider());
         if (a == null) {
             if (create) {
@@ -256,11 +253,18 @@ public class User implements Subject {
             final FirstLastNameIdentity identity = (FirstLastNameIdentity) authUser;
             final String firstName = identity.getFirstName();
             final String lastName = identity.getLastName();
-            if (user.getSurname()!=null && firstName != null) {
+            if (user.getSurname()==null && firstName != null) {
                 user.setSurname(firstName);
             }
-            if (user.getName()!=null && lastName != null) {
+            if (user.getName()==null && lastName != null) {
                 user.setName(lastName);
+            }
+        }
+        if (authUser instanceof NameIdentity) {
+            final NameIdentity identity = (NameIdentity) authUser;
+            final String name = identity.getName();
+            if (user.getName()==null && name != null) {
+                user.setName(name);
             }
         }
         user.save();
