@@ -46,7 +46,7 @@ public class Subscriber {
 
     private String carRef;
     
-    private List<String> possibleCars = new ArrayList<>();
+    private List<String> possibleCars = new ArrayList<String>();
     
     
     ///////////  CLASS METHODS /////////////////

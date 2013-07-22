@@ -21,22 +21,22 @@
 		<label>Email</label>
 		<div class="input-prepend">
 		<span class="add-on"><i class="icon-envelope"></i></span>
-		<input ng-model="user.email" class="span3"  type="email" required></input>
+		<input ng-model="user.email" class="span3"  type="email" required />
 		</div>
 		<label>Nom</label> 
 		<div class="input-prepend">
 		<span class="add-on"><i class="icon-user"></i></span>
-		<input ng-model="user.name" type="text" ></input> 
+		<input ng-model="user.name" type="text" />
 		</div>
 		<label>Prénom</label>
 		<div class="input-prepend">
 		<span class="add-on"><i class="icon-user"></i></span>
-		<input ng-model="user.surname" type="text" ></input> 
+		<input ng-model="user.surname" type="text" />
 		</div>
 		<label>Adresse : {{user.address.description}}</label> 
 		<div class="input-prepend">
 		<span class="add-on"><i class="icon-globe"></i></span>
-		<input ng-model="user.address" googleplace type="text" ></input>
+		<input ng-model="user.address" googleplace type="text" />
 		</div>
 		<ul>
 	    	<li><a href="@routes.Account.changePassword">@Messages("playauthenticate.profile.password_change")</a></li>

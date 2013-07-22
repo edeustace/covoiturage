@@ -11,8 +11,8 @@ public class Car {
 	
 	private Integer nbPlaces;
 	
-	private List<String> passengers = new ArrayList<>();
-	private List<String> waiting = new ArrayList<>();
+	private List<String> passengers = new ArrayList<String>();
+	private List<String> waiting = new ArrayList<String>();
 
 	public Car addPassenger(String passenger){
 		if(getNbPlaces().equals(this.getPassengers().size())){

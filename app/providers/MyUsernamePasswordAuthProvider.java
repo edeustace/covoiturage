@@ -104,7 +104,9 @@ public class MyUsernamePasswordAuthProvider
 		private String repeatPassword;
 
 		@Required
-		private String name;
+		private String lastName;
+
+        private String firstName;
 
 		public String getRepeatPassword() {
 			return repeatPassword;
@@ -114,11 +116,23 @@ public class MyUsernamePasswordAuthProvider
 			this.repeatPassword = repeatPassword;
 		}
 
-		public String getName() {
-			return name;
-		}
+        public String getLastName() {
+            return lastName;
+        }
 
-		@Override
+        public void setLastName(String lastName) {
+            this.lastName = lastName;
+        }
+
+        public String getFirstName() {
+            return firstName;
+        }
+
+        public void setFirstName(String firstName) {
+            this.firstName = firstName;
+        }
+
+        @Override
 		public String getEmail() {
 			return super.getEmail();
 		}
@@ -126,10 +140,6 @@ public class MyUsernamePasswordAuthProvider
 		@Override
 		public String getPassword() {
 			return super.getPassword();
-		}
-
-		public void setName(String name) {
-			this.name = name;
 		}
 
 		public String validate() {
@@ -150,13 +160,19 @@ public class MyUsernamePasswordAuthProvider
 		public void setRepeatPassword(String repeatPassword) {
 			signup.setRepeatPassword(repeatPassword);
 		}
-		public String getName() {
-			return signup.getName();
+		public String getLastName() {
+			return signup.getLastName();
 		}
-		public void setName(String name) {
-			signup.setName(name);
+		public void setLastName(String name) {
+			signup.setLastName(name);
 		}
-		public String validate() {
+        public String getFirstName() {
+            return signup.getFirstName();
+        }
+        public void setFirstName(String firstName) {
+            signup.setFirstName(firstName);
+        }
+        public String validate() {
 			return signup.validate();
 		}
 		public String getEmail() {

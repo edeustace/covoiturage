@@ -182,7 +182,7 @@ public class EventCtrl extends Controller {
         	
         	JsonNode node = request().body().asJson();
         	JsonNode jsonContacts = node.get("contacts");
-        	List<String> contacts = new ArrayList<>();
+        	List<String> contacts = new ArrayList<String>();
         	if(jsonContacts.isArray()){
         		for (JsonNode jsonNode : jsonContacts) {
         			contacts.add(jsonNode.asText());

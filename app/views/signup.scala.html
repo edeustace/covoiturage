@@ -11,10 +11,9 @@
     </div>
   </div>
 
-  <div id="signup" class="row">
+  <div id="signup" class="row-fluid">
 
     <div class="span3">
-        @* Display proprietary login form *@
     	@helper.form(routes.Application.doSignup) {
     	
             @if(signupForm.hasGlobalErrors) { 
@@ -22,17 +21,44 @@
 		            <span class="label label-important">@signupForm.globalError.message</span>
 		        </p>
             }
-            
-             @inputText(
-                signupForm("name"),
-                '_label -> Messages("playauthenticate.signup.name")
-             )
-             
-             @_emailPartial(signupForm)
-             
-             @_passwordPartial(signupForm)
 
-            <input type="submit" value="@Messages("playauthenticate.signup.now")" class="btn btn-primary">
+            @helper.input(signupForm("firstName"), '_label -> Messages("playauthenticate.signup.firstName")){ (id, name, value, args) =>
+                <div class="input-prepend">
+                <span class="add-on"><i class="icon-user"></i></span>
+                <input name="@name" id="@id" type="text" />
+                </div>
+            }
+
+            @helper.input(signupForm("lastName"), '_label -> Messages("playauthenticate.signup.lastName")){ (id, name, value, args) =>
+                <div class="input-prepend">
+                    <span class="add-on"><i class="icon-user"></i></span>
+                    <input name="@name" id="@id" type="text" />
+                </div>
+            }
+
+            @helper.input(signupForm("email"),   '_showConstraints -> false, '_label -> Messages("playauthenticate.login.email.placeholder")){ (id, name, value, args) =>
+                <div class="input-prepend">
+                    <span class="add-on"><i class="icon-envelope"></i></span>
+                    <input name="@name" id="@id" type="email" />
+                </div>
+            }
+
+
+            @helper.input(signupForm("password"), '_label -> Messages("playauthenticate.login.password.placeholder")){ (id, name, value, args) =>
+                <div class="input-prepend">
+                    <span class="add-on"><i class="icon-lock"></i></span>
+                    <input name="@name" id="@id" type="password" />
+                </div>
+            }
+
+            @helper.input(signupForm("repeatPassword"), '_label -> Messages("playauthenticate.login.password.repeat"), '_showConstraints -> false, '_error -> signupForm.error("password")){ (id, name, value, args) =>
+                <div class="input-prepend">
+                    <span class="add-on"><i class="icon-lock"></i></span>
+                    <input name="@name" id="@id" type="password" />
+                </div>
+            }
+
+            <input type="submit" value="@Messages("playauthenticate.signup.now")" class="btn btn-primary" />
     	}
     </div>
 

@@ -11,7 +11,7 @@ public class CarModel {
 
 	private Car car;
 
-	private List<Link> links = new ArrayList<>();
+	private List<Link> links = new ArrayList<Link>();
 	
 	public CarModel(Car car, String idEvent, String idSub) {
 		super();

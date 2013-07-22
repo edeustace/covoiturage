@@ -58,8 +58,11 @@ public class EventCtrlTest {
 
         running(testServer(3333), new Runnable() {
             public void run() {
+                User user = User.user().setEmail("toto@gmail.com").setPassword("123456").save();
 
-                Event event = Event.event().setCreator(User.user().setEmail("toto@gmail.com"));
+
+
+                Event event = Event.event().setCreatorRef(user.getId());
                 ObjectMapper objectMapper = new ObjectMapper();
                 JsonNode node = objectMapper.convertValue(event, JsonNode.class);
                 WS.Response response = WS.url("http://localhost:3333/rest/events").post(node).get();

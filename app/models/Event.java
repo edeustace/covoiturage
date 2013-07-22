@@ -47,7 +47,7 @@ public class Event {
 
     private Date toDate;
 
-    private List<String> contacts = new ArrayList<>();
+    private List<String> contacts = new ArrayList<String>();
     
     private Boolean contactsOnly = Boolean.FALSE;
 
@@ -177,7 +177,7 @@ public class Event {
     }
 
     public List<String> addContactsAndSave(List<String> contactsToAdd){
-    	List<String> addedcontacts = new ArrayList<>();
+    	List<String> addedcontacts = new ArrayList<String>();
     	for (String string : contactsToAdd) {
 			if(!this.getContacts().contains(string)){
 				this.getContacts().add(string);
@@ -225,7 +225,7 @@ public class Event {
 
     public static List<Event> listByUser(String idUser){
     	DBCursor<Event> cursor = collection().find(DBQuery.or(DBQuery.is("subscribers.userRef", idUser), DBQuery.is("creatorRef", idUser)));
-    	List<Event> result = new ArrayList<>();
+    	List<Event> result = new ArrayList<Event>();
     	while(cursor.hasNext()){
     		result.add(cursor.next());
     	}

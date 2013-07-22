@@ -56,7 +56,7 @@ public class Notification {
     
     public static List<Notification> listNotifications(String idEvent, String idSub){
     	DBCursor<Notification> cursor = collection().find(DBQuery.and(DBQuery.is("idEvent", idEvent), DBQuery.is("to", idSub)));
-    	List<Notification> result = new ArrayList<>();
+    	List<Notification> result = new ArrayList<Notification>();
     	while(cursor.hasNext()){
     		result.add(cursor.next());
     	}

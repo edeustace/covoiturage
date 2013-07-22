@@ -68,6 +68,8 @@ playauthenticate.login.oauth=ou connectez-vous avec un de ces fournisseurs:
 
 playauthenticate.signup.title=Enregistrement
 playauthenticate.signup.name=Votre nom
+playauthenticate.signup.firstName=Votre prénom
+playauthenticate.signup.lastName=Votre nom
 playauthenticate.signup.now=S'enregistrer maintenant
 playauthenticate.signup.oauth=ou enregistrez-vous avec un de ces fournisseurs:
 
@@ -120,7 +122,7 @@ playauthenticate.navigation.logout=Se Déconnecter
 playauthenticate.navigation.login=Se Connecter
 playauthenticate.navigation.home=Accueil
 playauthenticate.navigation.createEvent=Créer un événement
-playauthenticate.navigation.signup=S'enregister
+playauthenticate.navigation.signup=S''enregister
 
 # play-authenticate: Handler
 playauthenticate.handler.loginfirst=Vous devez vous connecter pour accéder à: ''{0}''
