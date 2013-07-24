@@ -1,17 +1,12 @@
 package models;
 
-import java.util.ArrayList;
-import java.util.List;
+import net.vz.mongodb.jackson.*;
+import play.modules.mongodb.jackson.MongoDB;
 
 import javax.persistence.Id;
-
-import net.vz.mongodb.jackson.DBCursor;
-import net.vz.mongodb.jackson.DBQuery;
-import net.vz.mongodb.jackson.JacksonDBCollection;
-import net.vz.mongodb.jackson.MongoCollection;
-import net.vz.mongodb.jackson.ObjectId;
-import net.vz.mongodb.jackson.WriteResult;
-import play.modules.mongodb.jackson.MongoDB;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 @MongoCollection(name="notifications")
 public class Notification {
@@ -30,17 +25,20 @@ public class Notification {
 	
 	public String message;
 
+    public Date date;
+
 	public Notification() {
 		super();
 	}
 
-	public Notification(String idEvent, String from, String to, String type, String message) {
+	public Notification(String idEvent, String from, String to, String type, String message, Date date) {
 		super();
 		this.idEvent = idEvent;
 		this.type = type;
 		this.from = from;
 		this.to = to;
 		this.message = message;
+        this.date = date;
 	} 
 	
     //MAJ

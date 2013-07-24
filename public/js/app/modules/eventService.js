@@ -32,8 +32,8 @@ angular.module('eventService', ['mapService'], function($provide){
 
         var $service = {
             saveSubscriber : function(subscriber, $scope){
-                mapService.addMarkerSubscriber(subscriber, $scope);
-            	eventService.reloadSubscribers($scope);
+                mapService.updateMarkerSubscriber(subscriber, $scope);
+            	$service.reloadSubscribers($scope);
             },
             buildLinks :function (links){
                 var theLinks = {};

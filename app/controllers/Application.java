@@ -62,10 +62,6 @@ public class Application extends Controller {
 	public static Result login() {
 		return ok(login.render(MyUsernamePasswordAuthProvider.LOGIN_FORM));
 	}
-
-	public static Result signupOrLogin() {
-		return ok(signupOrLogin.render(MyUsernamePasswordAuthProvider.SIGNUP_OR_LOGIN_FORM));
-	}
 	
 	public static Result doLogin() {
 		com.feth.play.module.pa.controllers.Authenticate.noCache(response());

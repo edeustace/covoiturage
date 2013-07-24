@@ -9,7 +9,7 @@ angular.module('mapService', [], function($provide){
 		}
 	   
 	   return {
-		   addMarkerEvent : function (event, $scope){
+		    addMarkerEvent : function (event, $scope){
 		    	$scope.mapOptions.center = new google.maps.LatLng(event.address.location.lat, event.address.location.lng);
 		    	
 		    	var marker = new google.maps.Marker({
@@ -21,9 +21,20 @@ angular.module('mapService', [], function($provide){
 		    	marker.type = "EVENT";
 		    	$scope.myMarkers.push(marker);
 		    	$scope.bounds.extend(marker.getPosition());
-		    }, 
+		    },
+            setMarkerEvent : function (event, $scope){
+                var current = null;
+                for(var i in $scope.myMarkers){
+                    var aMarker = $scope.myMarkers[i];
+                    if(aMarker.type === "EVENT"){
+                        aMarker.setPosition(new google.maps.LatLng(event.address.location.lat, event.address.location.lng));
+                        $scope.bounds.extend(marker.getPosition());
+                    }
+                }
+                $scope.myMap.fitBounds($scope.bounds);
+            },
 		    addMarkerSubscriber : function (subscriber, $scope){
-		    	var marker = this.findMarkerByUserRef(subscriber.userRef, $scope);
+		    	var marker = this.findMarkerByUserRef($scope.myMarkers, subscriber.userRef);
 		    	if(marker){
 		    		marker.setVisible(subscriber.visible);
 		    		marker.setIcon(subscriber.picto);
@@ -48,7 +59,27 @@ angular.module('mapService', [], function($provide){
 		    	}
 		    	marker.type = subscriber.locomotion;
 		    	marker.subscriber = subscriber;
-		    }, 
+		    },
+		    updateMarkerSubscriber : function (subscriber, $scope){
+                var marker = this.findMarkerByUserRef($scope.myMarkers, subscriber.userRef);
+                if(marker){
+                        marker.setPosition(new google.maps.LatLng(subscriber.address.location.lat, subscriber.address.location.lng));
+                        marker.setVisible(subscriber.visible);
+                        marker.setIcon(subscriber.picto);
+                }else{
+                    marker = new google.maps.Marker({
+                        map: $scope.myMap,
+                        position: new google.maps.LatLng(subscriber.address.location.lat, subscriber.address.location.lng),
+                        icon:subscriber.picto,
+                        visible : subscriber.visible
+                      });
+                    marker.type = subscriber.locomotion;
+                    $scope.myMarkers.push(marker);
+                    $scope.bounds.extend(marker.getPosition());
+                }
+                marker.type = subscriber.locomotion;
+                marker.subscriber = subscriber;
+            },
 		    findMarkerByLatLng : function (markers, lat, lng) {
 				for ( var i = 0; i < markers.length; i++) {
 					var pos = markers[i].getPosition();

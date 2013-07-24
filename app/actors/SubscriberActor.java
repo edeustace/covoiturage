@@ -3,6 +3,7 @@ package actors;
 import static akka.pattern.Patterns.ask;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -32,13 +33,13 @@ public class SubscriberActor extends UntypedActor{
 
 	static ActorRef subActorRef = Akka.system().actorOf(new Props(SubscriberActor.class));
 	
-	public static void notifySubscriberUpdate(final String idEvent, final String userRef, Subscriber subscriber){
-		SubscriberMessage message = new SubscriberMessage(idEvent, userRef, subscriber);
+	public static void notifySubscriberUpdate(final String idEvent, final String userRef, Subscriber subscriber, Date date){
+		SubscriberMessage message = new SubscriberMessage(idEvent, userRef, subscriber, date);
 		subActorRef.tell(message, null);
 	}
 	
-	public static void sendNotification(final String idEvent, final String from, final String to, final String type, final String message){
-		Notification msg = new Notification(idEvent, from, to, type, message);
+	public static void sendNotification(final String idEvent, final String from, final String to, final String type, final String message, final Date date){
+		Notification msg = new Notification(idEvent, from, to, type, message, date);
 		subActorRef.tell(msg, null);
 	}
 	
@@ -170,13 +171,18 @@ public class SubscriberActor extends UntypedActor{
         final String idEvent;
         final String userRef;
         final Subscriber subscriber;
+        final Date date;
         
 		public SubscriberMessage(String idEvent, String userRef,
-				Subscriber subscriber) {
+				Subscriber subscriber, Date date) {
 			super();
 			this.idEvent = idEvent;
 			this.userRef = userRef;
 			this.subscriber = subscriber;
+            if(date==null){
+                this.date = new Date();
+            }else this.date = date;
+
 		}
 	}
 	

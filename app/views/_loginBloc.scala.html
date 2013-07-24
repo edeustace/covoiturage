@@ -9,9 +9,14 @@
   	</div>
     
   <div id="login" class="row">
+      <div class="span3">
+          @Messages("playauthenticate.login.oauth2")
+          @_providerPartial(skipCurrent=false)
+      </div>
+
 
     <div class="span3">
-      @* Display proprietary login form *@
+
     	@helper.form(routes.Application.doLogin) {
     	
         @if(loginForm.hasGlobalErrors) { 

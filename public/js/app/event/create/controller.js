@@ -13,7 +13,11 @@ function EventCreationCtrl($scope, $http, $location, mailUtils) {
 	                  { id: "AUTOSTOP", name: 'à pied' },
 	                  { id: "DONT_KNOW_YET", name: 'Je ne sais pas encore' }
                     ];
-	$scope.addContact = function(){	
+	$scope.addContact = function(){
+	    if(!$scope.event.contacts){
+            $scope.event.contacts = new Array();
+	    }
+
 		$scope.event.contacts = mailUtils.pushMails($scope.contact, $scope.event.contacts);
 		$scope.contact = null;
 	};
@@ -28,6 +32,7 @@ function EventCreationCtrl($scope, $http, $location, mailUtils) {
 			$scope.event = {creatorRef:user.id};
 			//$scope.event.creator.locomotion = "CAR";
 			$scope.event.fromDate = $scope.minDate;
+			$scope.event.startTime = "";
 		}
 	}).error(function(error){
 		alert('error : '+error);
@@ -35,7 +40,6 @@ function EventCreationCtrl($scope, $http, $location, mailUtils) {
 	$scope.valider = function(){
 		var theEvent = $scope.event;
 		$http.post('/rest/events', theEvent).success(function(data){
-			alert('done '+data.name);
 			window.location = /evenement/+data.id;
 		}).error(function(data){
 		    var msg = '';

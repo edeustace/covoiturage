@@ -7,6 +7,7 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Date;
 
 import models.Car;
 import models.Car.CarIsFullException;
@@ -77,7 +78,7 @@ public class SubscriberCtrl extends Controller {
                 event.update();
                 Subscriber subsc = event.getSubscriberByMail(subscriber.getEmail());
                 SubscriberModel subscriberModel = new SubscriberModel(subsc, event.getId());
-                SubscriberActor.notifySubscriberUpdate(id, subscriber.getUserRef(), subscriber);
+                SubscriberActor.notifySubscriberUpdate(id, subscriber.getUserRef(), subscriber, new Date());
                 return ok(objectMapper.writeValueAsString(subscriberModel)).as("application/json");
             }
         } catch (Exception e){
@@ -102,7 +103,7 @@ public class SubscriberCtrl extends Controller {
                 event.addAndMergeSubscriber(subscriber);
                 event.update();
                 Subscriber subsc = event.getSubscriberByMail(subscriber.getEmail());
-                SubscriberActor.notifySubscriberUpdate(id, subsc.getUserRef(), subsc);
+                SubscriberActor.notifySubscriberUpdate(id, subsc.getUserRef(), subsc, new Date());
                 SubscriberModel subscriberModel = new SubscriberModel(subsc, event.getId());
                 return ok(objectMapper.writeValueAsString(subscriberModel)).as("application/json");
             }
@@ -151,11 +152,11 @@ public class SubscriberCtrl extends Controller {
             if(sub.getLocomotion().equals(Locomotion.CAR)){
             	MessageFormat msg = new MessageFormat("{0} {1} a validé votre demande et vous serez son passager");
             	msg.format(args);
-                SubscriberActor.sendNotification(id, from, to, "success", msg.format(args));	
+                SubscriberActor.sendNotification(id, from, to, "success", msg.format(args), new Date());
             }else if(sub.getLocomotion().equals(Locomotion.AUTOSTOP)){
             	MessageFormat msg = new MessageFormat("{0} {1} a validé votre demande et sera votre passager");
             	msg.format(args);
-                SubscriberActor.sendNotification(id, from, to, "success", msg.format(args));
+                SubscriberActor.sendNotification(id, from, to, "success", msg.format(args), new Date());
             }
             
             return ok().as("application/json");
@@ -178,13 +179,13 @@ public class SubscriberCtrl extends Controller {
             if(sub.getLocomotion().equals(Locomotion.CAR)){
             	MessageFormat msg = new MessageFormat("vous ne faites plus parti de la voiture de {0} {1}");
             	msg.format(args);
-                SubscriberActor.sendNotification(id, from, to, "error", msg.format(args));	
+                SubscriberActor.sendNotification(id, from, to, "error", msg.format(args), new Date());
             }else if(sub.getLocomotion().equals(Locomotion.AUTOSTOP)){
             	MessageFormat msg = new MessageFormat("{0} {1} ne fait plus parti de votre voiture");
             	msg.format(args);
-                SubscriberActor.sendNotification(id, from, to, "error", msg.format(args));
+                SubscriberActor.sendNotification(id, from, to, "error", msg.format(args), new Date());
             }
-            SubscriberActor.sendNotification(id, from, to, "deletePassenger", "");
+            SubscriberActor.sendNotification(id, from, to, "deletePassenger", "", new Date());
 	    	return ok().as("application/json");
 	    } catch (Exception e){
 	        return internalServerError(e.getMessage()).as("application/json");
@@ -211,7 +212,7 @@ public class SubscriberCtrl extends Controller {
             String[] args = {sub.getSurname(), sub.getName()};
         	MessageFormat msg = new MessageFormat("{0} {1} souhaite être passager de votre voiture");
         	msg.format(args);
-            SubscriberActor.sendNotification(id, from, to, "success", msg.format(args));	
+            SubscriberActor.sendNotification(id, from, to, "success", msg.format(args), new Date());
             return ok().as("application/json");
         } catch (Exception e){
             return internalServerError(e.getMessage()).as("application/json");
@@ -233,7 +234,7 @@ public class SubscriberCtrl extends Controller {
             String[] args = {sub.getSurname(), sub.getName()};
         	MessageFormat msg = new MessageFormat("{0} {1} a décliné votre proposition être passager de votre voiture");
         	msg.format(args);
-            SubscriberActor.sendNotification(id, from, to, "error", msg.format(args));
+            SubscriberActor.sendNotification(id, from, to, "error", msg.format(args), new Date());
             return ok().as("application/json");
         } catch (CarIsFullException e){
         	return badRequest("{message: 'La voiture est pleine'}").as("application/json");
@@ -266,7 +267,7 @@ public class SubscriberCtrl extends Controller {
             String[] args = {sub.getSurname(), sub.getName()};
         	MessageFormat msg = new MessageFormat("{0} {1} vous propose d'être passager de sa voiture");
         	msg.format(args);
-            SubscriberActor.sendNotification(id, from, to, "success", msg.format(args));
+            SubscriberActor.sendNotification(id, from, to, "success", msg.format(args), new Date());
             return ok().as("application/json");
         } catch (Exception e){
             return internalServerError(e.getMessage()).as("application/json");
@@ -287,7 +288,7 @@ public class SubscriberCtrl extends Controller {
             String[] args = {sub.getSurname(), sub.getName()};
         	MessageFormat msg = new MessageFormat("{0} {1} a décliné votre proposition d'être passager de sa voiture");
         	msg.format(args);
-            SubscriberActor.sendNotification(id, from, to, "error", msg.format(args));
+            SubscriberActor.sendNotification(id, from, to, "error", msg.format(args), new Date());
             return ok().as("application/json");
         } catch (Exception e){
             return internalServerError(e.getMessage()).as("application/json");

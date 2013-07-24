@@ -62,6 +62,11 @@ public class EventLight {
         return event.getToDate();
     }
 
+    @JsonProperty("creatorRef")
+    public String getCreatorRef() {
+        return event.getCreatorRef();
+    }
+
     @JsonProperty("address")
     public Address getAddress() {
         return event.getAddress();

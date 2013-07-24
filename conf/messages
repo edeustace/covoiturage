@@ -37,7 +37,7 @@ playauthenticate.accounts.merge.success=Comptes unifiés avec succès
 playauthenticate.verify_email.error.already_validated=Votre email a déjà été validé.
 playauthenticate.verify_email.error.set_email_first=Vous devez d'abord fournir un email.
 playauthenticate.verify_email.message.instructions_sent=Les instructions pour valider votre email ont été envoyé à l'adresse {0}.
-playauthenticate.verify_email.success=L'adresse E-mail  ({0}) a été validée avec succès.
+playauthenticate.verify_email.success=L''adresse E-mail  ({0}) a été validée avec succès.
 
 playauthenticate.reset_password.message.instructions_sent=Les instructions pour changer votre mot de passe ont été envoyées à l'adresse: {0}.
 playauthenticate.reset_password.message.email_not_verified=Votre email doit d'abord être vérifié, des instructions ont été envoyées. Réessayez ensuite.
@@ -60,11 +60,15 @@ playauthenticate.password.reset_email.subject=PlayAuthenticate: Comment changer 
 playauthenticate.login.email.placeholder=Votre adresse email
 playauthenticate.login.password.placeholder=Choisir un mot de passe
 playauthenticate.login.password.repeat=Réitérer votre mot de passe
-playauthenticate.login.title=Login
+playauthenticate.login.title=Je me connecte
 playauthenticate.login.password.placeholder=Mot de passe
 playauthenticate.login.now=Se connecter maintenant
 playauthenticate.login.forgot.password=Mot de passe oublié?
 playauthenticate.login.oauth=ou connectez-vous avec un de ces fournisseurs:
+playauthenticate.login.oauth2=Avec un de mes comptes :
+playauthenticate.login.existing = J''ai déjà un compte
+playauthenticate.login.create = Je crée mon compte
+playauthenticate.login.or = Ou
 
 playauthenticate.signup.title=Enregistrement
 playauthenticate.signup.name=Votre nom
@@ -117,12 +121,12 @@ playauthenticate.user.exists.message=Cet utilisateur existe déjà.
 
 # play-authenticate: Navigation
 playauthenticate.navigation.profile=Profile
-playauthenticate.navigation.link_more=Lier d'autres fournisseurs
+playauthenticate.navigation.link_more=Lier d''autres fournisseurs
 playauthenticate.navigation.logout=Se Déconnecter
 playauthenticate.navigation.login=Se Connecter
 playauthenticate.navigation.home=Accueil
 playauthenticate.navigation.createEvent=Créer un événement
-playauthenticate.navigation.signup=S''enregister
+playauthenticate.navigation.signup=Créer son compte
 
 # play-authenticate: Handler
 playauthenticate.handler.loginfirst=Vous devez vous connecter pour accéder à: ''{0}''
@@ -138,12 +142,14 @@ playauthenticate.profile.logged=Vous êtes connecté avec:
 playauthenticate.profile.session=Votre ID d'utilisateur est {0} et votre session se termine le {1}
 playauthenticate.profile.session_endless=Votre ID d'utilisateur est {0} et votre session ne se terminera jamais
 playauthenticate.profile.password_change=Changer le mot de passe de votre compte
+playauthenticate.profile.link.account=Lier mon compte à :
+
 
 # play-authenticate - sample: Index page
-playauthenticate.index.title=Bienvenu sur Play Authenticate
-playauthenticate.index.intro=Play Authenticate démo
-playauthenticate.index.intro_2=Ceci est un modèle d'application avec authentification.
-playauthenticate.index.intro_3=Essayez la barre de navigation pour voir les fonctions d'authentification.
+playauthenticate.index.title=Bienvenu sur mon covoiturage
+playauthenticate.index.intro=Mon covoiturage !
+playauthenticate.index.intro_2=Mon covoiturage est un réseau social de covoiturage.
+playauthenticate.index.intro_3=Créez et partagez des événement avec vos amis afin de covoiturez !
 playauthenticate.index.heading=Entête
 playauthenticate.index.details=Voir les détails
 
@@ -153,6 +159,6 @@ playauthenticate.restricted.secrets=Ils nous cachent la vérité!
 # play-authenticate - sample: Restricted page
 playauthenticate.createEvent.title = Créer un événement 
 
-playauthenticate.createEvent.title = Evénement
+playauthenticate.event.title = Mon événement
 
 ### --- play-authenticate END

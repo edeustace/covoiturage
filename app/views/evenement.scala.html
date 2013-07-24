@@ -4,12 +4,18 @@
 
 @main(Messages("playauthenticate.event.title"),"event") {
   <link rel="stylesheet" media="screen" href="@routes.Assets.at("css/demo.css")" />
+  <link href="@routes.Assets.at("css/bootstrap-datepicker.css")" rel="stylesheet" />
+  <link href="@routes.Assets.at("css/bootstrap-timepicker.css")" rel="stylesheet" />
+
   <script src="http://maps.googleapis.com/maps/api/js?libraries=places&sensor=false&language=fr"></script>
   
   <script type="text/javascript" src="@routes.Assets.at("js/lib/angular.js")"></script>
   <script type="text/javascript" src="@routes.Assets.at("js/app/directives/ui-bootstrap-tpls-0.4.0.min.js")"></script>
   <script type="text/javascript" src="@routes.Assets.at("js/app/directives/event.js")"></script>
   <script type="text/javascript" src="@routes.Assets.at("js/app/directives/ui-map.js")"></script>
+  <script type="text/javascript" src="@routes.Assets.at("js/app/directives/angular-strap.min.js")"></script>
+  <script type="text/javascript" src="@routes.Assets.at("js/app/directives/bootstrap-datepicker.js")"></script>
+  <script type="text/javascript" src="@routes.Assets.at("js/app/directives/bootstrap-timepicker.js")"></script>
   <script type="text/javascript" src="@routes.Assets.at("js/app/directives/googleplace.js")"></script>
   <script type="text/javascript" src="@routes.Assets.at("js/app/modules/mailUtils.js")"></script>
   <script type="text/javascript" src="@routes.Assets.at("js/app/modules/eventService.js")"></script>
@@ -18,41 +24,93 @@
   <script type="text/javascript" src="@routes.Assets.at("js/app/event/controller.js")"></script>
   <script type="text/javascript" src="@routes.Assets.at("js/app/filters.js")"></script>
   <script type="text/javascript" src="@routes.Application.jsRoutes()"></script>
+
   <div ng-controller="EventCtrl" ng-app="covoiturage">
 
 	<div class="row-fluid" >
 		<div class="span2">
 		</div>
 		<div class="span4">
-			<h1>
-			{{event.name}}
-			</h1>
-			<p class="text-center">{{event.description}}</p>
-			<strong>à l'adresse :</strong>
-			<address>
-			  {{event.address.description}}
-			</address>
-			
-			<accordion>
-			 <accordion-group heading="Contacts" >
-			 	<ul>
-			 		<li ng-repeat="contact in event.contacts" >{{contact}}</li>
-			 	</ul>
-			 	
-    		</accordion-group>
-			</accordion>
-			<alert ng-repeat="newContact in newContacts" type="'info'" close="remove($index)">{{newContact}}</alert>
-     		<div class="controls">
-				<div class="input-prepend input-append">
-			      <span class="add-on"><i class="icon-envelope"></i></span>
-			      <input ng-model="addedContact" placeholder="email1;email2..." type="text"></input>
-				  <button class="btn" type="button"  ng-click="addContact()">Ajouter</button>
-				</div>
-				<br/> 
+            <div ng-show="!eventEdit">
+                <h1>
+                {{event.name}}
+                </h1>
+                <p >
+                Le <strong>{{event.fromDate | date:'dd-MM-yyyy'}}</strong> <strong ng-show="event.startTime">à {{event.startTime}}</strong>
+                <address>à  {{event.address.description}}</address>
+                </p>
+                <accordion>
+                    <accordion-group heading="Plus d'informations ..." >
+                        <dl>
+                            <dt>Description de l'événement :</dt>
+                            <dd>
+                                <p class="text-rigth">
+                                {{event.description}}
+                                </p>
+                            </dd>
+                            <dt >Liste de diffusion : </dt>
+                            <dd>
+                                <ul>
+                                    <li ng-repeat="contact in event.contacts" >{{contact}}</li>
+                                </ul>
+                                <div class="controls">
+                                    <div class="input-prepend input-append" ng-show="showEventEditButton">
+                                        <span class="add-on"><i class="icon-envelope"></i></span>
+                                        <input ng-model="contacts.addedContact" placeholder="email1;email2..." type="text"></input>
+                                        <button class="btn" type="button"  ng-click="addContact(contacts.addedContact)">Ajouter</button>
+                                    </div>
+                                </div>
+                                <button class="btn" type="button"  ng-show="!event.contactsOnly && showEventEditButton" ng-click="securise()" tooltip-placement="right" tooltip="L'évenement sera restreint à la liste de diffusion">Sécuriser cet évenement</button>
+                                <button class="btn" type="button"  ng-show="event.contactsOnly && showEventEditButton" ng-click="unSecurise()">Ne plus sécuriser cet évenement</button>
+                            </dd>
+                        </dl>
+                    </accordion-group>
+                </accordion>
+
+
+                <button ng-show="showEventEditButton" class="btn" type="button" ng-click="setEventEditMode(true)">Editer</button>
+
+
+
 			</div>
-			
-			<button class="btn" type="button"  ng-show="!event.contactsOnly" ng-click="securise()">securiser</button>
-			<button class="btn" type="button"  ng-show="event.contactsOnly" ng-click="unSecurise()">ne plus securiser</button>
+            <div ng-show="eventEdit">
+                <div class="alert alert-info" ng-show="showUpdated">
+                    <button type="button" class="close" data-dismiss="alert" ng-click="setToUpdated()">&times;</button>
+                    Completez les informations de l'événement pour aider les participants !
+                </div>
+                <label>Nom</label>
+                <input ng-model="event.name" type="text" ></input>
+                <label>Description</label>
+                <textarea ng-model="event.description" rows="3" cols="8"></textarea>
+                <label>Date de l'événement</label>
+                <div class="control-group input-append">
+                    <input type="text" ng-model="event.fromDate" data-date-format="dd/mm/yyyy" bs-datepicker>
+                    <button type="button" class="btn" data-toggle="datepicker"><i class="icon-calendar"></i></button>
+                </div>
+                <label>Heure de début</label>
+                <div class="control-group input-append">
+                    <input type="text" ng-model="event.startTime" bs-timepicker>
+                    <button type="button" class="btn" data-toggle="timepicker"><i class="icon-time"></i></button>
+                </div>
+                <label>Adresse de l'évenement :</label>
+                <input ng-model="event.address" googleplace type="text" ></input>
+
+                <label>Liste de diffusion :</label>
+                <div class="controls">
+                    <div class="input-prepend input-append" >
+                        <span class="add-on"><i class="icon-envelope"></i></span>
+                        <input ng-model="contacts.addedContact" placeholder="email1;email2..." type="text"></input>
+                        <button class="btn" type="button"  ng-click="addContact(contacts.addedContact)">Ajouter</button>
+                    </div>
+                </div>
+                <button class="btn" type="button"  ng-show="!event.contactsOnly" ng-click="securise()" tooltip-placement="right" tooltip="L'évenement sera restreint à la liste de diffusion">Sécuriser cet évenement</button>
+                <button class="btn" type="button"  ng-show="event.contactsOnly" ng-click="unSecurise()">Ne plus sécuriser cet évenement</button>
+                <br/>
+                <button class="btn btn-primary" type="button" ng-click="saveEvent()">Valider</button>
+                <button class="btn" type="button" ng-click="setEventEditMode(false)">Annuler</button>
+            </div>
+
+
 			
 			<alert ng-repeat="alert in alerts" type="alert.type" close="closeAlert($index)">{{alert.msg}}</alert>
 			<br/>
@@ -143,7 +201,8 @@
 					<button  class="btn" ng-click="setEditMode(false)">Annuler</button>
 				</div>
 				
-				
+
+
 				<div ng-show="currentSubscriber.locomotion == 'AUTOSTOP'">
 					<div ng-show="currentSubscriber.carRef">
 						<strong>Ma voiture :</strong>
@@ -207,9 +266,8 @@
 				 <div class="btn-group">
 			        <button type="button" class="btn btn-primary" ng-model="filterUsers" btn-radio="'CAR'">Une voiture</button>
 			        <button type="button" class="btn btn-primary" ng-model="filterUsers" btn-radio="'AUTOSTOP'">Un passager</button>
-			        <button type="button" class="btn btn-primary" ng-model="filterUsers" btn-radio="''">Peu importe</button>
+			        <button type="button" class="btn btn-primary" ng-model="filterUsers" btn-radio="''">Aucun filtre</button>
 			    </div>
-				
 				
 				
 				<table id="searchTextResults" class="table table-hover">

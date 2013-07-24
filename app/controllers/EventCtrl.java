@@ -306,7 +306,6 @@ public class EventCtrl extends Controller {
             }
             return models;
         }
-
         @JsonProperty("creator")
         public UserModelLight getCreator() {
             return new UserModelLight(event.loadCreator());
@@ -319,8 +318,10 @@ public class EventCtrl extends Controller {
 		public Boolean getContactsOnly() {
 			return event.getContactsOnly();
 		}
-        
-        
+        @JsonProperty("updated")
+        public Boolean getUpdated() {
+            return event.getUpdated();
+        }
     }
 
     public static class LigthEvent{
@@ -330,6 +331,11 @@ public class EventCtrl extends Controller {
         public LigthEvent(Event event, Link link) {
             this.event = event;
             this.link = link;
+        }
+
+        @JsonProperty("creatorRef")
+        public String getCreatorRef() {
+            return event.getCreatorRef();
         }
 
         @JsonProperty("name")

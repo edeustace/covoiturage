@@ -51,7 +51,9 @@ public class Event {
     
     private Boolean contactsOnly = Boolean.FALSE;
 
-	@NotNull @Valid
+    private Boolean updated = Boolean.FALSE;
+
+    @NotNull @Valid
     private Address address;
 
     @Valid @NotNull
@@ -71,10 +73,13 @@ public class Event {
         if(event.getDescription()==null){
             this.setDescription(event.getDescription());
         }
-        if(event.getFromDate()==null){
+        if(event.getUpdated()!=null){
+            this.setUpdated(event.getUpdated());
+        }
+        if(event.getFromDate()!=null){
             this.setFromDate(event.getFromDate());
         }
-        if(event.getToDate()==null){
+        if(event.getToDate()!=null){
             this.setToDate(event.getToDate());
         }
         if(event.getAddress()!=null && !event.getAddress().empty()){
@@ -108,7 +113,9 @@ public class Event {
         this.persistOrLoadCreatorAndCreateRef();
         this.addCreatorAsSubscriber();
         this.persistUsersOnSubscribers();
-        this.setFromDate(new Date());
+        if(this.getFromDate()==null){
+            this.setFromDate(new Date());
+        }
         this.setCreator(null);
         WriteResult<Event, String> result = collection().save(this);
         this.id = result.getSavedId();
@@ -438,5 +445,14 @@ public class Event {
 	public Event setContactsOnly(Boolean contactsOnly) {
 		this.contactsOnly = contactsOnly;
 		return this;
-	}
+    }
+    @JsonProperty("updated")
+    public Boolean getUpdated() {
+        return updated;
+    }
+    @JsonProperty("updated")
+    public Event setUpdated(Boolean updated) {
+        this.updated = updated;
+        return this;
+    }
 }

@@ -5,7 +5,7 @@
 
 /* Controllers */
 
-function EventCtrl($scope, $http, $location, $compile, mailUtils, mapService, eventService) {
+function EventCtrl($scope, $http, $location, $compile, $filter, mailUtils, mapService, eventService) {
 	//////////////  ATTRIBUTS  ///////////////////
 	$scope.items = [
 	                  { id: "CAR", name: 'en voiture' },
@@ -62,8 +62,8 @@ function EventCtrl($scope, $http, $location, $compile, mailUtils, mapService, ev
 			alert("une erreur s'est produite");
 		}
 	};
-	$scope.addContact = function(){	
-		$scope.newContacts = mailUtils.pushMails($scope.addedContact, $scope.newContacts);
+	$scope.addContact = function(contacts){
+		$scope.newContacts = mailUtils.pushMails(contacts, $scope.newContacts);
 		$http.post($scope.eventLinks.contacts, {contacts:$scope.newContacts}).success(function(){
 			for ( var int = 0; int < $scope.newContacts.length; int++) {
 				var contact = $scope.newContacts[int];
@@ -93,7 +93,7 @@ function EventCtrl($scope, $http, $location, $compile, mailUtils, mapService, ev
 		if($scope.currentSubscriber){
 			$http.put($scope.subscribersLinks[$scope.currentSubscriber.userRef].self ,$scope.currentSubscriber).success(function(){
 				$scope.setEditMode(false);
-				eventService.saveSubscriber(currentSubscriber, $scope);
+				eventService.saveSubscriber($scope.currentSubscriber, $scope);
 			}).error(function(error){
 				alert("Error "+error);
 			});
@@ -193,7 +193,29 @@ function EventCtrl($scope, $http, $location, $compile, mailUtils, mapService, ev
         $scope.myInfoWindow.open($scope.myMap, marker);
         $scope.$apply();
     };
-    
+    $scope.setToUpdated = function(){
+      if(!$scope.event.updated && $scope.event){
+           $scope.event.updated = true;
+           $http.put($scope.eventLinks.self, $scope.event);
+      }
+    };
+    $scope.cancelUpdate = function(){
+        $scope.eventEdit = false;
+        $scope.setToUpdated();
+    };
+    $scope.setEventEditMode = function(value){
+        $scope.eventEdit = value;
+    };
+    $scope.saveEvent = function(){
+        if($scope.event){
+            $scope.event.updated = true;
+            $http.put($scope.eventLinks.self, $scope.event).success(function(){
+                $scope.eventEdit = false;
+                mapService.setMarkerEvent($scope.event, $scope);
+            });
+        }
+    };
+
     
     
     ///////////////  INIT /////////////////////
@@ -208,6 +230,18 @@ function EventCtrl($scope, $http, $location, $compile, mailUtils, mapService, ev
 			    	$scope.eventLinks = eventService.buildLinks(event.links);
 			    	event.picto = $scope.eventLinks.pictoFinish;
 				   	if(event){
+				   	    if(event.fromDate){
+                            event.fromDate = new Date(event.fromDate);
+				   	    }
+				   	    if(event.creator.id == user.id){
+				   	        $scope.showEventEditButton = true;
+				   	    }
+				   	    if(!event.updated && $scope.showEventEditButton){
+				   	        $scope.showUpdated = true;
+                            $scope.eventEdit = true;
+				   	    }
+
+
 				        mapService.addMarkerEvent(event, $scope);
 					   	if(event.subscribers){
 					   		eventService.initSubscribers($scope, event.subscribers, function(subscriber){
@@ -255,7 +289,11 @@ function EventCtrl($scope, $http, $location, $compile, mailUtils, mapService, ev
 					    	for ( var int = 0; int < notifications.length; int++) {
 								var notification = notifications[int];
 								if(notification.message){
-								    $scope.alerts.push({type:notification.type, msg:notification.message, notification:notification});
+								    var msg = notification.message;
+								    if(notification.date){
+                                        msg = 'le '+new Date(notification.date) +' : '+notification.message;
+								    }
+								    $scope.alerts.push({type:notification.type, msg:msg, notification:notification});
 								}
 							}
 					    });

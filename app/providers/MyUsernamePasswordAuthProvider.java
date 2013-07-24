@@ -151,52 +151,7 @@ public class MyUsernamePasswordAuthProvider
 		}
 	}
 
-	public static class MySignUpOrLogin{
-		private MySignup signup = new MySignup();
-		private MyLogin login = new MySignup();
-		public String getRepeatPassword() {
-			return signup.getRepeatPassword();
-		}
-		public void setRepeatPassword(String repeatPassword) {
-			signup.setRepeatPassword(repeatPassword);
-		}
-		public String getLastName() {
-			return signup.getLastName();
-		}
-		public void setLastName(String name) {
-			signup.setLastName(name);
-		}
-        public String getFirstName() {
-            return signup.getFirstName();
-        }
-        public void setFirstName(String firstName) {
-            signup.setFirstName(firstName);
-        }
-        public String validate() {
-			return signup.validate();
-		}
-		public String getEmail() {
-			return login.getEmail();
-		}
-		public String getPassword() {
-			return login.getPassword();
-		}
-		public String toString() {
-			return login.toString();
-		}
-		
-		public void setEmail(String email){
-			login.email = email;
-			signup.email = email;
-		}
-		
-		public void setPassword(String password){
-			login.password = password;
-			signup.password = password;
-		}
-	}
-	
-	public static final Form<MySignUpOrLogin> SIGNUP_OR_LOGIN_FORM = form(MySignUpOrLogin.class);
+	//public static final Form<MySignUpOrLogin> SIGNUP_OR_LOGIN_FORM = form(MySignUpOrLogin.class);
 	public static final Form<MySignup> SIGNUP_FORM = form(MySignup.class);
 	public static final Form<MyLogin> LOGIN_FORM = form(MyLogin.class);
 

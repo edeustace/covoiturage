@@ -38,6 +38,9 @@ function UserCtrl($scope, $http) {
 				for ( var int = 0; int < $scope.events.length; int++) {
 					var event = $scope.events[int];
 					event.links = buildLinks(event.links);
+					if(user.id == event.creatorRef){
+					    event.isCreator = true;
+					}
 				}
 			}).error(function(error){
 				alert('error : '+error);

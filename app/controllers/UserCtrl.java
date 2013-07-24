@@ -41,10 +41,15 @@ public class UserCtrl extends Controller {
     private static Form<User> userForm = form(User.class);
 
     public static Result getUser(String id) {
-        return ok().as("application/json");
+        try{
+            final User u = User.findById(id);
+            return ok(objectMapper.writeValueAsString(new UserModel(u))).as("application/json");
+        }catch (IOException e){
+            return internalServerError().as("application/json");
+        }
     }
 
-    public static Result getCurrentUser() throws JsonGenerationException, JsonMappingException, IOException{
+    public static Result getCurrentUser() throws IOException{
     	AuthUser authUser = PlayAuthenticate.getUser(ctx());
     	if(authUser!=null){
     		final User u = User.findByAuthUserIdentity(authUser);
