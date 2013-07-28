@@ -3,6 +3,7 @@
 
 
 
+
 /* Controllers */
 
 function EventCtrl($scope, $http, $location, $compile, $filter, mailUtils, mapService, eventService) {
@@ -25,7 +26,9 @@ function EventCtrl($scope, $http, $location, $compile, $filter, mailUtils, mapSe
 	$scope.alerts = [];
 	$scope.directionsDisplay = new google.maps.DirectionsRenderer();
 	$scope.directionsService = new google.maps.DirectionsService();
-	
+	$scope.topics = new Array();
+	$scope.chat = {messages:new Array()};
+	$scope.eltsInChat = 5;
 	//////////////  SCOPE METHODS  ///////////////////	
 	$scope.securise = function(){
 		$http.put($scope.eventLinks.securised, {value:true}).success(function(){
@@ -191,7 +194,7 @@ function EventCtrl($scope, $http, $location, $compile, $filter, mailUtils, mapSe
 		$scope.currentMarker = marker;
 		$scope.currentInfoWindowsSubscriber = marker.subscriber;
         $scope.myInfoWindow.open($scope.myMap, marker);
-        $scope.$apply();
+        //$scope.$apply();
     };
     $scope.setToUpdated = function(){
       if(!$scope.event.updated && $scope.event){
@@ -216,8 +219,85 @@ function EventCtrl($scope, $http, $location, $compile, $filter, mailUtils, mapSe
         }
     };
 
-    
-    
+    $scope.createTopicTitle=function(topic){
+      var title = $scope.subscribersRef[topic.creator].name;
+      return   title;
+    };
+
+    $scope.createTopic = function(subscriber){
+        var subscribers = new Array();
+        subscribers.push(subscriber.userRef);
+        subscribers.push($scope.currentSubscriber.userRef);
+
+        var topic = {
+                idEvent:$scope.event.id,
+                type:"topic",
+                creator:$scope.currentSubscriber.userRef,
+                subscribers:subscribers
+            };
+
+        var existing = ($scope.topics.length>0);
+        if(existing){
+            for(var i in $scope.topics){
+                var currentTopic = $scope.topics[i];
+                if(currentTopic.subscribers.length == 2){
+                    existing = true;
+                    for (var j in currentTopic.subscribers){
+                        var sub = currentTopic.subscribers[j];
+                        existing = (existing && ((sub === subscriber.userRef) || (sub === $scope.currentSubscriber.userRef)));
+                    }
+                    if(existing){
+                        break;
+                    }
+                }
+            }
+        }
+        if(!existing){
+            $scope.webSocket.send(JSON.stringify(topic));
+            topic.title = $scope.refSubscribers[topic.creator].name;
+            $scope.topics.push(topic);
+        }
+    };
+
+    $scope.sendMessage = function(topic, currentMessage){
+        if(topic.date){
+            topic.date = new Date(topic.date);
+        }
+
+        var messageToSend = {
+            type:"message",
+            topic: topic,
+            from: $scope.currentSubscriber.userRef,
+            message: currentMessage
+        };
+        $scope.webSocket.send(JSON.stringify(messageToSend));
+        if(!$scope.chat.messages){
+           $scope.chat.messages = new Array();
+        }
+        //$scope.chat.messages.push(messageToSend);
+        $scope.chat.currentMessage = null;
+    };
+
+
+    $scope.loadMessages = function(aTopic){
+        $scope.eltsInChat = 5;
+        aTopic.alert = null;
+        $http.get('/rest/messages/'+aTopic.id).success(function(messages){
+            $scope.chat.messages = messages;
+            formatMessages();
+        });
+    };
+
+    function formatMessages(){
+         if($scope.chat.messages){
+             for(var i in $scope.chat.messages){
+                 if($scope.chat.messages[i].date){
+                     $scope.chat.messages[i].date = new Date($scope.chat.messages[i].date);
+                 }
+             }
+         }
+    }
+
     ///////////////  INIT /////////////////////
     
     var id = extractFromUrl($location.absUrl());
@@ -267,22 +347,77 @@ function EventCtrl($scope, $http, $location, $compile, $filter, mailUtils, mapSe
 				   	}
 				   	
 				   	$scope.myMap.fitBounds($scope.bounds);
-				   	var wsUrl = jsRoutes.controllers.SubscriberCtrl.subscribersUpdates(event.id, $scope.user.id);
-				   	var ws = new WebSocket(wsUrl.webSocketURL());
-				    
-				    ws.onopen = function(){  
-				        console.log("Socket has been opened!");  
-				    };
-				    
-				    ws.onmessage = function(wsMsg) {
-				    	if(wsMsg && wsMsg.data){
-				    		var notification = JSON.parse(wsMsg.data);
-				    		if(notification.type && notification.message){
-				    			$scope.alerts.push({type:notification.type, msg:notification.message, notification:notification});
-				    		}
-				    	}
-				    	eventService.reloadSubscribers($scope);
-				    };
+
+                    $http.get('/rest/topics/'+$scope.event.id+'/users/'+$scope.user.id).success(function(topics){
+                       if(topics){
+                        $scope.topics = new Array();
+                        for(var i in topics){
+                            var topic = topics[i];
+                            topic.title = $scope.refSubscribers[topic.creator].name;
+                            $scope.topics.push(topic);
+                        }
+                        if($scope.topics.length>0){
+                            $scope.topics[0].active = true;
+                            $http.get('/rest/messages/'+$scope.topics[0].id).success(function(messages){
+                                $scope.chat.messages = messages;
+                                formatMessages();
+                            });
+
+                        }
+                       }
+                    });
+
+                    var wsUrl = jsRoutes.controllers.SubscriberCtrl.subscribersUpdates(event.id, $scope.user.id);
+                    var ws = new WebSocket(wsUrl.webSocketURL());
+                    //var ws = new SockJS(wsUrl.webSocketURL());
+                    ws.onopen = function() {
+                        console.log('Web socket open');
+                    };
+                    ws.onmessage = function(wsMsg) {
+                        if(wsMsg && wsMsg.data){
+                            var notification = JSON.parse(wsMsg.data);
+                            if(notification.type){
+                                if(notification.type=='topic'){
+                                    var exist = false;
+                                    for(var i in $scope.topics){
+                                        if($scope.topics[i].id = notification.id){
+                                            exist = true;
+                                        }
+                                    }
+                                    if(!exist){
+                                        $scope.topics.push(notification);
+                                    }
+                                }else if(notification.type=='message'){
+                                    if($scope.topics){
+                                        for(var i in $scope.topics){
+                                            if($scope.topics[i].id == notification.topicRef){
+                                                if($scope.topics[i].active){
+                                                    notification.date = new Date(notification.date);
+                                                    $scope.chat.messages.push(notification);
+                                                }else{
+                                                    if($scope.topics[i].alert){
+                                                        $scope.topics[i].alert++;
+                                                    }else{
+                                                        $scope.topics[i].alert = 1
+                                                    }
+                                                }
+                                                $scope.$apply();
+                                            }
+                                        }
+                                    }
+                                }else if(notification.message){
+                                    $scope.alerts.push({type:notification.type, msg:notification.message, notification:notification});
+                                    eventService.reloadSubscribers($scope);
+                                }
+                            }else{
+                                eventService.reloadSubscribers($scope);
+                            }
+
+                        }
+
+                    };
+                    $scope.webSocket = ws;
+
 				   	
 				    if($scope.currentSubscriber && $scope.subscribersLinks[$scope.currentSubscriber.userRef] && $scope.subscribersLinks[$scope.currentSubscriber.userRef].notifications){
 					    $http.get($scope.subscribersLinks[$scope.currentSubscriber.userRef].notifications).success(function(notifications) {

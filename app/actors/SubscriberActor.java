@@ -2,20 +2,24 @@ package actors;
 
 import static akka.pattern.Patterns.ask;
 import static java.util.concurrent.TimeUnit.SECONDS;
+import static play.data.Form.form;
 
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import models.ChatMessage;
 import models.Notification;
 import models.Subscriber;
 
+import models.Topic;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.node.ObjectNode;
 
 import controllers.decorators.SubscriberModel;
 
+import play.data.Form;
 import play.libs.Akka;
 import play.libs.F.Callback;
 import play.libs.F.Callback0;
@@ -30,6 +34,9 @@ import akka.actor.Props;
 import akka.actor.UntypedActor;
 
 public class SubscriberActor extends UntypedActor{
+
+    private static Form<Topic> topicForm = form(Topic.class);
+    private static Form<ChatMessage> messageForm = form(ChatMessage.class);
 
 	static ActorRef subActorRef = Akka.system().actorOf(new Props(SubscriberActor.class));
 	
@@ -113,11 +120,53 @@ public class SubscriberActor extends UntypedActor{
         } else if(message instanceof Notification)  {
         	Notification notification = (Notification)message;
             notifyOne(notification);
+        } else if(message instanceof JsonNode) {
+             JsonNode unTypedMesg = (JsonNode)message;
+             if(unTypedMesg.get("type").asText().equals("topic")){
+                 Form<Topic> form = topicForm.bind(unTypedMesg);
+                 if(!form.hasErrors()){
+                     Topic topic = form.get();
+                     topic.save();
+                     sendTopic(topic);
+                 }
+             }else if(unTypedMesg.get("type").asText().equals("message")){
+                 Form<ChatMessage> form = messageForm.bind(unTypedMesg);
+                 if(!form.hasErrors()){
+                     ChatMessage msg = form.get();
+                     msg.save();
+                     sendMessage(msg);
+                 }
+             }
         } else {
             unhandled(message);
         }
 	}
-	
+
+    public void sendTopic(Topic topic){
+        Map<String, Out<JsonNode>> users = events.get(topic.idEvent);
+        if(users!=null){
+            for(String user : topic.subscribers){
+                if(!user.equals(topic.creator)){
+                    Out<JsonNode> socket = users.get(user);
+                    if(socket!=null){
+                        socket.write(mapper.convertValue(topic, JsonNode.class));
+                    }
+                }
+            }
+        }
+    }
+
+    public void sendMessage(ChatMessage message){
+        Map<String, Out<JsonNode>> users = events.get(message.topic.idEvent);
+        if(users!=null){
+            for(String user : message.topic.subscribers){
+                Out<JsonNode> socket = users.get(user);
+                if(socket!=null){
+                    socket.write(mapper.convertValue(message, JsonNode.class));
+                }
+            }
+        }
+    }
 	public void notifyAll(String idEvent, String userRef, Subscriber message){
 		Map<String, Out<JsonNode>> users = events.get(idEvent);
 		if(users!=null){
@@ -137,7 +186,7 @@ public class SubscriberActor extends UntypedActor{
 			if(socket!=null){
 				socket.write(mapper.convertValue(notification, JsonNode.class));
 			}else{
-				
+
 			}
 		}
 	}

@@ -70,26 +70,31 @@ DELETE  /rest/events/:id/subscribers/:idSub       controllers.SubscriberCtrl.del
 GET     /ws/events/:id/subscribers/:idSub       controllers.SubscriberCtrl.subscribersUpdates(id :String, idSub :String)
 
 
-GET    	/rest/events/:id/subscribers/:idSub/car              controllers.SubscriberCtrl.getCar(id :String, idSub :String)
-POST    /rest/events/:id/subscribers/:idSub/car              controllers.SubscriberCtrl.updateCar(id :String, idSub :String)
-DELETE  /rest/events/:id/subscribers/:idSub/car/:idPassenger              controllers.SubscriberCtrl.deletePassenger(id :String, idSub :String, idPassenger :String)
+GET    	/rest/events/:id/subscribers/:idSub/car                 controllers.SubscriberCtrl.getCar(id :String, idSub :String)
+POST    /rest/events/:id/subscribers/:idSub/car                 controllers.SubscriberCtrl.updateCar(id :String, idSub :String)
+DELETE  /rest/events/:id/subscribers/:idSub/car/:idPassenger    controllers.SubscriberCtrl.deletePassenger(id :String, idSub :String, idPassenger :String)
 
-POST    /rest/events/:id/subscribers/:idSub/waitings              controllers.SubscriberCtrl.addToWaitingList(id :String, idSub :String)
-DELETE  /rest/events/:id/subscribers/:idSub/waitings/:idPassenger              controllers.SubscriberCtrl.removeFromWaitingList(id :String, idSub :String, idPassenger :String)
+POST    /rest/events/:id/subscribers/:idSub/waitings                controllers.SubscriberCtrl.addToWaitingList(id :String, idSub :String)
+DELETE  /rest/events/:id/subscribers/:idSub/waitings/:idPassenger   controllers.SubscriberCtrl.removeFromWaitingList(id :String, idSub :String, idPassenger :String)
 
-POST    /rest/events/:id/subscribers/:idSub/possiblecars              controllers.SubscriberCtrl.addPossibleCar(id :String, idSub :String)
-DELETE  /rest/events/:id/subscribers/:idSub/possiblecars/:idCar              controllers.SubscriberCtrl.deletePossibleCar(id :String, idSub :String, idCar :String)
+POST    /rest/events/:id/subscribers/:idSub/possiblecars            controllers.SubscriberCtrl.addPossibleCar(id :String, idSub :String)
+DELETE  /rest/events/:id/subscribers/:idSub/possiblecars/:idCar     controllers.SubscriberCtrl.deletePossibleCar(id :String, idSub :String, idCar :String)
 
-GET    	/rest/events/:id/subscribers/:idSub/notifications              controllers.SubscriberCtrl.listNotifications(id :String, idSub :String)
-DELETE  /rest/events/:id/subscribers/:idSub/notifications/:idNotif              controllers.SubscriberCtrl.deleteNotifications(id :String, idSub :String, idNotif :String)
+GET    	/rest/events/:id/subscribers/:idSub/notifications           controllers.SubscriberCtrl.listNotifications(id :String, idSub :String)
+DELETE  /rest/events/:id/subscribers/:idSub/notifications/:idNotif  controllers.SubscriberCtrl.deleteNotifications(id :String, idSub :String, idNotif :String)
 
 
 #Users
-GET     /rest/users/current                   controllers.UserCtrl.getCurrentUser()
+GET     /rest/users/current               controllers.UserCtrl.getCurrentUser()
 GET     /rest/users/:id                   controllers.UserCtrl.getUser(id :String)
 PUT     /rest/users/:id                   controllers.UserCtrl.updateUser(id :String)
-GET     /rest/users/:id/events                   controllers.UserCtrl.listEvent(id :String)
+GET     /rest/users/:id/events            controllers.UserCtrl.listEvent(id :String)
 
+
+GET    /rest/topics/:idEvent/users/:idUser             controllers.ChatController.getTopics(idEvent :String, idUser :String)
+POST    /rest/topics/:idEvent             controllers.ChatController.createTopic(idEvent :String)
+
+GET    /rest/messages/:idTopic                controllers.ChatController.getMessages(idTopic: String)
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)
