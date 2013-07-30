@@ -207,7 +207,7 @@
 
 
                     <div ng-show="currentSubscriber.locomotion == 'AUTOSTOP'">
-                        <div ng-show="currentSubscriber.carRef">
+                        <div ng-show="currentSubscriber.carRef" class="well">
                             <strong>Ma voiture :</strong>
                             {{refSubscribers[currentSubscriber.carRef].surname}} {{refSubscribers[currentSubscriber.carRef].name}}
                             <button class="btn btn-warning btn-mini" type="button" ng-click="removePassenger(refSubscribers[currentSubscriber.carRef], currentSubscriber.userRef)" >Annuler</button>
@@ -232,7 +232,7 @@
 
                     </div>
                     <div ng-show="currentSubscriber.locomotion == 'CAR'">
-                        <div ng-show="currentSubscriber.car &&  currentSubscriber.car.passengers">
+                        <div ng-show="currentSubscriber.car &&  currentSubscriber.car.passengers" class="well">
                             <label>Les passagers de ma voiture : </label>
                             <ul>
                                 <li ng-repeat="passenger in currentSubscriber.car.passengers" >
@@ -272,7 +272,13 @@
                         <button type="button" class="btn btn-primary" ng-model="filterUsers" btn-radio="''">Tout le monde</button>
                     </div>
 
-
+		<br/>
+		<div>
+		<form class="form-search">
+		Filtrer : 
+		  <input type="text" ng-model="query" class="input-medium search-query">
+		</form>
+		</div>
                     <table id="searchTextResults" class="table table-hover">
                         <thead>
                             <tr>
@@ -286,7 +292,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr ng-repeat="subscriber in subscribers | auto:filterUsers:markers " ng-show="!subscriber.current" class="{{subscriber.class}}" >
+                            <tr ng-repeat="subscriber in subscribers | auto:filterUsers:markers  | filter:query" ng-show="!subscriber.current" class="{{subscriber.class}}" >
                                 <td><a ng-click="openSubscriberInfo(subscriber)"><img ng-src="{{subscriber.picto}}" /></a></td>
                                 <td><a ng-click="createTopic(subscriber)"><i class=" icon-comment" tooltip="Démarrer une discution" ></i></a></td>
                                 <td >{{subscriber.surname}} {{subscriber.name}}</td>
@@ -330,45 +336,39 @@
             <div class="span2">
             </div>
             <div class="span10">
-                <tabset >
-                    <tab ng-repeat="topic in topics" active="topic.active" disabled="topic.disabled" select="loadMessages(topic)">
-                        <tab-heading>
-                            <ul class="inline">
-                                <li ng-show="chaters != currentSubscriber.userRef" ng-repeat="chaters in topic.subscribers">{{refSubscribers[chaters].surname}} {{refSubscribers[chaters].name}}, </li>
-                            </ul>
-                            <span ng-show="topic.alert" class="badge badge-important">message</span>
-                        </tab-heading>
+                <div class="tabbable tabs-left">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-header">Mes conversations</li>
+                        <li ng-repeat="topic in topics  | orderBy: '-update'" ng-class="{'active' : topic.active}">
+                            <a href="javascript:void" ng-click="loadMessages(topic)">
+                                <ul class="inline">
+                                    <li ng-show="chaters != currentSubscriber.userRef" ng-repeat="chaters in topic.subscribers">{{refSubscribers[chaters].surname}} {{refSubscribers[chaters].name}}, </li>
+                                </ul>
+                                <span ng-show="topic.alert" class="badge badge-important">message</span>
+                                <small>{{topic.update | date:'HH:mm:ss le dd/MM'}}</small>
+                            </a>
+                        </li>
+                    </ul>
+                    <div class="tab-content">
+                        <p>
+                            <a ng-click="eltsInChat = eltsInChat + 5 ">...</a>
+                        </p>
 
-                        <ul class="inline">
-                            <li ng-show="chaters != currentSubscriber.userRef" ng-repeat="chaters in topic.subscribers">{{refSubscribers[chaters].surname}} {{refSubscribers[chaters].name}}, </li>
-                            <li>
-                                <div class="input-append">
-                                    <input class="span4" type="text">
-                                    <button class="btn" type="button">Ajouter à la conversation</button>
-                                </div>
-                            </li>
-                        </ul>
-
-                        <table class="table table-condensed">
-                            <tr ng-repeat="message in chat.messages | orderBy: '-date' | limitTo: eltsInChat">
-                                <td>
-                                    <div class="span3">
-                                    <strong ng-show="message.from != currentSubscriber.userRef">{{refSubscribers[message.from].surname}} {{refSubscribers[message.from].name}} :</strong>
-                                    <strong ng-show="message.from == currentSubscriber.userRef">Moi :</strong>
-                                    à <small>{{message.date | date:'HH:mm:ss le dd/MM'}} </small>
-                                    </div>
-                                    <div class="span6">
-                                    {{message.message}}
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr><td><div class="span3"></div><div class="span6"><a ng-click="eltsInChat = eltsInChat + 5 ">...</a></div></td></tr>
-                        </table>
-
+                        <dl ng-repeat="message in chat.messages | orderBy: 'date' | limitTo: -eltsInChat" class="dl-horizontal">
+                            <dt ng-show="message.from != currentSubscriber.userRef" tooltip-placement="left" tooltip="{{message.date | date:'à HH:mm:ss le dd/MM'}}">
+                                {{refSubscribers[message.from].surname}} {{refSubscribers[message.from].name}} :
+                            </dt>
+                            <dt ng-show="message.from == currentSubscriber.userRef" tooltip-placement="left" tooltip="{{message.date | date:'à HH:mm:ss le dd/MM'}}">
+                                Moi :
+                            </dt>
+                            <dd>
+                                {{message.message}}
+                            </dd>
+                        </dl>
                         <input type="text" ng-model="chat.currentMessage" />
-                        <button class="btn" type="button" ng-click="sendMessage(topic, chat.currentMessage)" >Envoyer</button>
-                    </tab>
-                </tabset>
+                        <button class="btn" type="button" ng-click="sendMessage(chat.currentMessage)" >Envoyer</button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

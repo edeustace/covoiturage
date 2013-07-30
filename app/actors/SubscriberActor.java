@@ -135,6 +135,10 @@ public class SubscriberActor extends UntypedActor{
                      ChatMessage msg = form.get();
                      msg.save();
                      sendMessage(msg);
+                     Topic topic = Topic.getById(msg.topicRef);
+                     topic.update = new Date();
+                     topic.save();
+                     //sendTopic(topic);
                  }
              }
         } else {
@@ -146,11 +150,9 @@ public class SubscriberActor extends UntypedActor{
         Map<String, Out<JsonNode>> users = events.get(topic.idEvent);
         if(users!=null){
             for(String user : topic.subscribers){
-                if(!user.equals(topic.creator)){
-                    Out<JsonNode> socket = users.get(user);
-                    if(socket!=null){
-                        socket.write(mapper.convertValue(topic, JsonNode.class));
-                    }
+                Out<JsonNode> socket = users.get(user);
+                if(socket!=null){
+                    socket.write(mapper.convertValue(topic, JsonNode.class));
                 }
             }
         }

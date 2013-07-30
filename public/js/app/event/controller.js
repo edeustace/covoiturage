@@ -29,6 +29,11 @@ function EventCtrl($scope, $http, $location, $compile, $filter, mailUtils, mapSe
 	$scope.topics = new Array();
 	$scope.chat = {messages:new Array()};
 	$scope.eltsInChat = 5;
+	$scope.opts = {
+        backdropFade: true,
+        dialogFade:true
+      };
+
 	//////////////  SCOPE METHODS  ///////////////////	
 	$scope.securise = function(){
 		$http.put($scope.eventLinks.securised, {value:true}).success(function(){
@@ -259,14 +264,14 @@ function EventCtrl($scope, $http, $location, $compile, $filter, mailUtils, mapSe
         }
     };
 
-    $scope.sendMessage = function(topic, currentMessage){
-        if(topic.date){
-            topic.date = new Date(topic.date);
+    $scope.sendMessage = function(currentMessage){
+        if($scope.chat.currentTopic.date){
+            $scope.chat.currentTopic.date = new Date($scope.chat.currentTopic.date);
         }
-
+        $scope.chat.currentTopic.update = new Date();
         var messageToSend = {
             type:"message",
-            topic: topic,
+            topic: $scope.chat.currentTopic,
             from: $scope.currentSubscriber.userRef,
             message: currentMessage
         };
@@ -278,12 +283,21 @@ function EventCtrl($scope, $http, $location, $compile, $filter, mailUtils, mapSe
         $scope.chat.currentMessage = null;
     };
 
-
     $scope.loadMessages = function(aTopic){
         $scope.eltsInChat = 5;
         aTopic.alert = null;
+        for(var i in $scope.topics){
+            if(aTopic.id == $scope.topics[i].id){
+                $scope.topics[i].active = true;
+            }else{
+                $scope.topics[i].active = false;
+            }
+        }
         $http.get('/rest/messages/'+aTopic.id).success(function(messages){
-            $scope.chat.messages = messages;
+            $scope.chat = {
+                messages : messages,
+                currentTopic : aTopic
+            };
             formatMessages();
         });
     };
@@ -297,6 +311,7 @@ function EventCtrl($scope, $http, $location, $compile, $filter, mailUtils, mapSe
              }
          }
     }
+
 
     ///////////////  INIT /////////////////////
     
@@ -353,16 +368,15 @@ function EventCtrl($scope, $http, $location, $compile, $filter, mailUtils, mapSe
                         $scope.topics = new Array();
                         for(var i in topics){
                             var topic = topics[i];
+                            topic.active = false;
                             topic.title = $scope.refSubscribers[topic.creator].name;
+                            topic.date = new Date(topic.date);
+                            topic.update = new Date(topic.update);
                             $scope.topics.push(topic);
                         }
                         if($scope.topics.length>0){
                             $scope.topics[0].active = true;
-                            $http.get('/rest/messages/'+$scope.topics[0].id).success(function(messages){
-                                $scope.chat.messages = messages;
-                                formatMessages();
-                            });
-
+                            $scope.loadMessages($scope.topics[0]);
                         }
                        }
                     });
@@ -379,29 +393,40 @@ function EventCtrl($scope, $http, $location, $compile, $filter, mailUtils, mapSe
                             if(notification.type){
                                 if(notification.type=='topic'){
                                     var exist = false;
+                                    var topic = notification;
+                                    topic.date = new Date(topic.date);
+                                    topic.update = new Date(topic.update);
+                                    topic.active = false;
                                     for(var i in $scope.topics){
-                                        if($scope.topics[i].id = notification.id){
+                                        if($scope.topics[i].id == topic.id){
                                             exist = true;
+                                            $scope.topics[i].date = topic.date;
                                         }
                                     }
                                     if(!exist){
-                                        $scope.topics.push(notification);
+                                        $scope.topics.push(topic);
                                     }
+                                    $scope.$apply();
                                 }else if(notification.type=='message'){
+                                    var message = notification;
                                     if($scope.topics){
                                         for(var i in $scope.topics){
-                                            if($scope.topics[i].id == notification.topicRef){
-                                                if($scope.topics[i].active){
-                                                    notification.date = new Date(notification.date);
-                                                    $scope.chat.messages.push(notification);
+                                            var topic = $scope.topics[i];
+                                            if(topic.id == message.topicRef){
+                                                topic.date = new Date(message.date);
+                                                topic.update = new Date(message.date);
+                                                if(topic.active){
+                                                    message.date = new Date(message.date);
+                                                    $scope.chat.messages.push(message);
                                                 }else{
-                                                    if($scope.topics[i].alert){
-                                                        $scope.topics[i].alert++;
+                                                    if(topic.alert){
+                                                        topic.alert++;
                                                     }else{
-                                                        $scope.topics[i].alert = 1
+                                                        topic.alert = 1;
                                                     }
                                                 }
                                                 $scope.$apply();
+                                                return ;
                                             }
                                         }
                                     }

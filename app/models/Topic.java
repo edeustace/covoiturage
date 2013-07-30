@@ -33,6 +33,8 @@ public class Topic {
 
     public Date date;
 
+    public Date update;
+
     @NotNull
     public String creator;
 
@@ -41,16 +43,7 @@ public class Topic {
     public Topic() {
         super();
         this.date = new Date();
-    }
-
-    public Topic(String idEvent, String creator, List<String> subscribers) {
-        this.idEvent = idEvent;
-        this.date = new Date();
-        this.creator = creator;
-        this.subscribers = subscribers;
-        if(!this.subscribers.contains(this.creator)){
-            this.subscribers.add(this.creator);
-        }
+        this.update = this.date;
     }
 
     ////////////  STATIC  ////////////////
@@ -58,6 +51,10 @@ public class Topic {
         WriteResult<Topic, String> result = collection().save(this);
         this.id = result.getSavedId();
         return this;
+    }
+
+    public static Topic getById(String id){
+        return collection().findOneById(id);
     }
 
     public static List<Topic> findByIdEventAndIdUser(String idEvent, String idUser){
