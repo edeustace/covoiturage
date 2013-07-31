@@ -54,6 +54,8 @@ public class ChatMessage {
         return this;
     }
 
+
+
     public static List<ChatMessage> findByIdTopic(String idTopic){
         DBCursor<ChatMessage> cursor = collection().find(DBQuery.is("topicRef", idTopic));
         List<ChatMessage> result = new ArrayList<ChatMessage>();

@@ -29,6 +29,16 @@ public class ChatController extends Controller {
 
     private static Form<Topic> topicForm = form(Topic.class);
 
+
+    public static Result getMainTopics(String idEvent, String categorie) {
+        List<Topic> topics = Topic.findByIdEventAndCategorie(idEvent, categorie);
+        try {
+            return ok(objectMapper.writeValueAsString(topics)).as("application/json");
+        } catch (IOException e) {
+            return internalServerError(e.getMessage()).as("application/json");
+        }
+    }
+
     public static Result getTopics(String idEvent, String idUser) {
         List<Topic> topics = Topic.findByIdEventAndIdUser(idEvent, idUser);
         try {

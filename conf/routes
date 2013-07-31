@@ -91,6 +91,7 @@ PUT     /rest/users/:id                   controllers.UserCtrl.updateUser(id :St
 GET     /rest/users/:id/events            controllers.UserCtrl.listEvent(id :String)
 
 
+GET    /rest/topics/:idEvent             controllers.ChatController.getMainTopics(idEvent :String, categorie : String)
 GET    /rest/topics/:idEvent/users/:idUser             controllers.ChatController.getTopics(idEvent :String, idUser :String)
 POST    /rest/topics/:idEvent             controllers.ChatController.createTopic(idEvent :String)
 

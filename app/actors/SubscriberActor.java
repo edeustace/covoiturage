@@ -149,10 +149,16 @@ public class SubscriberActor extends UntypedActor{
     public void sendTopic(Topic topic){
         Map<String, Out<JsonNode>> users = events.get(topic.idEvent);
         if(users!=null){
-            for(String user : topic.subscribers){
-                Out<JsonNode> socket = users.get(user);
-                if(socket!=null){
+            if(topic.subscribers.isEmpty()){
+                for(Out<JsonNode> socket : users.values()){
                     socket.write(mapper.convertValue(topic, JsonNode.class));
+                }
+            }else{
+                for(String user : topic.subscribers){
+                    Out<JsonNode> socket = users.get(user);
+                    if(socket!=null){
+                        socket.write(mapper.convertValue(topic, JsonNode.class));
+                    }
                 }
             }
         }
@@ -161,10 +167,16 @@ public class SubscriberActor extends UntypedActor{
     public void sendMessage(ChatMessage message){
         Map<String, Out<JsonNode>> users = events.get(message.topic.idEvent);
         if(users!=null){
-            for(String user : message.topic.subscribers){
-                Out<JsonNode> socket = users.get(user);
-                if(socket!=null){
+            if(message.topic.subscribers == null || message.topic.subscribers.isEmpty()){
+                for(Out<JsonNode> socket : users.values()){
                     socket.write(mapper.convertValue(message, JsonNode.class));
+                }
+            }else{
+                for(String user : message.topic.subscribers){
+                    Out<JsonNode> socket = users.get(user);
+                    if(socket!=null){
+                        socket.write(mapper.convertValue(message, JsonNode.class));
+                    }
                 }
             }
         }

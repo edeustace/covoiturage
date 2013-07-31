@@ -31,6 +31,8 @@ public class Topic {
 
     public String type = "topic";
 
+    public String categorie;
+
     public Date date;
 
     public Date update;
@@ -55,6 +57,17 @@ public class Topic {
 
     public static Topic getById(String id){
         return collection().findOneById(id);
+    }
+
+
+
+    public static List<Topic> findByIdEventAndCategorie(String idEvent, String categorie){
+        DBCursor<Topic> cursor = collection().find(DBQuery.and(DBQuery.is("categorie", categorie), DBQuery.is("idEvent", idEvent)));
+        List<Topic> result = new ArrayList<Topic>();
+        while(cursor.hasNext()){
+            result.add(cursor.next());
+        }
+        return result;
     }
 
     public static List<Topic> findByIdEventAndIdUser(String idEvent, String idUser){
