@@ -496,22 +496,24 @@ function EventCtrl($scope, $http, $location, $compile, $filter, mailUtils, mapSe
                     };
 
                     $http.get('/rest/topics/'+$scope.event.id+'/users/'+$scope.user.id).success(function(topics){
-                       if(topics){
-                        $scope.topics = new Array();
-                        for(var i in topics){
-                            var topic = topics[i];
-                            topic.active = false;
-                            topic.title = $scope.refSubscribers[topic.creator].name;
-                            topic.date = new Date(topic.date);
-                            topic.update = new Date(topic.update);
-                            $scope.topics.push(topic);
+                        if(topics){
+                            $scope.topics = new Array();
+                            var maxDate = null;
+                            var maxDateTopic = null;
+                            for(var i in topics){
+                                var topic = topics[i];
+                                topic.active = false;
+                                topic.title = $scope.refSubscribers[topic.creator].name;
+                                topic.date = new Date(topic.date);
+                                if((!maxDate) || (topic.update > maxDate)){
+                                    maxDate=topic.update;
+                                    maxDateTopic = topic;
+                                }
+                                topic.update = new Date(topic.update);
+                                $scope.topics.push(topic);
+                            }
+                            $scope.loadMessages(maxDateTopic);
                         }
-                        if($scope.topics.length>0){
-                            $scope.topics[0].active = true;
-                            $scope.loadMessages($scope.topics[0]);
-                        }
-
-                       }
                     });
 
 				   	$http.get('/rest/topics/'+$scope.event.id+'?categorie=mainChat').success(function(topics){
