@@ -2,7 +2,8 @@ package providers;
 
 import com.feth.play.module.mail.Mailer.Mail.Body;
 import com.feth.play.module.pa.PlayAuthenticate;
-import com.feth.play.module.pa.providers.password.*;
+import com.feth.play.module.pa.providers.password.UsernamePasswordAuthProvider;
+import com.feth.play.module.pa.providers.password.UsernamePasswordAuthUser;
 import controllers.routes;
 import models.LinkedAccount;
 import models.TokenAction;
@@ -29,7 +30,7 @@ import static play.data.Form.form;
 
 public class MyUsernamePasswordAuthProvider
 		extends
-		UsernamePasswordAuthProvider<String, MyLoginUsernamePasswordAuthUser, MyUsernamePasswordAuthUser, MyUsernamePasswordAuthProvider.MyLogin, MyUsernamePasswordAuthProvider.MySignup> {
+        UsernamePasswordAuthProvider<String, MyLoginUsernamePasswordAuthUser, MyUsernamePasswordAuthUser, MyUsernamePasswordAuthProvider.MyLogin, MyUsernamePasswordAuthProvider.MySignup> {
 
 	private static final String SETTING_KEY_VERIFICATION_LINK_SECURE = SETTING_KEY_MAIL
 			+ "." + "verificationLink.secure";
@@ -168,7 +169,7 @@ public class MyUsernamePasswordAuthProvider
 	}
 
 	@Override
-	protected SignupResult signupUser(final MyUsernamePasswordAuthUser user) {
+	protected com.feth.play.module.pa.providers.password.UsernamePasswordAuthProvider.SignupResult signupUser(final MyUsernamePasswordAuthUser user) {
 		final User u = User.findByUsernamePasswordIdentity(user);
 		if (u != null) {
 			if (u.getEmailValidated()) {
@@ -191,7 +192,7 @@ public class MyUsernamePasswordAuthProvider
 	}
 
 	@Override
-	protected LoginResult loginUser(final MyLoginUsernamePasswordAuthUser authUser) {
+	protected com.feth.play.module.pa.providers.password.UsernamePasswordAuthProvider.LoginResult loginUser(final MyLoginUsernamePasswordAuthUser authUser) {
 		final User u = User.findByUsernamePasswordIdentity(authUser);
 		if (u == null) {
 			return LoginResult.NOT_FOUND;
