@@ -246,18 +246,19 @@ function EventCtrl($scope, $http, $location, $compile, $filter, mailUtils, mapSe
             categorie:'chat',
             subscribers:subscribers
         };
-        var topicId = null;
+
+        var aTopic = null;
         for(var i in $scope.topics){
             var currentTopic = $scope.topics[i];
             if(compareArrays(currentTopic.subscribers, subscribers)){
-                topicId = currentTopic.id;
+                aTopic = currentTopic;
                 break;
             }
         }
-        if(!topicId){
+        if(!aTopic){
             $http.post($scope.eventLinks.topics, topic);
         }else{
-           setCurrentTopic(topicId);
+           $scope.loadMessages(aTopic);
         }
     };
 
@@ -331,7 +332,7 @@ function EventCtrl($scope, $http, $location, $compile, $filter, mailUtils, mapSe
 
     $scope.loadMessages = function(aTopic){
         if(aTopic){
-            $scope.eltsInChat = 5;
+            $scope.eltsInChat = 10;
             aTopic.alert = null;
             setCurrentTopic(aTopic.id);
             $http.get('/rest/messages/'+aTopic.id).success(function(messages){
