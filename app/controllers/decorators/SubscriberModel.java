@@ -35,6 +35,7 @@ public class SubscriberModel {
             this.links.add(Link.link("addPossibleCar", controllers.routes.SubscriberCtrl.addPossibleCar(idEvent, subscriber.getUserRef()).toString()));
             this.links.add(Link.link("deletePossibleCar", controllers.routes.SubscriberCtrl.addPossibleCar(idEvent, subscriber.getUserRef()).toString()));
             this.links.add(Link.link("notifications", controllers.routes.SubscriberCtrl.listNotifications(idEvent, subscriber.getUserRef()).toString()));
+            this.links.add(Link.link("feed", controllers.routes.SubscriberCtrl.pushChannel(idEvent, subscriber.getUserRef()).toString()));
         }
     }
 

@@ -17,7 +17,9 @@ public class Notification {
 	
 	public String idEvent; 
 	
-	public String type;
+	public String type = "notification";
+
+    public String categorie;
 	
 	public String from;
 	
@@ -31,10 +33,10 @@ public class Notification {
 		super();
 	}
 
-	public Notification(String idEvent, String from, String to, String type, String message, Date date) {
+	public Notification(String idEvent, String from, String to, String categorie, String message, Date date) {
 		super();
 		this.idEvent = idEvent;
-		this.type = type;
+		this.categorie = categorie;
 		this.from = from;
 		this.to = to;
 		this.message = message;

@@ -1,10 +1,12 @@
 package controllers;
 
+import actors.SubscriberActor;
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
 import models.ChatMessage;
 import models.Topic;
 import net.vz.mongodb.jackson.MongoCollection;
+import org.apache.commons.lang.StringUtils;
 import org.codehaus.jackson.map.ObjectMapper;
 import play.data.Form;
 import play.mvc.Controller;
@@ -28,24 +30,26 @@ public class ChatController extends Controller {
     private static ObjectMapper objectMapper = new ObjectMapper();
 
     private static Form<Topic> topicForm = form(Topic.class);
+    private static Form<ChatMessage> messageForm = form(ChatMessage.class);
 
-
-    public static Result getMainTopics(String idEvent, String categorie) {
-        List<Topic> topics = Topic.findByIdEventAndCategorie(idEvent, categorie);
-        try {
-            return ok(objectMapper.writeValueAsString(topics)).as("application/json");
-        } catch (IOException e) {
-            return internalServerError(e.getMessage()).as("application/json");
+    public static Result getTopics(String idEvent, String categorie, String idUser) {
+        if(StringUtils.isNotEmpty(categorie)){
+            List<Topic> topics = Topic.findByIdEventAndCategorie(idEvent, categorie);
+            try {
+                return ok(objectMapper.writeValueAsString(topics)).as("application/json");
+            } catch (IOException e) {
+                return internalServerError(e.getMessage()).as("application/json");
+            }
         }
-    }
-
-    public static Result getTopics(String idEvent, String idUser) {
-        List<Topic> topics = Topic.findByIdEventAndIdUser(idEvent, idUser);
-        try {
-            return ok(objectMapper.writeValueAsString(topics)).as("application/json");
-        } catch (IOException e) {
-            return internalServerError(e.getMessage()).as("application/json");
+        if(StringUtils.isNotEmpty(idUser)){
+            List<Topic> topics = Topic.findByIdEventAndIdUser(idEvent, idUser);
+            try {
+                return ok(objectMapper.writeValueAsString(topics)).as("application/json");
+            } catch (IOException e) {
+                return internalServerError(e.getMessage()).as("application/json");
+            }
         }
+        return ok().as("application/json");
     }
 
     public static Result getMessages(String idTopic) {
@@ -65,6 +69,7 @@ public class ChatController extends Controller {
         }else{
             Topic topic = form.get();
             topic.save();
+            SubscriberActor.publishTopic(topic);
             try {
                 return ok(objectMapper.writeValueAsString(topic)).as("application/json");
             } catch (IOException e) {
@@ -74,5 +79,21 @@ public class ChatController extends Controller {
 
     }
 
+    @Restrict(@Group(Application.USER_ROLE))
+    public static Result createMessage(String idEvent, String idTopic) {
+        Form<ChatMessage> form = messageForm.bindFromRequest();
+        if(form.hasErrors()){
+            return badRequest(form.errorsAsJson()).as("application/json");
+        }else{
+            ChatMessage message = form.get();
+            message.save();
+            SubscriberActor.publishMessage(message);
+            try {
+                return ok(objectMapper.writeValueAsString(message)).as("application/json");
+            } catch (IOException e) {
+                return internalServerError(e.getMessage()).as("application/json");
+            }
+        }
 
+    }
 }

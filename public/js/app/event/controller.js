@@ -255,7 +255,7 @@ function EventCtrl($scope, $http, $location, $compile, $filter, mailUtils, mapSe
             }
         }
         if(!topicId){
-            $scope.webSocket.send(JSON.stringify(topic));
+            $http.post($scope.eventLinks.topics, topic);
         }else{
            setCurrentTopic(topicId);
         }
@@ -307,7 +307,7 @@ function EventCtrl($scope, $http, $location, $compile, $filter, mailUtils, mapSe
             from: $scope.currentSubscriber.userRef,
             message: currentMessage
         };
-        $scope.webSocket.send(JSON.stringify(messageToSend));
+        $http.post($scope.eventLinks.topics+'/'+topic.id+'/messages', messageToSend);
     };
 
     $scope.openModalChat= function(aTopic){
@@ -342,22 +342,103 @@ function EventCtrl($scope, $http, $location, $compile, $filter, mailUtils, mapSe
             formatMessages();
         });
     };
-      $scope.open = function () {
-        $scope.shouldBeOpen = true;
-      };
 
-      $scope.close = function () {
-        $scope.closeMsg = 'I was closed at: ' + new Date();
-        $scope.shouldBeOpen = false;
-      };
 
-      $scope.opts = {
-        backdrop:false,
-        backdropFade: false,
-        keyboard:true,
-        backdropClick: true,
-        dialogFade:false
-      };
+    $scope.addTopic = function(msg){
+        var topic = JSON.parse(msg.data);
+        if(topic.type && topic.type=='topic'){
+            var exist = false;
+            var topic = notification;
+            topic.date = new Date(topic.date);
+            topic.update = new Date(topic.update);
+            if(topic.categorie=='mainChat'){
+                $scope.mainChat.topic = topic;
+            }else{
+                topic.active = false;
+                for(var i in $scope.topics){
+                    if($scope.topics[i].id == topic.id){
+                        exist = true;
+                        $scope.topics[i].date = topic.date;
+                    }
+                }
+                if(!exist){
+                    $scope.topics.push(topic);
+                    if(topic.creator === $scope.currentSubscriber.userRef){
+                        $scope.loadMessages(topic);
+                    }
+                }
+            }
+            $scope.$apply();
+        }
+    };
+    $scope.addMessage = function(msg){
+        var message = JSON.parse(msg.data);
+        if(message.type=='message'){
+            if($scope.mainChat.topic && (message.topicRef == $scope.mainChat.topic.id)){
+                message.date = new Date(message.date);
+                $scope.mainChat.messages.push(message);
+                $scope.$apply();
+            }else if($scope.topics){
+                for(var i in $scope.topics){
+                    var topic = $scope.topics[i];
+                    if(topic.id == message.topicRef){
+                        topic.date = new Date(message.date);
+                        topic.update = new Date(message.date);
+                        if(topic.active){
+                            message.date = new Date(message.date);
+                            $scope.chat.messages.push(message);
+                        }else{
+                            if(topic.alert){
+                                topic.alert++;
+                            }else{
+                                topic.alert = 1;
+                            }
+                        }
+                        $scope.$apply();
+                    }
+                }
+            }
+        }
+    };
+
+    $scope.addNotification = function(msg){
+        var notification = JSON.parse(msg.data);
+        if(notification.type == 'notification'){
+            $scope.alerts.push({type:notification.type, msg:notification.message, notification:notification});
+            eventService.reloadSubscribers($scope);
+        }
+    };
+
+    $scope.handleSubscriberUpdated = function(msg){
+        var notification = JSON.parse(msg.data);
+        if(!notification.type){
+            eventService.reloadSubscribers($scope);
+        }
+    };
+
+    $scope.listen = function(){
+        var feed = $scope.subscribersLinks[$scope.currentSubscriber.userRef].feed;
+        $scope.feed = new EventSource(feed);
+        $scope.feed.addEventListener("open", function(msg){
+            console.log(feed+' : sse open !');
+        }, false);
+        $scope.feed.addEventListener("error", function(e){
+            if (e.readyState == EventSource.CLOSED) {
+                console.log('connection close');
+            }else{
+                console.log(e);
+            }
+        }, false);
+        $scope.feed.addEventListener("message", function(msg){
+            console.log(msg.data);
+        }, false);
+        $scope.feed.addEventListener("message", $scope.addTopic, false);
+        $scope.feed.addEventListener("message", $scope.addMessage, false);
+        $scope.feed.addEventListener("message", $scope.addNotification, false);
+        $scope.feed.addEventListener("message", $scope.handleSubscriberUpdated, false);
+    };
+
+
     function formatMessages(){
          if($scope.chat.messages){
              for(var i in $scope.chat.messages){
@@ -420,82 +501,7 @@ function EventCtrl($scope, $http, $location, $compile, $filter, mailUtils, mapSe
 
 
 
-                    var wsUrl = jsRoutes.controllers.SubscriberCtrl.subscribersUpdates(event.id, $scope.user.id);
-                    var ws = new WebSocket(wsUrl.webSocketURL());
-                    //var ws = new SockJS(wsUrl.webSocketURL());
-                    $scope.webSocket = ws;
-
-                    ws.onopen = function() {
-                        console.log('Web socket open');
-                    };
-                    ws.onmessage = function(wsMsg) {
-                        if(wsMsg && wsMsg.data){
-                            var notification = JSON.parse(wsMsg.data);
-                            if(notification.type){
-                                if(notification.type=='topic'){
-                                    var exist = false;
-                                    var topic = notification;
-                                    topic.date = new Date(topic.date);
-                                    topic.update = new Date(topic.update);
-                                    if(topic.categorie=='mainChat'){
-                                        $scope.mainChat.topic = topic;
-                                    }else{
-                                        topic.active = false;
-                                        for(var i in $scope.topics){
-                                            if($scope.topics[i].id == topic.id){
-                                                exist = true;
-                                                $scope.topics[i].date = topic.date;
-                                            }
-                                        }
-                                        if(!exist){
-                                            $scope.topics.push(topic);
-                                            if(topic.creator === $scope.currentSubscriber.userRef){
-                                                $scope.loadMessages(topic);
-                                            }
-                                        }
-                                    }
-
-                                    $scope.$apply();
-                                }else if(notification.type=='message'){
-                                    var message = notification;
-                                    if($scope.mainChat.topic && (message.topicRef == $scope.mainChat.topic.id)){
-                                        message.date = new Date(message.date);
-                                        $scope.mainChat.messages.push(message);
-                                        $scope.$apply();
-                                    }else if($scope.topics){
-                                        for(var i in $scope.topics){
-                                            var topic = $scope.topics[i];
-                                            if(topic.id == message.topicRef){
-                                                topic.date = new Date(message.date);
-                                                topic.update = new Date(message.date);
-                                                if(topic.active){
-                                                    message.date = new Date(message.date);
-                                                    $scope.chat.messages.push(message);
-                                                }else{
-                                                    if(topic.alert){
-                                                        topic.alert++;
-                                                    }else{
-                                                        topic.alert = 1;
-                                                    }
-                                                }
-                                                $scope.$apply();
-                                                return ;
-                                            }
-                                        }
-                                    }
-                                }else if(notification.message){
-                                    $scope.alerts.push({type:notification.type, msg:notification.message, notification:notification});
-                                    eventService.reloadSubscribers($scope);
-                                }
-                            }else{
-                                eventService.reloadSubscribers($scope);
-                            }
-
-                        }
-
-                    };
-
-                    $http.get('/rest/topics/'+$scope.event.id+'/users/'+$scope.user.id).success(function(topics){
+                    $http.get($scope.eventLinks.topics+'?user='+$scope.user.id).success(function(topics){
                         if(topics){
                             $scope.topics = new Array();
                             var maxDate = null;
@@ -516,7 +522,7 @@ function EventCtrl($scope, $http, $location, $compile, $filter, mailUtils, mapSe
                         }
                     });
 
-				   	$http.get('/rest/topics/'+$scope.event.id+'?categorie=mainChat').success(function(topics){
+				   	$http.get($scope.eventLinks.topics+'?categorie=mainChat').success(function(topics){
                         if(topics && topics.length>0){
                             var topic = topics[0];
                             topic.date = new Date(topic.date);
@@ -531,7 +537,7 @@ function EventCtrl($scope, $http, $location, $compile, $filter, mailUtils, mapSe
                                 categorie:'mainChat',
                                 subscribers:new Array()
                             };
-                            $http.post('/rest/topics/'+$scope.event.id, topic).success(function(topic){
+                            $http.post($scope.eventLinks.topics, topic).success(function(topic){
                                 $scope.mainChat.topic = topic;
                             });
                         }
@@ -566,6 +572,9 @@ function EventCtrl($scope, $http, $location, $compile, $filter, mailUtils, mapSe
 						}
 							
 					});
+
+                    //Connection to server sent events
+                    $scope.listen();
 			    }
 		   });
 		}

@@ -12,13 +12,13 @@ import play.mvc.Result;
 import providers.MyUsernamePasswordAuthProvider;
 import providers.MyUsernamePasswordAuthProvider.MyLogin;
 import providers.MyUsernamePasswordAuthProvider.MySignup;
+import views.txt.robot;
 import views.html.evenementCreation;
 import views.html.index;
 import views.html.login;
 import views.html.profile;
 import views.html.restricted;
 import views.html.signup;
-import views.html.signupOrLogin;
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
 
@@ -35,6 +35,10 @@ public class Application extends Controller {
 	public static Result index() {
 		return ok(index.render());
 	}
+
+    public static Result robot() {
+        return ok(robot.render());
+    }
 
 	public static User getLocalUser(final Session session) {
 		final AuthUser currentAuthUser = PlayAuthenticate.getUser(session);
@@ -83,8 +87,7 @@ public class Application extends Controller {
 	public static Result jsRoutes() {
 		return ok(
 				Routes.javascriptRouter("jsRoutes",
-						controllers.routes.javascript.Signup.forgotPassword(), 
-						controllers.routes.javascript.SubscriberCtrl.subscribersUpdates()))
+						controllers.routes.javascript.Signup.forgotPassword()))
 				.as("text/javascript");
 	}
 

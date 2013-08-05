@@ -21,18 +21,19 @@ import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.node.ObjectNode;
 
+import play.Logger;
 import play.data.Form;
 import play.libs.Json;
 import play.mvc.BodyParser;
 import play.mvc.Controller;
 import play.mvc.Result;
-import play.mvc.WebSocket;
 import actors.SubscriberActor;
 
 import com.feth.play.module.pa.PlayAuthenticate;
 import com.feth.play.module.pa.user.AuthUser;
 
 import controllers.decorators.SubscriberModel;
+import play.mvc.ServerSentEventChunk;
 
 /**
  * Created with IntelliJ IDEA.
@@ -308,22 +309,19 @@ public class SubscriberCtrl extends Controller {
     	Notification.delete(idNotifications);
     	return ok().as("application/json");
     }
-    
-    /**
-     * Websocket.
-     */
-    public static WebSocket<JsonNode> subscribersUpdates(final String idEvent, final String userRef) {
-        return new WebSocket<JsonNode>() {
-            // Called when the Websocket Handshake is done.
-            public void onReady(WebSocket.In<JsonNode> in, WebSocket.Out<JsonNode> out){
-                // Join the chat room.
-                try { 
-                	SubscriberActor.join(idEvent, userRef, in, out);
-                } catch (Exception ex) {
-                    ex.printStackTrace();
+
+    public static Result pushChannel(final String idEvent, final String userRef){
+        Chunks<String> chunks = new ServerSentEventChunk() {
+            // Called when the stream is ready
+            public void onReady(ServerSentEventChunk out) {
+                try{
+                    SubscriberActor.join(idEvent, userRef, out);
+                }catch(Exception e){
+                    Logger.error("", e);
                 }
             }
         };
+        return ok(chunks).as("text/event-stream");
     }
     
     private static String getToUser(String from, String id1, String id2){

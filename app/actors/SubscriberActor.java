@@ -1,37 +1,34 @@
 package actors;
 
-import static akka.pattern.Patterns.ask;
-import static java.util.concurrent.TimeUnit.SECONDS;
-import static play.data.Form.form;
-
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-
+import akka.actor.ActorRef;
+import akka.actor.Props;
+import akka.actor.UntypedActor;
+import controllers.decorators.SubscriberModel;
 import models.ChatMessage;
 import models.Notification;
 import models.Subscriber;
-
 import models.Topic;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.node.ObjectNode;
-
-import controllers.decorators.SubscriberModel;
-
+import play.Logger;
 import play.data.Form;
 import play.libs.Akka;
-import play.libs.F.Callback;
 import play.libs.F.Callback0;
 import play.libs.Json;
-import play.mvc.Http.Request;
-import play.mvc.WebSocket;
-import play.mvc.WebSocket.Out;
+import play.mvc.Results;
+import play.mvc.ServerSentEventChunk;
 import scala.concurrent.Await;
 import scala.concurrent.duration.Duration;
-import akka.actor.ActorRef;
-import akka.actor.Props;
-import akka.actor.UntypedActor;
+
+import java.io.IOException;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
+import static akka.pattern.Patterns.ask;
+import static java.util.concurrent.TimeUnit.SECONDS;
+import static play.data.Form.form;
 
 public class SubscriberActor extends UntypedActor{
 
@@ -49,30 +46,30 @@ public class SubscriberActor extends UntypedActor{
 		Notification msg = new Notification(idEvent, from, to, type, message, date);
 		subActorRef.tell(msg, null);
 	}
-	
-	public static void join(final String idEvent, final String userRef, WebSocket.In<JsonNode> in, WebSocket.Out<JsonNode> out) throws Exception{
+
+    public static void publishTopic(Topic topic){
+        subActorRef.tell(topic, null);
+    }
+
+    public static void publishMessage(ChatMessage message){
+        subActorRef.tell(message, null);
+    }
+
+	public static void join(final String idEvent, final String userRef, ServerSentEventChunk out) throws Exception{
         
         // Send the Join message to the room
         String result = (String)Await.result(ask(subActorRef, new Join(idEvent, userRef, out), 1000), Duration.create(1, SECONDS));
-        
+
+
+
         if("OK".equals(result)) {
-            
-            // For each event received on the socket,
-            in.onMessage(new Callback<JsonNode>() {
-               public void invoke(JsonNode event) {
-            	   subActorRef.tell(event, null);               } 
+
+            out.onDisconnected(new Callback0() {
+                @Override
+                public void invoke() throws Throwable {
+                    subActorRef.tell(new Quit(idEvent, userRef), null);
+                }
             });
-            
-            // When the socket is closed.
-            in.onClose(new Callback0() {
-               public void invoke() {
-                   
-                   // Send a Quit message to the room.
-            	   subActorRef.tell(new Quit(idEvent, userRef), null);
-                   
-               }
-            });
-            
         } else {
             
             // Cannot connect, create a Json error.
@@ -80,14 +77,14 @@ public class SubscriberActor extends UntypedActor{
             error.put("error", result);
             
             // Send the error to the socket.
-            out.write(error);
+            out.sendMessage(mapper.writeValueAsString(error));
             
         }
         
     }
 	
-	Map<String, Map<String, Out<JsonNode>>> events = new HashMap<String, Map<String, Out<JsonNode>>>();
-	ObjectMapper mapper = new ObjectMapper();
+	Map<String, Map<String, ServerSentEventChunk>> events = new HashMap<String, Map<String, ServerSentEventChunk>>();
+	private static ObjectMapper mapper = new ObjectMapper();
 	
 	@Override
 	public void onReceive(Object message) throws Exception {
@@ -95,17 +92,17 @@ public class SubscriberActor extends UntypedActor{
             // Received a Join message
             Join join = (Join)message;
             
-            Map<String, Out<JsonNode>> event = events.get(join.idEvent);
+            Map<String, ServerSentEventChunk> event = events.get(join.idEvent);
             
             // Check if this username is free.
             if(event==null) {
-            	event = new HashMap<String, Out<JsonNode>>();
+            	event = new HashMap<String, ServerSentEventChunk>();
             	events.put(join.idEvent, event);
             } 
             if(event.containsKey(join.userRef)){
             	event.remove(join.userRef);
             }
-            event.put(join.userRef, join.socket);
+            event.put(join.userRef, join.connection);
             getSender().tell("OK", getSelf());
             
         } else if(message instanceof SubscriberMessage)  {
@@ -113,13 +110,17 @@ public class SubscriberActor extends UntypedActor{
             notifyAll(subscriber.idEvent, subscriber.userRef, subscriber.subscriber);
         } else if(message instanceof Quit)  {
             Quit quit = (Quit)message;
-            Map<String, Out<JsonNode>> event = events.get(quit.idEvent);
+            Map<String, ServerSentEventChunk> event = events.get(quit.idEvent);
             if(event!=null){
             	event.remove(quit.userRef);
             }
         } else if(message instanceof Notification)  {
         	Notification notification = (Notification)message;
             notifyOne(notification);
+        } else if(message instanceof Topic) {
+             sendTopic((Topic)message);
+        } else if(message instanceof ChatMessage) {
+             sendMessage((ChatMessage)message);
         } else if(message instanceof JsonNode) {
              JsonNode unTypedMesg = (JsonNode)message;
              if(unTypedMesg.get("type").asText().equals("topic")){
@@ -147,17 +148,25 @@ public class SubscriberActor extends UntypedActor{
 	}
 
     public void sendTopic(Topic topic){
-        Map<String, Out<JsonNode>> users = events.get(topic.idEvent);
+        Map<String, ServerSentEventChunk> users = events.get(topic.idEvent);
         if(users!=null){
             if(topic.subscribers.isEmpty()){
-                for(Out<JsonNode> socket : users.values()){
-                    socket.write(mapper.convertValue(topic, JsonNode.class));
+                for(ServerSentEventChunk socket : users.values()){
+                    try{
+                        socket.sendMessage(mapper.writeValueAsString(topic));
+                    }catch(IOException e){
+                        Logger.error("Erreur à la serialisation du topic", e);
+                    }
                 }
             }else{
                 for(String user : topic.subscribers){
-                    Out<JsonNode> socket = users.get(user);
+                    ServerSentEventChunk socket = users.get(user);
                     if(socket!=null){
-                        socket.write(mapper.convertValue(topic, JsonNode.class));
+                        try{
+                            socket.sendMessage(mapper.writeValueAsString(topic));
+                        }catch(IOException e){
+                            Logger.error("Erreur à la serialisation du topic", e);
+                        }
                     }
                 }
             }
@@ -165,40 +174,58 @@ public class SubscriberActor extends UntypedActor{
     }
 
     public void sendMessage(ChatMessage message){
-        Map<String, Out<JsonNode>> users = events.get(message.topic.idEvent);
+        Map<String, ServerSentEventChunk> users = events.get(message.topic.idEvent);
         if(users!=null){
             if(message.topic.subscribers == null || message.topic.subscribers.isEmpty()){
-                for(Out<JsonNode> socket : users.values()){
-                    socket.write(mapper.convertValue(message, JsonNode.class));
+                for(ServerSentEventChunk socket : users.values()){
+                    try{
+                        String chunk = mapper.writeValueAsString(message);
+                        socket.sendMessage(chunk);
+                    }catch(IOException e){
+                        Logger.error("Erreur à la serialisation du message", e);
+                    }
                 }
             }else{
                 for(String user : message.topic.subscribers){
-                    Out<JsonNode> socket = users.get(user);
+                    ServerSentEventChunk socket = users.get(user);
                     if(socket!=null){
-                        socket.write(mapper.convertValue(message, JsonNode.class));
+                        try{
+                            String chunk = mapper.writeValueAsString(message);
+                            socket.sendMessage(chunk);
+                        }catch(IOException e){
+                            Logger.error("Erreur à la serialisation du message", e);
+                        }
                     }
                 }
             }
         }
     }
 	public void notifyAll(String idEvent, String userRef, Subscriber message){
-		Map<String, Out<JsonNode>> users = events.get(idEvent);
+		Map<String, ServerSentEventChunk> users = events.get(idEvent);
 		if(users!=null){
 			for (String ref : users.keySet()) {
-				Out<JsonNode> socket = users.get(ref);
+                ServerSentEventChunk socket = users.get(ref);
 				SubscriberModel model = new SubscriberModel(message, idEvent);
-				socket.write(mapper.convertValue(model, JsonNode.class));
+                try{
+                    socket.sendMessage(mapper.writeValueAsString(model));
+                }catch(IOException e){
+                    Logger.error("Erreur à la serialisation du subscriber", e);
+                }
 			}
 		}
 	}
 	
 	public void notifyOne(Notification notification){
-		Map<String, Out<JsonNode>> users = events.get(notification.idEvent);
+		Map<String, ServerSentEventChunk> users = events.get(notification.idEvent);
 		notification.save();
 		if(users!=null){
-			Out<JsonNode> socket = users.get(notification.to);
+            ServerSentEventChunk socket = users.get(notification.to);
 			if(socket!=null){
-				socket.write(mapper.convertValue(notification, JsonNode.class));
+                try{
+				    socket.sendMessage(mapper.writeValueAsString(notification));
+                }catch(IOException e){
+                    Logger.error("Erreur à la serialisation d''une notification", e);
+                }
 			}else{
 
 			}
@@ -209,12 +236,12 @@ public class SubscriberActor extends UntypedActor{
         
         final String idEvent;
         final String userRef;
-        final Out<JsonNode> socket;
+        final ServerSentEventChunk connection;
         
-        public Join(String idEvent, String userRef, Out<JsonNode> socket) {
+        public Join(String idEvent, String userRef, ServerSentEventChunk out) {
             this.idEvent = idEvent;
             this.userRef = userRef;
-            this.socket = socket;
+            this.connection = out;
         }
         
     }
@@ -247,16 +274,5 @@ public class SubscriberActor extends UntypedActor{
             }else this.date = date;
 
 		}
-	}
-	
-	public static class Socket {
-		public final WebSocket.Out<JsonNode> socket;
-		public final Request request;
-		public Socket(Out<JsonNode> socket, Request request) {
-			super();
-			this.socket = socket;
-			this.request = request;
-		}
-		
 	}
 }
