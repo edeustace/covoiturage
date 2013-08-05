@@ -44,7 +44,7 @@
                     <address>à  {{event.address.description}}</address>
                     </p>
                     <accordion>
-                        <accordion-group heading="Plus d'informations ..." >
+                        <accordion-group heading="Détails :" >
                             <dl>
                                 <dt>Description de l'événement :</dt>
                                 <dd>
@@ -295,7 +295,7 @@
                         <tbody>
                             <tr ng-repeat="subscriber in subscribers | auto:filterUsers:markers  | filter:query" ng-show="!subscriber.current" class="{{subscriber.class}}" >
                                 <td><a ng-click="openSubscriberInfo(subscriber)"><img ng-src="{{subscriber.picto}}" /></a></td>
-                                <td><a ng-click="createTopic(subscriber)"><i class=" icon-comment" tooltip="Démarrer une discution" ></i></a></td>
+                                <td><a ng-click="createTopic(subscriber)" href="#discussion"><i class=" icon-comment" tooltip="Démarrer une discution" ></i></a></td>
                                 <td >{{subscriber.surname}} {{subscriber.name}}</td>
                                 <td>{{subscriber.address.description}}</td>
                                 <td>{{subscriber.car.nbPlaces - subscriber.car.passengers.length}}</td>
@@ -350,14 +350,14 @@
                     </strong>
                     <br/>
                     {{msg.message}}
-                </p>                 li
+                </p>
                 <p>
                     <a ng-click="eltsInMainChat = eltsInMainChat + 5 ">Plus ...</a>
                     <a class="pull-right" ng-show="eltsInMainChat > 10" ng-click="eltsInMainChat = eltsInMainChat - 5 ">... moins</a>
                 </p>
             </div>
-            <div class="span5 well">
-                <div class="tabbable tabs-right">
+            <div class="span5 well" ng-show="topics">
+                <div class="tabbable tabs-right" id="discussion">
                     <ul class="nav nav-tabs">
                         <li class="nav-header">Mes conversations</li>
                         <li ng-repeat="topic in topics  | orderBy: '-update'" ng-class="{'active' : topic.active}">

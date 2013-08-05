@@ -1,12 +1,14 @@
 package models;
 
 import net.vz.mongodb.jackson.*;
+import org.springframework.util.CollectionUtils;
 import play.data.validation.Constraints;
 import play.modules.mongodb.jackson.MongoDB;
 
 import javax.persistence.Id;
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -50,6 +52,9 @@ public class Topic {
 
     ////////////  STATIC  ////////////////
     public Topic save(){
+
+
+
         WriteResult<Topic, String> result = collection().save(this);
         this.id = result.getSavedId();
         return this;
@@ -59,7 +64,62 @@ public class Topic {
         return collection().findOneById(id);
     }
 
+    public static Topic exists(Topic topic){
 
+        if(topic.id != null){
+            Topic db = collection().findOneById(topic.id);
+            if(db!=null)
+                return db;
+        }
+        List<Topic> topics = findByIdEventAndCategorie(topic.idEvent, topic.categorie);
+        if(!topics.isEmpty()){
+            for(Topic aTopic : topics){
+                if(topic.equals(aTopic)){
+                    return aTopic;
+                }
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+
+        if(obj instanceof Topic){
+            Topic topic = (Topic)obj;
+            if(topic.id != null && this.id!=null && topic.id.equals(this.id)){
+                return true;
+            }
+            if(topic.categorie != null && this.categorie!=null && topic.categorie.equals(this.categorie) &&
+                topic.idEvent != null && this.idEvent!=null && topic.idEvent.equals(this.idEvent)){
+
+                if((topic.subscribers==null || topic.subscribers.isEmpty()) && (this.subscribers==null || this.subscribers.isEmpty())){
+                    return true;
+                }
+                if(topic.subscribers!=null && !topic.subscribers.isEmpty() && this.subscribers!=null && !this.subscribers.isEmpty()){
+                    List<String> current = new ArrayList<String>();
+                    current.addAll(this.subscribers);
+                    List<String> other = new ArrayList<String>();
+                    other.addAll(topic.subscribers);
+
+                    current.removeAll(other);
+                    if(!current.isEmpty()){
+                        return false;
+                    }
+                    current = new ArrayList<String>();
+                    current.addAll(this.subscribers);
+
+                    other.removeAll(current);
+                    if(other.isEmpty()){
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        return super.equals(obj);    //To change body of overridden methods use File | Settings | File Templates.
+    }
 
     public static List<Topic> findByIdEventAndCategorie(String idEvent, String categorie){
         DBCursor<Topic> cursor = collection().find(DBQuery.and(DBQuery.is("categorie", categorie), DBQuery.is("idEvent", idEvent)));

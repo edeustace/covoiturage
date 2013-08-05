@@ -68,10 +68,14 @@ public class ChatController extends Controller {
             return badRequest(form.errorsAsJson()).as("application/json");
         }else{
             Topic topic = form.get();
-            topic.save();
+
+            Topic existing = Topic.exists(topic);
+            if(existing==null){
+                topic.save();
+            }
             SubscriberActor.publishTopic(topic);
             try {
-                return ok(objectMapper.writeValueAsString(topic)).as("application/json");
+                return ok(objectMapper.writeValueAsString(existing)).as("application/json");
             } catch (IOException e) {
                 return internalServerError(e.getMessage()).as("application/json");
             }

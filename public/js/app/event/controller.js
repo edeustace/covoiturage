@@ -32,7 +32,7 @@ function EventCtrl($scope, $http, $location, $compile, $filter, mailUtils, mapSe
 	    messages:new Array(),
 	    topic :{}
 	};
-	$scope.eltsInChat = 5;
+	$scope.eltsInChat = 10;
 	$scope.eltsInMainChat = 10;
 	$scope.opts = {
         backdropFade: true,
@@ -330,17 +330,18 @@ function EventCtrl($scope, $http, $location, $compile, $filter, mailUtils, mapSe
     };
 
     $scope.loadMessages = function(aTopic){
-
-        $scope.eltsInChat = 5;
-        aTopic.alert = null;
-        setCurrentTopic(aTopic.id);
-        $http.get('/rest/messages/'+aTopic.id).success(function(messages){
-            $scope.chat = {
-                messages : messages,
-                currentTopic : aTopic
-            };
-            formatMessages();
-        });
+        if(aTopic){
+            $scope.eltsInChat = 5;
+            aTopic.alert = null;
+            setCurrentTopic(aTopic.id);
+            $http.get('/rest/messages/'+aTopic.id).success(function(messages){
+                $scope.chat = {
+                    messages : messages,
+                    currentTopic : aTopic
+                };
+                formatMessages();
+            });
+        }
     };
 
 
@@ -348,7 +349,6 @@ function EventCtrl($scope, $http, $location, $compile, $filter, mailUtils, mapSe
         var topic = JSON.parse(msg.data);
         if(topic.type && topic.type=='topic'){
             var exist = false;
-            var topic = notification;
             topic.date = new Date(topic.date);
             topic.update = new Date(topic.update);
             if(topic.categorie=='mainChat'){
@@ -371,6 +371,7 @@ function EventCtrl($scope, $http, $location, $compile, $filter, mailUtils, mapSe
             $scope.$apply();
         }
     };
+
     $scope.addMessage = function(msg){
         var message = JSON.parse(msg.data);
         if(message.type=='message'){
@@ -429,9 +430,6 @@ function EventCtrl($scope, $http, $location, $compile, $filter, mailUtils, mapSe
                 console.log(e);
             }
         }, false);
-        $scope.feed.addEventListener("message", function(msg){
-            console.log(msg.data);
-        }, false);
         $scope.feed.addEventListener("message", $scope.addTopic, false);
         $scope.feed.addEventListener("message", $scope.addMessage, false);
         $scope.feed.addEventListener("message", $scope.addNotification, false);
@@ -476,14 +474,14 @@ function EventCtrl($scope, $http, $location, $compile, $filter, mailUtils, mapSe
 				        mapService.addMarkerEvent(event, $scope);
 					   	if(event.subscribers){
 					   		eventService.initSubscribers($scope, event.subscribers, function(subscriber){
-					   			var idUser = $scope.user.id;
-								if(idUser == subscriber.userRef){
-									if(subscriber.locomotion=="CAR"){
-										$scope.filterUsers = "AUTOSTOP";	
-									}else if(subscriber.locomotion=="AUTOSTOP"){
-										$scope.filterUsers = "CAR";
-									}
-								}
+					   			//var idUser = $scope.user.id;
+								//if(idUser == subscriber.userRef){
+								//	if(subscriber.locomotion=="CAR"){
+								//		$scope.filterUsers = "AUTOSTOP";
+								//	}else if(subscriber.locomotion=="AUTOSTOP"){
+								//		$scope.filterUsers = "CAR";
+								//	}
+								//}
 					   		});
 				       	}
 				   	}
