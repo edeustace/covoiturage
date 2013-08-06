@@ -1,26 +1,21 @@
 package controllers;
 
-import static play.data.Form.form;
-
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import be.objectify.deadbolt.java.actions.Dynamic;
+import be.objectify.deadbolt.java.actions.Group;
+import be.objectify.deadbolt.java.actions.Restrict;
+import be.objectify.deadbolt.java.actions.SubjectPresent;
+import com.feth.play.module.mail.Mailer;
+import com.feth.play.module.mail.Mailer.Mail.Body;
+import controllers.decorators.Link;
+import controllers.decorators.SubscriberModel;
+import controllers.decorators.UserModelLight;
 import models.Address;
 import models.Event;
 import models.Subscriber;
 import models.User;
-
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.codehaus.jackson.map.ObjectMapper;
-
 import play.Logger;
 import play.data.Form;
 import play.i18n.Lang;
@@ -28,18 +23,13 @@ import play.mvc.BodyParser;
 import play.mvc.Controller;
 import play.mvc.Result;
 import views.html.evenement;
-import views.html.evenementParticipation;
-import be.objectify.deadbolt.java.actions.Dynamic;
-import be.objectify.deadbolt.java.actions.Group;
-import be.objectify.deadbolt.java.actions.Restrict;
-import be.objectify.deadbolt.java.actions.SubjectPresent;
 
-import com.feth.play.module.mail.Mailer;
-import com.feth.play.module.mail.Mailer.Mail.Body;
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.*;
 
-import controllers.decorators.Link;
-import controllers.decorators.SubscriberModel;
-import controllers.decorators.UserModelLight;
+import static play.data.Form.form;
 
 @SubjectPresent
 public class EventCtrl extends Controller {
@@ -56,10 +46,7 @@ public class EventCtrl extends Controller {
 	public static Result evenement(String id) {
 		return ok(evenement.render());
 	}
-	@Restrict(@Group(Application.USER_ROLE))
-	public static Result participer(String id) {
-		return ok(evenementParticipation.render());
-	}
+
 	@Restrict(@Group(Application.USER_ROLE))
 	public static Result getEvent(String id) {
 	    Event event = Event.read(id);
@@ -255,11 +242,13 @@ public class EventCtrl extends Controller {
             this.links.add(Link.link("pictoFinish", controllers.routes.Assets.at("icons/finish.png").toString()));
             this.links.add(Link.link("pictoCarDark", controllers.routes.Assets.at("icons/car_dark.png").toString()));
             this.links.add(Link.link("pictoCar", controllers.routes.Assets.at("icons/car_classic.png").toString()));
+            this.links.add(Link.link("pictoMyCar", controllers.routes.Assets.at("icons/car_red.png").toString()));
             this.links.add(Link.link("pictoCarLight", controllers.routes.Assets.at("icons/car_light.png").toString()));
-            this.links.add(Link.link("pictoStopDark", controllers.routes.Assets.at("icons/pedestriancrossing_dark.png").toString()));
-            this.links.add(Link.link("pictoStop", controllers.routes.Assets.at("icons/pedestriancrossing_classic.png").toString()));
+            this.links.add(Link.link("pictoMyPassenger", controllers.routes.Assets.at("icons/pedestriancrossing_red.png").toString()));
+            this.links.add(Link.link("pictoStopDark", controllers.routes.Assets.at("icons/pedestriancrossing_green-dark.png").toString()));
+            this.links.add(Link.link("pictoStop", controllers.routes.Assets.at("icons/pedestriancrossing_green-classic.png").toString()));
             this.links.add(Link.link("pictoStopLight", controllers.routes.Assets.at("icons/pedestriancrossing_light.png").toString()));
-            this.links.add(Link.link("pictoDontKnow", controllers.routes.Assets.at("icons/symbol_blank_jaune_dark.png").toString()));
+            this.links.add(Link.link("pictoDontKnow", controllers.routes.Assets.at("icons/symbol_blank.png").toString()));
             this.links.add(Link.link("pictoDontKnowLight", controllers.routes.Assets.at("icons/symbol_blank_jaune_def.png").toString()));
         }
 

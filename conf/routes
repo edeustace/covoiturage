@@ -50,7 +50,6 @@ POST    /login/password/forgot     controllers.Signup.doForgotPassword
 
 #PAGES
 GET     /evenement/:id                          controllers.EventCtrl.evenement(id: String)
-GET     /evenement/:id/participer             	controllers.EventCtrl.participer(id: String)
 
 #API REST
 #Events
@@ -71,6 +70,8 @@ PUT     /rest/events/:id/subscribers/:idSub       controllers.SubscriberCtrl.upd
 DELETE  /rest/events/:id/subscribers/:idSub       controllers.SubscriberCtrl.deleteSubscriber(id :String, idSub :String)
 GET     /rest/events/:id/subscribers/:idSub/feed       controllers.SubscriberCtrl.pushChannel(id :String, idSub :String)
 
+
+PUT    /rest/events/:id/subscribers/:idSub/locomotion          controllers.SubscriberCtrl.changeLocomotion(id :String, idSub :String)
 
 GET    	/rest/events/:id/subscribers/:idSub/car                 controllers.SubscriberCtrl.getCar(id :String, idSub :String)
 POST    /rest/events/:id/subscribers/:idSub/car                 controllers.SubscriberCtrl.updateCar(id :String, idSub :String)

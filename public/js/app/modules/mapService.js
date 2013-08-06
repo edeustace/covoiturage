@@ -19,6 +19,8 @@ angular.module('mapService', [], function($provide){
 		            visible : true 
 		          });
 		    	marker.type = "EVENT";
+		    	marker.name = event.name;
+                marker.address = event.address.description;
 		    	$scope.myMarkers.push(marker);
 		    	$scope.bounds.extend(marker.getPosition());
 		    },

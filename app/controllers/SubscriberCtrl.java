@@ -126,7 +126,39 @@ public class SubscriberCtrl extends Controller {
             return internalServerError().as("application/json");
         }
     }
-    
+
+
+    @BodyParser.Of(BodyParser.Json.class)
+    public static Result changeLocomotion(String id, String idSub){
+        try{
+            Event event = Event.read(id);
+            Subscriber subsc = event.getSubscriberById(idSub);
+            JsonNode node = request().body().asJson();
+            String locomotion = node.get("locomotion").getTextValue();
+            if(locomotion!=null){
+                if(locomotion.equals("CAR")){
+                    if(subsc.getPossibleCars()!=null){
+                        subsc.getPossibleCars().clear();
+                    }
+                    for(Subscriber subscriber : event.getSubscribers()){
+                        if(subscriber.getCar()!=null && subscriber.getCar().getWaiting()!=null){
+                            subscriber.getCar().getWaiting().remove(idSub);
+                        }
+                    }
+                    subsc.setCar(new Car());
+                    subsc.setLocomotion(Locomotion.CAR);
+                }else if(locomotion.equals("AUTOSTOP")){
+                    event.removeCar(idSub);
+                    subsc.setLocomotion(Locomotion.AUTOSTOP);
+                }
+            }
+            event.save();
+            return ok().as("application/json");
+        } catch (Exception e){
+            return internalServerError().as("application/json");
+        }
+    }
+
     public static Result getCar(String id, String idSub){
         try{
             Event event = Event.read(id);

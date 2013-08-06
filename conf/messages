@@ -74,7 +74,7 @@ playauthenticate.signup.title=Enregistrement
 playauthenticate.signup.name=Votre nom
 playauthenticate.signup.firstName=Votre prénom
 playauthenticate.signup.lastName=Votre nom
-playauthenticate.signup.now=S'enregistrer maintenant
+playauthenticate.signup.now=S''enregistrer maintenant
 playauthenticate.signup.oauth=ou enregistrez-vous avec un de ces fournisseurs:
 
 playauthenticate.verify.account.title=Vérification par email obligatoire
@@ -126,6 +126,7 @@ playauthenticate.navigation.logout=Se Déconnecter
 playauthenticate.navigation.login=Se Connecter
 playauthenticate.navigation.home=Accueil
 playauthenticate.navigation.createEvent=Créer un événement
+playauthenticate.navigation.myEvents = Mes événements
 playauthenticate.navigation.signup=Créer son compte
 
 # play-authenticate: Handler
@@ -149,7 +150,7 @@ playauthenticate.profile.link.account=Lier mon compte à :
 playauthenticate.index.title=Bienvenu sur mon covoiturage
 playauthenticate.index.intro=Mon covoiturage !
 playauthenticate.index.intro_2=Mon covoiturage est un réseau social de covoiturage.
-playauthenticate.index.intro_3=Créez et partagez des événement avec vos amis afin de covoiturez !
+playauthenticate.index.intro_3=Créez et partagez des événement avec vos amis afin de covoiturer !
 playauthenticate.index.heading=Entête
 playauthenticate.index.details=Voir les détails
 

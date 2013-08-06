@@ -6,7 +6,7 @@
 
 /* Controllers */
 
-function EventCtrl($scope, $http, $location, $compile, $filter, mailUtils, mapService, eventService) {
+function EventCtrl($scope, $http, $location, $compile, $filter, mailUtils, mapService, eventService,  $anchorScroll, $modal) {
 	//////////////  ATTRIBUTS  ///////////////////
 	$scope.items = [
 	                  { id: "CAR", name: 'en voiture' },
@@ -40,6 +40,11 @@ function EventCtrl($scope, $http, $location, $compile, $filter, mailUtils, mapSe
       };
 
 	//////////////  SCOPE METHODS  ///////////////////	
+    $scope.scrollTo = function(id) {
+        $location.hash(id);
+        $anchorScroll();
+    };
+
 	$scope.securise = function(){
 		$http.put($scope.eventLinks.securised, {value:true}).success(function(){
 			$scope.event.contactsOnly = true;
@@ -75,6 +80,36 @@ function EventCtrl($scope, $http, $location, $compile, $filter, mailUtils, mapSe
 			alert("une erreur s'est produite");
 		}
 	};
+
+
+    $scope.opts = {
+        backdropFade: true,
+        dialogFade:true
+    };
+	$scope.closeLocomotionPopin = function(){
+        $scope.validationLocomotion = false;
+	};
+
+    $scope.updateLocomotion = function(locomotion){
+        if($scope.currentSubscriber){
+            if(locomotion=='AUTOSTOP' && $scope.currentSubscriber.locomotion == 'CAR' && !$scope.validationLocomotion){
+                $scope.validationLocomotion = true;
+                var modal = $modal({
+                  template: 'popin.html',
+                  show: true,
+                  backdrop: 'static',
+                  scope: $scope
+                });
+            }else{
+                $scope.validationLocomotion = false;
+                var link = $scope.subscribersLinks[$scope.currentSubscriber.userRef].locomotion;
+                $http.put(link, {locomotion : locomotion}).success(function(){
+                    eventService.reloadSubscribers($scope);
+                });
+            }
+        }
+
+    };
 	$scope.addContact = function(contacts){
 		$scope.newContacts = mailUtils.pushMails(contacts, $scope.newContacts);
 		$http.post($scope.eventLinks.contacts, {contacts:$scope.newContacts}).success(function(){
@@ -202,7 +237,12 @@ function EventCtrl($scope, $http, $location, $compile, $filter, mailUtils, mapSe
     };
 	$scope.openMarkerInfo = function(marker) {
 		$scope.currentMarker = marker;
-		$scope.currentInfoWindowsSubscriber = marker.subscriber;
+		if(marker.type == 'EVENT'){
+            $scope.currentInfoWindowsEvent = marker;
+		}else if(marker.event){
+		    $scope.currentInfoWindowsSubscriber = marker.subscriber;
+		}
+
         $scope.myInfoWindow.open($scope.myMap, marker);
         //$scope.$apply();
     };
@@ -260,6 +300,7 @@ function EventCtrl($scope, $http, $location, $compile, $filter, mailUtils, mapSe
         }else{
            $scope.loadMessages(aTopic);
         }
+        $scope.scrollTo('discussion');
     };
 
     function compareArrays(array1, array2){
@@ -356,6 +397,11 @@ function EventCtrl($scope, $http, $location, $compile, $filter, mailUtils, mapSe
                 $scope.mainChat.topic = topic;
             }else{
                 topic.active = false;
+
+                if(!$scope.topics){
+                    $scope.topics=new Array();
+                }
+
                 for(var i in $scope.topics){
                     if($scope.topics[i].id == topic.id){
                         exist = true;
@@ -548,9 +594,6 @@ function EventCtrl($scope, $http, $location, $compile, $filter, mailUtils, mapSe
 								var notification = notifications[int];
 								if(notification.message){
 								    var msg = notification.message;
-								    if(notification.date){
-                                        msg = 'le '+new Date(notification.date) +' : '+notification.message;
-								    }
 								    $scope.alerts.push({type:notification.type, msg:msg, notification:notification});
 								}
 							}
@@ -571,9 +614,6 @@ function EventCtrl($scope, $http, $location, $compile, $filter, mailUtils, mapSe
 						}
 							
 					});
-
-                    //Connection to server sent events
-                    $scope.listen();
 			    }
 		   });
 		}

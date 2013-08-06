@@ -9,8 +9,6 @@
 
     <script src="http://maps.googleapis.com/maps/api/js?libraries=places&sensor=false&language=fr"></script>
     <script src="http://cdn.sockjs.org/sockjs-0.3.min.js"></script>
-
-    <script type="text/javascript" src="@routes.Assets.at("js/lib/angular.js")"></script>
     <script type="text/javascript" src="@routes.Assets.at("js/app/directives/ui-bootstrap-tpls-0.4.0.min.js")"></script>
     <script type="text/javascript" src="@routes.Assets.at("js/app/directives/event.js")"></script>
     <script type="text/javascript" src="@routes.Assets.at("js/app/directives/keypress.js")"></script>
@@ -29,7 +27,7 @@
 
 
 
-    <div ng-controller="EventCtrl" ng-app="covoiturage">
+    <div ng-controller="EventCtrl" >
 
         <div class="row-fluid" >
             <div class="span2">
@@ -40,8 +38,8 @@
                     {{event.name}}
                     </h1>
                     <p >
-                    Le <strong>{{event.fromDate | date:'dd-MM-yyyy'}}</strong> <strong ng-show="event.startTime">à {{event.startTime}}</strong>
-                    <address>à  {{event.address.description}}</address>
+                    Cet événement a lieu le <strong>{{event.fromDate | date:'dd-MM-yyyy'}}</strong> <strong ng-show="event.startTime">à {{event.startTime}}</strong>
+                    <address>Adresse : <strong>{{event.address.description}}</strong></address>
                     </p>
                     <accordion>
                         <accordion-group heading="Détails :" >
@@ -122,6 +120,7 @@
                          ui-event="{'map-click': 'openMarkerInfo(marker)'}">
                     </div>
                     <div ui-map-info-window="myInfoWindow">
+                        <div ng-show="currentInfoWindowsSubscriber">
                             <strong>{{currentInfoWindowsSubscriber.surname}} {{currentInfoWindowsSubscriber.name}}</strong>
                             <div ng-show="currentInfoWindowsSubscriber.locomotion == 'CAR'">
                                 Passagers :
@@ -133,35 +132,41 @@
                                 {{currentInfoWindowsSubscriber.car.nbPlaces - currentInfoWindowsSubscriber.car.passengers.length}} places restantes
                             </div>
                             <div ng-show="currentSubscriber.locomotion == 'AUTOSTOP' && currentInfoWindowsSubscriber.normalCar" >
-                                <button class="btn btn-success btn-mini" type="button" ng-click="askForSeat(currentInfoWindowsSubscriber)" >Monter</button>
+                                <button class="btn btn-success btn-mini" type="button" ng-click="askForSeat(currentInfoWindowsSubscriber)" >Reserver une place</button>
                             </div>
                             <div ng-show="currentSubscriber.locomotion == 'AUTOSTOP' && currentInfoWindowsSubscriber.currentCar" >
-                                <button class="btn btn-warning btn-mini" type="button" ng-click="removePassenger(currentInfoWindowsSubscriber, currentSubscriber.userRef)" >Descendre</button>
+                                <button class="btn btn-warning btn-mini" type="button" ng-click="removePassenger(currentInfoWindowsSubscriber, currentSubscriber.userRef)" >Annuler ma reservation</button>
                             </div>
                             <div ng-show="currentSubscriber.locomotion == 'AUTOSTOP' && currentInfoWindowsSubscriber.iAskHim" >
-                                <button class="btn btn-warning btn-mini" type="button" ng-click="removeWaitingGuy(currentInfoWindowsSubscriber, currentSubscriber.userRef)" >Descendre</button>
+                                <button class="btn btn-warning btn-mini" type="button" ng-click="removeWaitingGuy(currentInfoWindowsSubscriber, currentSubscriber.userRef)" >Annuler ma reservation</button>
                             </div>
                             <div ng-show="currentSubscriber.locomotion == 'AUTOSTOP' && currentInfoWindowsSubscriber.heAskMeToBeInHisCar">
-                                <button class="btn btn-warning btn-mini" type="button" ng-click="removePossibleCar(currentSubscriber, currentInfoWindowsSubscriber.userRef)" >Descendre</button>
+                                <button class="btn btn-warning btn-mini" type="button" ng-click="removePossibleCar(currentSubscriber, currentInfoWindowsSubscriber.userRef)" >Decliner sa proposition</button>
                             </div>
                             <!-- AUTOSTOP -->
                             <div ng-show="currentSubscriber.locomotion == 'CAR' && currentInfoWindowsSubscriber.free">
-                                <button class="btn btn-success btn-mini" type="button" ng-click="proposeSeat(currentInfoWindowsSubscriber, currentSubscriber.userRef)" >Prendre</button>
+                                <button class="btn btn-success btn-mini" type="button" ng-click="proposeSeat(currentInfoWindowsSubscriber, currentSubscriber.userRef)" >Proposer une place</button>
                             </div>
                             <div ng-show="currentSubscriber.locomotion == 'CAR' && currentInfoWindowsSubscriber.requestedByMe">
-                                <button class="btn btn-warning btn-mini" type="button" ng-click="removePossibleCar(currentInfoWindowsSubscriber, currentSubscriber.userRef)" >Ne plus prendre</button>
+                                <button class="btn btn-warning btn-mini" type="button" ng-click="removePossibleCar(currentInfoWindowsSubscriber, currentSubscriber.userRef)" >Annuler ma proposition</button>
                             </div>
                             <div ng-show="currentSubscriber.locomotion == 'CAR' && currentInfoWindowsSubscriber.waitingForMyCar">
-                                <button class="btn btn-warning btn-mini" type="button" ng-click="removeWaitingGuy(currentSubscriber, currentInfoWindowsSubscriber.userRef)" >Ne plus prendre</button>
+                                <button class="btn btn-warning btn-mini" type="button" ng-click="removeWaitingGuy(currentSubscriber, currentInfoWindowsSubscriber.userRef)" >Decliner la reservation</button>
                             </div>
                             <div ng-show="currentSubscriber.locomotion == 'CAR' && currentInfoWindowsSubscriber.inMyCar">
-                                <button class="btn btn-warning btn-mini" type="button" ng-click="removePassenger(currentSubscriber, currentInfoWindowsSubscriber.userRef)" >Ne plus prendre</button>
+                                <button class="btn btn-warning btn-mini" type="button" ng-click="removePassenger(currentSubscriber, currentInfoWindowsSubscriber.userRef)" >Annuler la reservation</button>
                             </div>
+                        </div>
+                        <div ng-show="currentInfoWindowsEvent">
+                            <strong>{{currentInfoWindowsEvent.name}}</strong><br/>
+                            Adresse : <address><strong>{{currentInfoWindowsEvent.address}}</strong></address>
+                        </div>
                     </div>
                     <div id="map_canvas" ui-map="myMap" class="map"
                          ui-options="mapOptions">
                     </div>
             </div>
+
             <div ng-show="!currentSubscriber"  class="span4">
                 <fieldset>
                     <legend>Vous ne participez pas encore :</legend>
@@ -188,12 +193,36 @@
 
 
                 <div>
-                    <h3>{{currentSubscriber.surname}} {{currentSubscriber.name}}</h3>
+                    <h3><i><img ng-src="{{currentSubscriber.picto}}" /></i>{{currentSubscriber.surname}} {{currentSubscriber.name}}</h3>
                     <strong>Mon point de départ : </strong>
 
                     <address ng-show="!editMode">
                       <i class="icon-globe"></i> {{currentSubscriber.address.description}} <button class="btn" ng-show="!editMode" ng-click="setEditMode(true)">Modifier</button>
                     </address>
+
+
+                    <div class="btn-group">
+                        <button ng-show="currentSubscriber.locomotion == 'AUTOSTOP' || currentSubscriber.locomotion == 'DONT_KNOW_YET'" ng-click="updateLocomotion('CAR')" type="button" class="btn" >Devenir conducteur</button>
+                        <button ng-show="currentSubscriber.locomotion == 'CAR' || currentSubscriber.locomotion == 'DONT_KNOW_YET'" ng-click="updateLocomotion('AUTOSTOP')" type="button" class="btn" >Devenir passager</button>
+                    </div>
+
+
+                    <script type="text/ng-template" id="popin.html">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                            <h3>Attention</h3>
+                        </div>
+                        <div class="modal-body">
+                            <p>
+                                Vous allez supprimer votre voiture et tous les passagers qui sont à bord !
+                            </p>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-primary" ng-click="updateLocomotion('AUTOSTOP');dismiss()">Valider</button>
+                            <button class="btn btn-warning cancel" ng-click="dismiss()">Annuler</button>
+                        </div>
+                    </script>
+
 
                     <div ng-show="editMode" >
                         <label>Nouvelle adresse : </label>
@@ -234,7 +263,7 @@
                     </div>
                     <div ng-show="currentSubscriber.locomotion == 'CAR'">
                         <div ng-show="currentSubscriber.car &&  currentSubscriber.car.passengers" class="well">
-                            <label>Les passagers de ma voiture : </label>
+                            <strong>Les passagers de ma voiture : </strong>
                             <ul>
                                 <li ng-repeat="passenger in currentSubscriber.car.passengers" >
                                     {{refSubscribers[passenger].surname}} {{refSubscribers[passenger].name}}
@@ -255,7 +284,7 @@
                             </ul>
                         </div>
                         <div >
-                            <strong>Mes propositions : </strong>
+                            <strong>Mes propositions en attente de validation : </strong>
                             <ul>
                                 <li ng-repeat="subscriber in subscribers" ng-show="subscriber.requestedByMe">
                                     {{subscriber.surname}} {{subscriber.name}}
@@ -276,7 +305,7 @@
 		<br/>
 		<div>
 		<form class="form-search">
-		Filtrer : 
+		Rechercher :
 		  <input type="text" ng-model="query" class="input-medium search-query">
 		</form>
 		</div>
@@ -284,21 +313,22 @@
                         <thead>
                             <tr>
                                 <th>locomotion</th>
-                                <th></th>
                                 <th>Nom</th>
                                 <th>Adresse</th>
-                                <th>places restantes</th>
+                                <th class="hidden-phone">places restantes</th>
                                 <th ng-show="currentSubscriber.locomotion == 'AUTOSTOP'">Monter/Descendre</th>
                                 <th ng-show="currentSubscriber.locomotion == 'CAR'">Prendre/Ne plus prendre</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr ng-repeat="subscriber in subscribers | auto:filterUsers:markers  | filter:query" ng-show="!subscriber.current" class="{{subscriber.class}}" >
-                                <td><a ng-click="openSubscriberInfo(subscriber)"><img ng-src="{{subscriber.picto}}" /></a></td>
-                                <td><a ng-click="createTopic(subscriber)" href="#discussion"><i class=" icon-comment" tooltip="Démarrer une discution" ></i></a></td>
+                                <td>
+                                    <a ng-click="openSubscriberInfo(subscriber)"><img ng-src="{{subscriber.picto}}" /></a>
+                                    <a ng-click="createTopic(subscriber)" ><i class=" icon-comment" tooltip="Démarrer une discussion" ></i></a>
+                                </td>
                                 <td >{{subscriber.surname}} {{subscriber.name}}</td>
                                 <td>{{subscriber.address.description}}</td>
-                                <td>{{subscriber.car.nbPlaces - subscriber.car.passengers.length}}</td>
+                                <td class="hidden-phone">{{subscriber.car.nbPlaces - subscriber.car.passengers.length}}</td>
                                 <!-- CAR -->
                                 <td ng-show="currentSubscriber.locomotion == 'AUTOSTOP' && subscriber.normalCar" >
                                     <button class="btn btn-success" type="button" ng-click="askForSeat(subscriber)" >Reserver une place</button>
@@ -307,10 +337,10 @@
                                     <button class="btn btn-warning" type="button" ng-click="removePassenger(subscriber, currentSubscriber.userRef)" >Annuler ma reservation</button>
                                 </td>
                                 <td ng-show="currentSubscriber.locomotion == 'AUTOSTOP' && subscriber.iAskHim" >
-                                    <button class="btn btn-warning" type="button" ng-click="removeWaitingGuy(subscriber, currentSubscriber.userRef)" >Annuler ma demande</button>
+                                    <button class="btn btn-warning" type="button" ng-click="removeWaitingGuy(subscriber, currentSubscriber.userRef)" >Annuler ma reservation</button>
                                 </td>
                                 <td ng-show="currentSubscriber.locomotion == 'AUTOSTOP' && subscriber.heAskMeToBeInHisCar">
-                                    <button class="btn btn-warning" type="button" ng-click="removePossibleCar(currentSubscriber, subscriber.userRef)" >Refuser la demande</button>
+                                    <button class="btn btn-warning" type="button" ng-click="removePossibleCar(currentSubscriber, subscriber.userRef)" >Decliner sa proposition</button>
                                 </td>
                                 <!-- AUTOSTOP -->
                                 <td ng-show="currentSubscriber.locomotion == 'CAR' && subscriber.free">
@@ -320,10 +350,10 @@
                                     <button class="btn btn-warning" type="button" ng-click="removePossibleCar(subscriber, currentSubscriber.userRef)" >Annuler ma proposition</button>
                                 </td>
                                 <td ng-show="currentSubscriber.locomotion == 'CAR' && subscriber.waitingForMyCar">
-                                    <button class="btn btn-warning" type="button" ng-click="removeWaitingGuy(currentSubscriber, subscriber.userRef)" >Refuser la demande</button>
+                                    <button class="btn btn-warning" type="button" ng-click="removeWaitingGuy(currentSubscriber, subscriber.userRef)" >Annuler ma proposition</button>
                                 </td>
                                 <td ng-show="currentSubscriber.locomotion == 'CAR' && subscriber.inMyCar">
-                                    <button class="btn btn-warning" type="button" ng-click="removePassenger(currentSubscriber, subscriber.userRef)" >-</button>
+                                    <button class="btn btn-warning" type="button" ng-click="removePassenger(currentSubscriber, subscriber.userRef)" >Annuler la reservation</button>
                                 </td>
                             </tr>
                         </tbody>
@@ -356,7 +386,7 @@
                     <a class="pull-right" ng-show="eltsInMainChat > 10" ng-click="eltsInMainChat = eltsInMainChat - 5 ">... moins</a>
                 </p>
             </div>
-            <div class="span5 well" ng-show="topics">
+            <div class="span5 well" >
                 <div class="tabbable tabs-right" id="discussion">
                     <ul class="nav nav-tabs">
                         <li class="nav-header">Mes conversations</li>

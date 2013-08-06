@@ -151,8 +151,29 @@ public class Event {
     		passenger.getPossibleCars().remove(idCarOwner);
     	}
     	return this;
-    }  
-    
+    }
+
+    public Event removeCar(String idCarOwner){
+        Subscriber carOwner = this.getSubscriberById(idCarOwner);
+        if(carOwner.getCar()!=null && carOwner.getCar().getPassengers()!=null){
+            for(String pass : carOwner.getCar().getPassengers()){
+                Subscriber passenger = this.getSubscriberById(pass);
+                if(passenger!=null && passenger.getCarRef()!=null && passenger.getCarRef().equals(idCarOwner)){
+                    passenger.setCarRef(null);
+                }
+            }
+            carOwner.setCar(null);
+        }
+        for (Subscriber subscriber : this.getSubscribers()) {
+            if(!subscriber.getUserRef().equals(idCarOwner)){
+                if(subscriber.getPossibleCars()!=null && subscriber.getPossibleCars().contains(idCarOwner)){
+                    subscriber.getPossibleCars().remove(idCarOwner);
+                }
+            }
+        }
+        return this;
+    }
+
     public Event deletePassenger(String idPassenger, String idCarOwner){
     	Subscriber carOwner = this.getSubscriberById(idCarOwner);
     	if(carOwner.getCar()!=null && carOwner.getCar().getPassengers()!=null){

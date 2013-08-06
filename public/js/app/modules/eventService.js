@@ -110,7 +110,8 @@ angular.module('eventService', ['mapService'], function($provide){
                     var subscriber = subscribers[i];
                     if($scope.currentSubscriber && $scope.currentSubscriber.locomotion=='CAR' && subscriber.locomotion=='AUTOSTOP'){
                         if(subscriber.carRef == $scope.currentSubscriber.userRef){
-                            subscriber.picto = $scope.eventLinks.pictoStopLight;
+                            //subscriber.picto = $scope.eventLinks.pictoStopLight;
+                            subscriber.picto = $scope.eventLinks.pictoMyPassenger
                             subscriber.inMyCar = true;
                         }else if($scope.currentSubscriber.car && $scope.currentSubscriber.car.waitings && $scope.currentSubscriber.car.waitings.length>0 && inArray(subscriber.userRef, $scope.currentSubscriber.car.waitings)){
                             subscriber.picto = $scope.eventLinks.pictoStop;
@@ -124,7 +125,8 @@ angular.module('eventService', ['mapService'], function($provide){
                         }
                     }else if($scope.currentSubscriber && $scope.currentSubscriber.locomotion=='AUTOSTOP' && subscriber.locomotion=='CAR'){
                         if($scope.currentSubscriber.carRef == subscriber.userRef){
-                            subscriber.picto = $scope.eventLinks.pictoCarLight;
+                            //subscriber.picto = $scope.eventLinks.pictoCarLight;
+                            subscriber.picto = $scope.eventLinks.pictoMyCar;
                             subscriber.currentCar = true;
                         }else if(subscriber.car && subscriber.car.waitings && subscriber.car.waitings.length>0 &&
                                 inArray($scope.currentSubscriber.userRef, subscriber.car.waitings)){
@@ -137,6 +139,12 @@ angular.module('eventService', ['mapService'], function($provide){
                         }else{
                             subscriber.picto = $scope.eventLinks.pictoCarDark;
                             subscriber.normalCar = true;
+                        }
+                    }else if($scope.currentSubscriber && subscriber.userRef == $scope.currentSubscriber.userRef){
+                        if($scope.currentSubscriber && $scope.currentSubscriber.locomotion=='CAR'){
+                            subscriber.picto = $scope.eventLinks.pictoMyCar;
+                        }else if($scope.currentSubscriber && $scope.currentSubscriber.locomotion=='AUTOSTOP'){
+                            subscriber.picto = $scope.eventLinks.pictoMyPassenger;
                         }
                     }else if(subscriber.locomotion=='CAR'){
                         subscriber.picto = $scope.eventLinks.pictoCarDark;
@@ -151,9 +159,9 @@ angular.module('eventService', ['mapService'], function($provide){
                 }
 
                 if($scope.currentSubscriber && $scope.currentSubscriber.locomotion=='CAR'){
-                    $scope.currentSubscriber.picto = $scope.eventLinks.pictoCarLight;
+                    $scope.currentSubscriber.picto = $scope.eventLinks.pictoMyCar;
                 }else if($scope.currentSubscriber && $scope.currentSubscriber.locomotion=='AUTOSTOP'){
-                    $scope.currentSubscriber.picto = $scope.eventLinks.pictoStopLight;
+                    $scope.currentSubscriber.picto = $scope.eventLinks.pictoMyPassenger;
                 }
 
                 if(callback){
@@ -164,6 +172,10 @@ angular.module('eventService', ['mapService'], function($provide){
                     }
                 $scope.subscribers = subscribers;
                 mapService.traceDirections($scope);
+                //Connection to server sent events
+                if($scope.currentSubscriber){
+                    $scope.listen();
+                }
             }
         };
 
