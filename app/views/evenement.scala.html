@@ -235,13 +235,24 @@
                     </div>
 
 
+                    <div ng-show="currentCar" class="well">
+                        <strong>Ma voiture :</strong><br/>
+                        <strong>Le conducteur :</strong> {{currentCar.driver.name}} <br/>
+                        <div ng-show="currentCar.passengers.length==0"><strong>Aucun passager</strong><br/></div>
+                        <div ng-show="currentCar.passengers.length>0">
+                            <strong>Les passagers : </strong>
+                            <ul >
+                                <li ng-repeat="passenger in currentCar.passengers" >
+                                    {{passenger.name}}
+                                    <button ng-show="passenger.deleteRight" class="btn btn-warning btn-mini" type="button" ng-click="removePassenger(currentCar.driver.subscriber, passenger.subscriber.userRef)" >Annuler la reservation</button>
+                                    </td>
+                                </li>
+                            </ul>
+                        </div>
+                        {{currentCar.driver.subscriber.car.nbPlaces - currentCar.driver.subscriber.car.passengers.length}} places restantes
+                    </div>
 
                     <div ng-show="currentSubscriber.locomotion == 'AUTOSTOP'">
-                        <div ng-show="currentSubscriber.carRef" class="well">
-                            <strong>Ma voiture :</strong>
-                            {{refSubscribers[currentSubscriber.carRef].surname}} {{refSubscribers[currentSubscriber.carRef].name}}
-                            <button class="btn btn-warning btn-mini" type="button" ng-click="removePassenger(refSubscribers[currentSubscriber.carRef], currentSubscriber.userRef)" >Annuler</button>
-                        </div>
                         <div ng-show="!currentSubscriber.carRef">
                             <strong>Mes demandes en attente :</strong>
                             <ul>
@@ -262,17 +273,6 @@
 
                     </div>
                     <div ng-show="currentSubscriber.locomotion == 'CAR'">
-                        <div ng-show="currentSubscriber.car &&  currentSubscriber.car.passengers" class="well">
-                            <strong>Les passagers de ma voiture : </strong>
-                            <ul>
-                                <li ng-repeat="passenger in currentSubscriber.car.passengers" >
-                                    {{refSubscribers[passenger].surname}} {{refSubscribers[passenger].name}}
-                                    <button class="btn btn-warning btn-mini" type="button" ng-click="removePassenger(currentSubscriber, passenger)" >Supprimer</button>
-                                </td>
-                                </li>
-                            </ul>
-                            {{currentSubscriber.car.nbPlaces - currentSubscriber.car.passengers.length}} places restantes
-                        </div>
                         <div ng-show="currentSubscriber.car &&  currentSubscriber.car.waitings">
                             <strong>En attente : </strong>
                             <ul>

@@ -163,7 +163,7 @@ angular.module('eventService', ['mapService'], function($provide){
                 }else if($scope.currentSubscriber && $scope.currentSubscriber.locomotion=='AUTOSTOP'){
                     $scope.currentSubscriber.picto = $scope.eventLinks.pictoMyPassenger;
                 }
-
+                $service.setCurrentCar($scope);
                 if(callback){
                         for(var i=0; i<length; i++){
                             var subscriber = subscribers[i];
@@ -176,6 +176,45 @@ angular.module('eventService', ['mapService'], function($provide){
                 if($scope.currentSubscriber){
                     $scope.listen();
                 }
+            },
+            setCurrentCar : function($scope){
+                if($scope.currentSubscriber){
+                    if($scope.currentSubscriber.locomotion == 'CAR' && $scope.currentSubscriber.car){
+                        $scope.currentCar = buildCarObject($scope.currentSubscriber);
+                    }else if( $scope.currentSubscriber.locomotion=='AUTOSTOP' && $scope.currentSubscriber.carRef){
+                        $scope.currentCar = buildCarObject($scope.refSubscribers[$scope.currentSubscriber.carRef]);
+                    }
+                }
+
+                function buildCarObject(carOwner){
+                    if(carOwner){
+                        var car = {
+                            driver :
+                            {
+                                name : carOwner.surname + ' ' + carOwner.name,
+                                id : carOwner.userRef,
+                                subscriber : carOwner
+                            },
+                            passengers : new Array()
+                        };
+
+                        if(carOwner.car){
+                            for(var i in carOwner.car.passengers){
+                                var ref = carOwner.car.passengers[i];
+                                var passenger = $scope.refSubscribers[ref];
+                                car.passengers.push(
+                                {
+                                    name:passenger.surname+' '+passenger.name,
+                                    id : passenger,
+                                    subscriber :passenger,
+                                    deleteRight : (carOwner.userRef == $scope.currentSubscriber.userRef || $scope.currentSubscriber.userRef == ref)
+                                });
+                            }
+                        }
+                        return car;
+                    }
+                }
+
             }
         };
 
