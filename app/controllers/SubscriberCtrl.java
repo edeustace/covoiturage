@@ -152,6 +152,7 @@ public class SubscriberCtrl extends Controller {
                     subsc.setLocomotion(Locomotion.AUTOSTOP);
                 }
             }
+
             event.save();
             return ok().as("application/json");
         } catch (Exception e){

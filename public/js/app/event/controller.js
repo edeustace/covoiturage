@@ -239,8 +239,10 @@ function EventCtrl($scope, $http, $location, $compile, $filter, mailUtils, mapSe
 		$scope.currentMarker = marker;
 		if(marker.type == 'EVENT'){
             $scope.currentInfoWindowsEvent = marker;
-		}else if(marker.event){
+            $scope.currentInfoWindowsSubscriber = null;
+		}else {
 		    $scope.currentInfoWindowsSubscriber = marker.subscriber;
+		    $scope.currentInfoWindowsEvent = null;
 		}
 
         $scope.myInfoWindow.open($scope.myMap, marker);
