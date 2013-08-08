@@ -17,12 +17,15 @@
     <script type="text/javascript" src="@routes.Assets.at("js/app/directives/bootstrap-datepicker.js")"></script>
     <script type="text/javascript" src="@routes.Assets.at("js/app/directives/bootstrap-timepicker.js")"></script>
     <script type="text/javascript" src="@routes.Assets.at("js/app/directives/googleplace.js")"></script>
+    <script type="text/javascript" src="@routes.Assets.at("js/app/directives/scrollglue.js")"></script>
+    <script type="text/javascript" src="@routes.Assets.at("js/app/directives/ng-infinite-scroll.min.js")"></script>
     <script type="text/javascript" src="@routes.Assets.at("js/app/modules/mailUtils.js")"></script>
     <script type="text/javascript" src="@routes.Assets.at("js/app/modules/eventService.js")"></script>
     <script type="text/javascript" src="@routes.Assets.at("js/app/modules/mapService.js")"></script>
     <script type="text/javascript" src="@routes.Assets.at("js/app/event/app.js")"></script>
     <script type="text/javascript" src="@routes.Assets.at("js/app/event/controller.js")"></script>
     <script type="text/javascript" src="@routes.Assets.at("js/app/filters.js")"></script>
+
     <script type="text/javascript" src="@routes.Application.jsRoutes()"></script>
 
 
@@ -413,18 +416,20 @@
                             <p >
                                 <a ng-click="eltsInChat = eltsInChat + 5 ">Plus ...</a>
                             </p>
-                            <p ng-repeat="message in chat.messages | orderBy: 'date' | limitTo: -eltsInChat" >
-                                <strong ng-show="message.from != currentSubscriber.userRef" tooltip-placement="left" tooltip="{{message.date | date:'à HH:mm:ss le dd/MM'}}">
-                                    {{refSubscribers[message.from].surname}} {{refSubscribers[message.from].name}} :
-                                </strong>
-                                <strong ng-show="message.from == currentSubscriber.userRef" tooltip-placement="left" tooltip="{{message.date | date:'à HH:mm:ss le dd/MM'}}">
-                                    Moi :
-                                </strong>
-                                {{message.message}} <br/>
-                                <small class="muted" ng-show="message.from == currentSubscriber.userRef && message.statut && message.statut == 'SENDING'">Envoi en cours</small>
-                                <small class="muted" ng-show="message.from == currentSubscriber.userRef && !message.statut || message.statut == 'RECEIVED'">Envoyé</small>
-                                <small class="text-error" ng-show="message.from == currentSubscriber.userRef && message.statut && message.statut == 'FAILURE'">Erreur le message n'a pas été envoyé</small>
-                            </p>
+                            <div style="max-height:200px;overflow:auto;" scroll-glue >
+                                <p ng-repeat="message in chat.messages | orderBy: 'date' | limitTo: -eltsInChat" >
+                                    <strong ng-show="message.from != currentSubscriber.userRef" tooltip-placement="left" tooltip="{{message.date | date:'à HH:mm:ss le dd/MM'}}">
+                                        {{refSubscribers[message.from].surname}} {{refSubscribers[message.from].name}} :
+                                    </strong>
+                                    <strong ng-show="message.from == currentSubscriber.userRef" tooltip-placement="left" tooltip="{{message.date | date:'à HH:mm:ss le dd/MM'}}">
+                                        Moi :
+                                    </strong>
+                                    {{message.message}} <br/>
+                                    <small class="muted" ng-show="message.from == currentSubscriber.userRef && message.statut && message.statut == 'SENDING'">Envoi en cours</small>
+                                    <small class="muted" ng-show="message.from == currentSubscriber.userRef && !message.statut || message.statut == 'RECEIVED'">Envoyé</small>
+                                    <small class="text-error" ng-show="message.from == currentSubscriber.userRef && message.statut && message.statut == 'FAILURE'">Erreur le message n'a pas été envoyé</small>
+                                </p>
+                            </div>
                         </div>
 
                         <div class="row-fluid pull-right">

@@ -482,7 +482,7 @@ function EventCtrl($scope, $http, $location, $compile, $filter, mailUtils, mapSe
         if(message.type=='message'){
             if($scope.mainChat.topic && (message.topicRef == $scope.mainChat.topic.id)){
                 message.date = new Date(message.date);
-                $scope.mainChat.messages.push(message);
+                addMessageToTopic(message, $scope.mainChat.messages);
                 $scope.$apply();
             }else if($scope.topics){
                 for(var i in $scope.topics){
@@ -509,11 +509,14 @@ function EventCtrl($scope, $http, $location, $compile, $filter, mailUtils, mapSe
 
     function addMessageToTopic(message, messages){
         var found = false;
-        if(message.from == $scope.currentSubscriber.userRef){
+        if(message.from == $scope.currentSubscriber.userRef || message.topic.categorie == 'mainChat'){
             for(var i in messages){
                 var msg = messages[i];
                 if((msg.id && message.id && msg.id == message.id) || ((!msg.id || !message.id) && msg.tmpId && message.tmpId && msg.tmpId == message.tmpId)){
                     msg.statut = 'RECEIVED';
+                    if(!msg.id){
+                        msg.id = message.id;
+                    }
                     if(!msg.date){
                         msg.date = message.date;
                     }
@@ -561,6 +564,10 @@ function EventCtrl($scope, $http, $location, $compile, $filter, mailUtils, mapSe
         $scope.feed.addEventListener("message", $scope.handleSubscriberUpdated, false);
     };
 
+    $scope.nextMessages = function(){
+        alert("next");
+        $scope.eltsInChat += 5;
+    };
 
     function formatMessages(){
          if($scope.chat.messages){
