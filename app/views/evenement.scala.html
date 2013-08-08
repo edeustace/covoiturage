@@ -413,11 +413,13 @@
                             <p class="nav-header">
                                 Ma conversation avec : <strong ng-show="chaters != currentSubscriber.userRef" ng-repeat="chaters in chat.currentTopic.subscribers">{{refSubscribers[chaters].surname}} {{refSubscribers[chaters].name}}, </strong>
                             </p>
+                            <!--
                             <p >
                                 <a ng-click="eltsInChat = eltsInChat + 5 ">Plus ...</a>
                             </p>
+                            -->
                             <div style="max-height:200px;overflow:auto;" scroll-glue >
-                                <p ng-repeat="message in chat.messages | orderBy: 'date' | limitTo: -eltsInChat" >
+                                <p ng-repeat="message in chat.messages | orderBy: 'date' " >
                                     <strong ng-show="message.from != currentSubscriber.userRef" tooltip-placement="left" tooltip="{{message.date | date:'à HH:mm:ss le dd/MM'}}">
                                         {{refSubscribers[message.from].surname}} {{refSubscribers[message.from].name}} :
                                     </strong>
