@@ -287,6 +287,7 @@ function EventCtrl($scope, $http, $location, $compile, $filter, mailUtils, mapSe
             type:"topic",
             creator:$scope.currentSubscriber.userRef,
             categorie:'chat',
+            statut : 'SENDING',
             subscribers:subscribers
         };
 
@@ -301,16 +302,49 @@ function EventCtrl($scope, $http, $location, $compile, $filter, mailUtils, mapSe
         if(!aTopic){
             var tmpIdTopic = getTmpIdTopic();
             topic.tmpId = tmpIdTopic;
-            $http.post($scope.eventLinks.topics, topic).success(function(){
-
+            $scope.topics.push(topic);
+            if($scope.topics.length==1){
+                $scope.loadMessages(topic);
+            }
+            $http.post($scope.eventLinks.topics, topic).success(function(aTopic){
+                addTopicToList(aTopic, $scope.topics);
             }).error(function(){
-
+                for(var i in $scope.topics){
+                    if(!$scope.topics[i].id && topic.tmpId == $scope.topics[i].tmpId){
+                        topics[i].statut = 'FAILURE';
+                    }
+                }
             });
         }else{
            $scope.loadMessages(aTopic);
         }
         $scope.scrollTo('discussion');
     };
+
+    function addTopicToList(topic, topics){
+        if(topics){
+            var found = false;
+            for(var i in topics){
+                var currentTopic=topics[i];
+                if((currentTopic.id && topic.id && currentTopic.id == topic.id) || ((!currentTopic.id || !topic.id) && currentTopic.tmpId && topic.tmpId && currentTopic.tmpId == topic.tmpId)){
+                    found = true;
+                    currentTopic.id = topic.id;
+                    currentTopic.date = topic.date;
+                    currentTopic.update = topic.update;
+                    currentTopic.statut = 'RECEIVED';
+                }
+            }
+            if(!found){
+                if(topics.length == 0){
+                    topic.active;
+                }
+                topics.push(topic);
+                if(topic.creator === $scope.currentSubscriber.userRef || topic.active){
+                    $scope.loadMessages(topic);
+                }
+            }
+        }
+    }
 
     var _tmpIdTopic = 0;
     function getTmpIdTopic(){
@@ -359,6 +393,7 @@ function EventCtrl($scope, $http, $location, $compile, $filter, mailUtils, mapSe
             tmpId: tmpIdMessage,
             from: $scope.currentSubscriber.userRef,
             message: currentMessage,
+            date : new Date(),
             statut:"SENDING"
         };
         if(topic.categorie == "chat"){
@@ -414,6 +449,7 @@ function EventCtrl($scope, $http, $location, $compile, $filter, mailUtils, mapSe
             $scope.eltsInChat = 10;
             aTopic.alert = null;
             setCurrentTopic(aTopic.id);
+            $scope.chat.currentTopic = aTopic;
             $http.get('/rest/messages/'+aTopic.id).success(function(messages){
                 $scope.chat = {
                     messages : messages,
@@ -435,23 +471,7 @@ function EventCtrl($scope, $http, $location, $compile, $filter, mailUtils, mapSe
                 $scope.mainChat.topic = topic;
             }else{
                 topic.active = false;
-
-                if(!$scope.topics){
-                    $scope.topics=new Array();
-                }
-
-                for(var i in $scope.topics){
-                    if($scope.topics[i].id == topic.id){
-                        exist = true;
-                        $scope.topics[i].date = topic.date;
-                    }
-                }
-                if(!exist){
-                    $scope.topics.push(topic);
-                    if(topic.creator === $scope.currentSubscriber.userRef){
-                        $scope.loadMessages(topic);
-                    }
-                }
+                addTopicToList(topic, $scope.topics);
             }
             $scope.$apply();
         }
@@ -488,11 +508,17 @@ function EventCtrl($scope, $http, $location, $compile, $filter, mailUtils, mapSe
     };
 
     function addMessageToTopic(message, messages){
-        for(var i in messages){
-            var msg = messages[i];
-            if((msg.id && message.id && msg.id == message.id) || ((!msg.id || !message.id) && msg.tmpId && message.tmpId && msg.tmpId == message.tmpId)){
-                msg.statut = 'RECEIVED';
-                found = true;
+        var found = false;
+        if(message.from == $scope.currentSubscriber.userRef){
+            for(var i in messages){
+                var msg = messages[i];
+                if((msg.id && message.id && msg.id == message.id) || ((!msg.id || !message.id) && msg.tmpId && message.tmpId && msg.tmpId == message.tmpId)){
+                    msg.statut = 'RECEIVED';
+                    if(!msg.date){
+                        msg.date = message.date;
+                    }
+                    found = true;
+                }
             }
         }
         if(!found){

@@ -35,6 +35,8 @@ public class Topic {
 
     public String categorie;
 
+    public String tmpId;
+
     public Date date;
 
     public Date update;

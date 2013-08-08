@@ -13,6 +13,7 @@ import play.mvc.Controller;
 import play.mvc.Result;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.List;
 
 import static play.data.Form.form;
@@ -90,6 +91,7 @@ public class ChatController extends Controller {
             return badRequest(form.errorsAsJson()).as("application/json");
         }else{
             ChatMessage message = form.get();
+            message.date = new Date();
             message.save();
             SubscriberActor.publishMessage(message);
             try {
