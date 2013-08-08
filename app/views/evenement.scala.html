@@ -380,6 +380,9 @@
                     </strong>
                     <br/>
                     {{msg.message}}
+                    <small class="muted" ng-show="msg.statut && msg.statut == 'SENDING'">Envoi en cours</small>
+                    <small class="muted" ng-show="!msg.statut || msg.statut == 'RECEIVED'">Envoyé</small>
+                    <small class="text-error" ng-show="msg.statut && msg.statut == 'FAILURE'">Erreur le message n'a pas été envoyé</small>
                 </p>
                 <p>
                     <a ng-click="eltsInMainChat = eltsInMainChat + 5 ">Plus ...</a>
@@ -396,7 +399,7 @@
                                     <li ng-show="chaters != currentSubscriber.userRef" ng-repeat="chaters in topic.subscribers">{{refSubscribers[chaters].surname}} {{refSubscribers[chaters].name}}, </li>
                                 </ul>
                                 <span ng-show="topic.alert" class="badge badge-important">message</span>
-                                <small>{{topic.update | date:'HH:mm:ss le dd/MM'}}</small>
+                                <small class="muted">{{topic.update | date:'HH:mm:ss le dd/MM'}}</small>
                             </a>
                         </li>
                     </ul>
@@ -415,7 +418,10 @@
                                 <strong ng-show="message.from == currentSubscriber.userRef" tooltip-placement="left" tooltip="{{message.date | date:'à HH:mm:ss le dd/MM'}}">
                                     Moi :
                                 </strong>
-                                {{message.message}}
+                                {{message.message}} <br/>
+                                <small class="muted" ng-show="message.statut && message.statut == 'SENDING'">Envoi en cours</small>
+                                <small class="muted" ng-show="!message.statut || message.statut == 'RECEIVED'">Envoyé</small>
+                                <small class="text-error" ng-show="message.statut && message.statut == 'FAILURE'">Erreur le message n'a pas été envoyé</small>
                             </p>
                         </div>
 

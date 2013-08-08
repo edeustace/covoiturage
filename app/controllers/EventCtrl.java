@@ -244,12 +244,15 @@ public class EventCtrl extends Controller {
             this.links.add(Link.link("pictoCar", controllers.routes.Assets.at("icons/car_classic.png").toString()));
             this.links.add(Link.link("pictoMyCar", controllers.routes.Assets.at("icons/car_red.png").toString()));
             this.links.add(Link.link("pictoCarLight", controllers.routes.Assets.at("icons/car_light.png").toString()));
+            this.links.add(Link.link("pictoCarGrey", controllers.routes.Assets.at("icons/car_grey.png").toString()));
             this.links.add(Link.link("pictoMyPassenger", controllers.routes.Assets.at("icons/pedestriancrossing_red.png").toString()));
             this.links.add(Link.link("pictoStopDark", controllers.routes.Assets.at("icons/pedestriancrossing_green-dark.png").toString()));
             this.links.add(Link.link("pictoStop", controllers.routes.Assets.at("icons/pedestriancrossing_green-classic.png").toString()));
             this.links.add(Link.link("pictoStopLight", controllers.routes.Assets.at("icons/pedestriancrossing_light.png").toString()));
+            this.links.add(Link.link("pictoStopGrey", controllers.routes.Assets.at("icons/pedestriancrossing_grey.png").toString()));
             this.links.add(Link.link("pictoDontKnow", controllers.routes.Assets.at("icons/symbol_blank.png").toString()));
             this.links.add(Link.link("pictoDontKnowLight", controllers.routes.Assets.at("icons/symbol_blank_jaune_def.png").toString()));
+
         }
 
         @JsonProperty("links")

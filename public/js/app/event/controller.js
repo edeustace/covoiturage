@@ -281,6 +281,7 @@ function EventCtrl($scope, $http, $location, $compile, $filter, mailUtils, mapSe
         subscribers.push(subscriber.userRef);
         subscribers.push($scope.currentSubscriber.userRef);
 
+
         var topic = {
             idEvent:$scope.event.id,
             type:"topic",
@@ -298,12 +299,24 @@ function EventCtrl($scope, $http, $location, $compile, $filter, mailUtils, mapSe
             }
         }
         if(!aTopic){
-            $http.post($scope.eventLinks.topics, topic);
+            var tmpIdTopic = getTmpIdTopic();
+            topic.tmpId = tmpIdTopic;
+            $http.post($scope.eventLinks.topics, topic).success(function(){
+
+            }).error(function(){
+
+            });
         }else{
            $scope.loadMessages(aTopic);
         }
         $scope.scrollTo('discussion');
     };
+
+    var _tmpIdTopic = 0;
+    function getTmpIdTopic(){
+        _tmpIdTopic++;
+        return _tmpIdTopic;
+    }
 
     function compareArrays(array1, array2){
         if(array1.sort().join(',')=== array2.sort().join(',')){
@@ -330,13 +343,7 @@ function EventCtrl($scope, $http, $location, $compile, $filter, mailUtils, mapSe
     };
 
     $scope.sendMessage = function(currentMessage){
-
         sendAMessage(currentMessage, $scope.chat.currentTopic);
-
-        if(!$scope.chat.messages){
-           $scope.chat.messages = new Array();
-        }
-        //$scope.chat.messages.push(messageToSend);
         $scope.chat.currentMessage = null;
     };
 
@@ -345,19 +352,48 @@ function EventCtrl($scope, $http, $location, $compile, $filter, mailUtils, mapSe
             topic.date = new Date(topic.date);
         }
         topic.update = new Date();
+        var tmpIdMessage = getTmpIdMessage();
         var messageToSend = {
             type:"message",
             topic: topic,
+            tmpId: tmpIdMessage,
             from: $scope.currentSubscriber.userRef,
-            message: currentMessage
+            message: currentMessage,
+            statut:"SENDING"
         };
-        $http.post($scope.eventLinks.topics+'/'+topic.id+'/messages', messageToSend);
+        if(topic.categorie == "chat"){
+            $scope.chat.messages.push(messageToSend);
+        }else if(topic.categorie == "mainChat"){
+            $scope.mainChat.messages.push(messageToSend);
+        }
+        $http.post($scope.eventLinks.topics+'/'+topic.id+'/messages', messageToSend).success(function(message){
+            if(topic.categorie == "chat"){
+                addMessageToTopic(message, $scope.chat.messages);
+            }else if(topic.categorie == "mainChat"){
+                addMessageToTopic(message, $scope.mainChat.messages);
+            }
+        }).error(function(){
+            if(topic.categorie == "chat"){
+                for(var i in $scope.chat.messages){
+                    if(!$scope.chat.messages[i].id && $scope.chat.messages[i].tmpId == tmpIdMessage){
+                        $scope.chat.messages[i].statut = "FAILURE";
+                    }
+                }
+            }else if(topic.categorie == "mainChat"){
+                for(var i in $scope.mainChat.messages){
+                    if(!$scope.mainChat.messages[i].id && $scope.mainChat.messages[i].tmpId == tmpIdMessage){
+                        $scope.mainChat.messages[i].statut = "FAILURE";
+                    }
+                }
+            }
+        });
     };
 
-    $scope.openModalChat= function(aTopic){
-        $scope.shouldBeOpen = true;
-        $scope.loadMessages(aTopic);
-    };
+    var _tmpIdMessage = 0;
+    function getTmpIdMessage(){
+        _tmpIdMessage++;
+        return _tmpIdMessage;
+    }
 
     $scope.loadMainChatMessages = function(){
         $http.get('/rest/messages/'+$scope.mainChat.topic.id).success(function(messages){
@@ -436,7 +472,7 @@ function EventCtrl($scope, $http, $location, $compile, $filter, mailUtils, mapSe
                         topic.update = new Date(message.date);
                         if(topic.active){
                             message.date = new Date(message.date);
-                            $scope.chat.messages.push(message);
+                            addMessageToTopic(message, $scope.chat.messages);
                         }else{
                             if(topic.alert){
                                 topic.alert++;
@@ -450,6 +486,20 @@ function EventCtrl($scope, $http, $location, $compile, $filter, mailUtils, mapSe
             }
         }
     };
+
+    function addMessageToTopic(message, messages){
+        for(var i in messages){
+            var msg = messages[i];
+            if((msg.id && message.id && msg.id == message.id) || ((!msg.id || !message.id) && msg.tmpId && message.tmpId && msg.tmpId == message.tmpId)){
+                msg.statut = 'RECEIVED';
+                found = true;
+            }
+        }
+        if(!found){
+            message.statut = 'RECEIVED';
+            messages.push(message);
+        }
+    }
 
     $scope.addNotification = function(msg){
         var notification = JSON.parse(msg.data);

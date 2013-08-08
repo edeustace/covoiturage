@@ -34,6 +34,9 @@ public class ChatMessage {
     public String topicRef;
 
     @NotNull
+    public String tmpId;
+
+    @NotNull
     public Topic topic;
 
     @NotNull
