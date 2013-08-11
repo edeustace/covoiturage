@@ -9,12 +9,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Date;
 
-import models.Car;
+import models.*;
 import models.Car.CarIsFullException;
-import models.Event;
-import models.Notification;
-import models.Subscriber;
-import models.User;
 import models.enums.Locomotion;
 
 import org.codehaus.jackson.JsonNode;
@@ -192,7 +188,19 @@ public class SubscriberCtrl extends Controller {
             	msg.format(args);
                 SubscriberActor.sendNotification(id, from, to, "success", msg.format(args), new Date());
             }
-            
+
+            List<Topic> topics = Topic.findByIdEventAndIdUser(id, idSub);
+            for(Topic topic : topics){
+                if(topic.categorie.equals("carChat")){
+                    if(!topic.subscribers.contains(idPassenger)){
+                        topic.subscribers.add(idPassenger);
+                        topic.save();
+                        SubscriberActor.publishTopic(topic);
+                        break;
+                    }
+                }
+            }
+
             return ok().as("application/json");
         } catch (CarIsFullException e){
         	return badRequest("{message: 'La voiture est pleine'}").as("application/json");

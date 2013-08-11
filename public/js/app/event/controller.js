@@ -38,6 +38,8 @@ function EventCtrl($scope, $http, $location, $compile, $filter, mailUtils, mapSe
         backdropFade: true,
         dialogFade:true
       };
+    $scope.editAddTopic = false;
+
 
 	//////////////  SCOPE METHODS  ///////////////////	
     $scope.scrollTo = function(id) {
@@ -291,10 +293,33 @@ function EventCtrl($scope, $http, $location, $compile, $filter, mailUtils, mapSe
             subscribers:subscribers
         };
 
+        createTopic(topic);
+    };
+
+    $scope.createTopicForCar = function(){
+        if($scope.currentCar){
+            var subscribers = new Array();
+            subscribers.push($scope.currentCar.driver.id);
+            for(var i in $scope.currentCar.passengers){
+                subscribers.push($scope.currentCar.passengers[i].id);
+            }
+            var topic = {
+                idEvent:$scope.event.id,
+                type:"topic",
+                creator:$scope.currentCar.driver.id,
+                categorie:'carChat',
+                statut : 'SENDING',
+                subscribers:subscribers
+            };
+            createTopic(topic);
+        }
+    };
+
+    function createTopic(topic){
         var aTopic = null;
         for(var i in $scope.topics){
             var currentTopic = $scope.topics[i];
-            if(compareArrays(currentTopic.subscribers, subscribers)){
+            if(compareArrays(currentTopic.subscribers, topic.subscribers)){
                 aTopic = currentTopic;
                 break;
             }
@@ -303,9 +328,7 @@ function EventCtrl($scope, $http, $location, $compile, $filter, mailUtils, mapSe
             var tmpIdTopic = getTmpIdTopic();
             topic.tmpId = tmpIdTopic;
             $scope.topics.push(topic);
-            if($scope.topics.length==1){
-                $scope.loadMessages(topic);
-            }
+            $scope.loadMessages(topic);
             $http.post($scope.eventLinks.topics, topic).success(function(aTopic){
                 addTopicToList(aTopic, $scope.topics);
             }).error(function(){
@@ -319,7 +342,7 @@ function EventCtrl($scope, $http, $location, $compile, $filter, mailUtils, mapSe
            $scope.loadMessages(aTopic);
         }
         $scope.scrollTo('discussion');
-    };
+    }
 
     function addTopicToList(topic, topics){
         if(topics){
@@ -332,6 +355,7 @@ function EventCtrl($scope, $http, $location, $compile, $filter, mailUtils, mapSe
                     currentTopic.date = topic.date;
                     currentTopic.update = topic.update;
                     currentTopic.statut = 'RECEIVED';
+                    currentTopic.subscribers = topic.subscribers;
                 }
             }
             if(!found){
@@ -353,6 +377,9 @@ function EventCtrl($scope, $http, $location, $compile, $filter, mailUtils, mapSe
     }
 
     function compareArrays(array1, array2){
+        if(!array1 || !array2){
+            return false;
+        }
         if(array1.sort().join(',')=== array2.sort().join(',')){
             return true;
         }else{
@@ -396,19 +423,19 @@ function EventCtrl($scope, $http, $location, $compile, $filter, mailUtils, mapSe
             date : new Date(),
             statut:"SENDING"
         };
-        if(topic.categorie == "chat"){
+        if(topic.categorie == "chat" || topic.categorie == "carChat"){
             $scope.chat.messages.push(messageToSend);
         }else if(topic.categorie == "mainChat"){
             $scope.mainChat.messages.push(messageToSend);
         }
         $http.post($scope.eventLinks.topics+'/'+topic.id+'/messages', messageToSend).success(function(message){
-            if(topic.categorie == "chat"){
+            if(topic.categorie == "chat" || topic.categorie == "carChat"){
                 addMessageToTopic(message, $scope.chat.messages);
             }else if(topic.categorie == "mainChat"){
                 addMessageToTopic(message, $scope.mainChat.messages);
             }
         }).error(function(){
-            if(topic.categorie == "chat"){
+            if(topic.categorie == "chat" || topic.categorie == "carChat"){
                 for(var i in $scope.chat.messages){
                     if(!$scope.chat.messages[i].id && $scope.chat.messages[i].tmpId == tmpIdMessage){
                         $scope.chat.messages[i].statut = "FAILURE";
@@ -579,7 +606,37 @@ function EventCtrl($scope, $http, $location, $compile, $filter, mailUtils, mapSe
          }
     }
 
+    $scope.addToTopic = function(){
+        $http.put($scope.eventLinks.topics+'/'+$scope.chat.currentTopic.id+'/subscribers', {subscribers:$scope.chat.currentTopic.newTopicSubscribers}).success(function(){
+            $scope.chat.currentTopic.addNewSubscribersStatut = 'RECEIVED';
+        }).error(function(){
+            $scope.chat.currentTopic.addNewSubscribersStatut = 'FAILURE';
+        });
+        $scope.setEditAddTopic(false);
+        $scope.chat.currentTopic.addNewSubscribersStatut = 'SENDING';
+    };
 
+    var validator = new RegExp("^\\w{20,}$");
+    $scope.$watch('chat.currentTopic.userToAddToTopic', function(newValue, oldValue) {
+        if(newValue && validator.test(newValue)){
+            if(!$scope.chat.currentTopic.newTopicSubscribers){
+                $scope.chat.currentTopic.newTopicSubscribers = new Array();
+            }
+            $scope.chat.currentTopic.newTopicSubscribers.push(newValue);
+            $scope.chat.currentTopic.userToAddToTopic = null;
+        }
+    });
+
+    $scope.removeNewTopicSubscriber = function(index){
+        $scope.chat.currentTopic.newTopicSubscribers.splice(index, 1);
+    };
+    $scope.setEditAddTopic = function(value){
+        if(!value){
+            $scope.userToAddToTopic = null;
+            $scope.chat.currentTopic.newTopicSubscribers = new Array();
+        }
+        $scope.editAddTopic = value;
+    }
     ///////////////  INIT /////////////////////
     
     var id = extractFromUrl($location.absUrl());

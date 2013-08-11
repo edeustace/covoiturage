@@ -86,12 +86,12 @@ DELETE  /rest/events/:id/subscribers/:idSub/possiblecars/:idCar     controllers.
 GET    	/rest/events/:id/subscribers/:idSub/notifications           controllers.SubscriberCtrl.listNotifications(id :String, idSub :String)
 DELETE  /rest/events/:id/subscribers/:idSub/notifications/:idNotif  controllers.SubscriberCtrl.deleteNotifications(id :String, idSub :String, idNotif :String)
 
-GET     /rest/events/:idEvent/topics             controllers.ChatController.getTopics(idEvent :String, categorie : String ?= null, user :String ?=null)
-POST    /rest/events/:idEvent/topics             controllers.ChatController.createTopic(idEvent :String)
-POST    /rest/events/:idEvent/topics/:idTopic/messages             controllers.ChatController.createMessage(idEvent :String, idTopic :String)
+GET     /rest/events/:idEvent/topics                            controllers.ChatCtrl.getTopics(idEvent :String, categorie : String ?= null, user :String ?=null)
+POST    /rest/events/:idEvent/topics                            controllers.ChatCtrl.createTopic(idEvent :String)
+POST    /rest/events/:idEvent/topics/:idTopic/messages          controllers.ChatCtrl.createMessage(idEvent :String, idTopic :String)
+PUT     /rest/events/:idEvent/topics/:idTopic/subscribers       controllers.ChatCtrl.addSubscribers(idEvent :String, idTopic :String)
 
-
-GET    /rest/messages/:idTopic                controllers.ChatController.getMessages(idTopic: String)
+GET    /rest/messages/:idTopic                controllers.ChatCtrl.getMessages(idTopic: String)
 
 
 

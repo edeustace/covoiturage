@@ -7,8 +7,11 @@ import models.ChatMessage;
 import models.Topic;
 import net.vz.mongodb.jackson.MongoCollection;
 import org.apache.commons.lang.StringUtils;
+import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
+import play.Logger;
 import play.data.Form;
+import play.mvc.BodyParser;
 import play.mvc.Controller;
 import play.mvc.Result;
 
@@ -26,7 +29,7 @@ import static play.data.Form.form;
  * To change this template use File | Settings | File Templates.
  */
 
-public class ChatController extends Controller {
+public class ChatCtrl extends Controller {
 
     private static ObjectMapper objectMapper = new ObjectMapper();
 
@@ -39,6 +42,7 @@ public class ChatController extends Controller {
             try {
                 return ok(objectMapper.writeValueAsString(topics)).as("application/json");
             } catch (IOException e) {
+                Logger.error("Erreur", e);
                 return internalServerError(e.getMessage()).as("application/json");
             }
         }
@@ -47,6 +51,7 @@ public class ChatController extends Controller {
             try {
                 return ok(objectMapper.writeValueAsString(topics)).as("application/json");
             } catch (IOException e) {
+                Logger.error("Erreur", e);
                 return internalServerError(e.getMessage()).as("application/json");
             }
         }
@@ -58,6 +63,7 @@ public class ChatController extends Controller {
         try {
             return ok(objectMapper.writeValueAsString(messages)).as("application/json");
         } catch (IOException e) {
+            Logger.error("Erreur", e);
             return internalServerError(e.getMessage()).as("application/json");
         }
     }
@@ -78,11 +84,39 @@ public class ChatController extends Controller {
             try {
                 return ok(objectMapper.writeValueAsString(existing)).as("application/json");
             } catch (IOException e) {
+                Logger.error("Erreur", e);
                 return internalServerError(e.getMessage()).as("application/json");
             }
         }
 
     }
+
+    @Restrict(@Group(Application.USER_ROLE))
+    @BodyParser.Of(BodyParser.Json.class)
+    public static Result addSubscribers(String idEvent, String idTopic) {
+        JsonNode node  = request().body().asJson();
+
+        Topic topic = Topic.getById(idTopic);
+
+        JsonNode subscribers = node.get("subscribers");
+        if(subscribers!= null){
+            for(JsonNode val : subscribers){
+                String subscriber = val.asText();
+                if(subscriber!=null && !topic.subscribers.contains(subscriber)){
+                    topic.subscribers.add(subscriber);
+                }
+            }
+            topic.save();
+        }
+        SubscriberActor.publishTopic(topic);
+        try {
+            return ok(objectMapper.writeValueAsString(topic)).as("application/json");
+        } catch (IOException e) {
+            Logger.error("Erreur", e);
+            return internalServerError(e.getMessage()).as("application/json");
+        }
+    }
+
 
     @Restrict(@Group(Application.USER_ROLE))
     public static Result createMessage(String idEvent, String idTopic) {
@@ -93,10 +127,14 @@ public class ChatController extends Controller {
             ChatMessage message = form.get();
             message.date = new Date();
             message.save();
+            Topic topic = Topic.getById(idTopic);
+            topic.update = new Date();
+            topic.save();
             SubscriberActor.publishMessage(message);
             try {
                 return ok(objectMapper.writeValueAsString(message)).as("application/json");
             } catch (IOException e) {
+                Logger.error("Erreur", e);
                 return internalServerError(e.getMessage()).as("application/json");
             }
         }

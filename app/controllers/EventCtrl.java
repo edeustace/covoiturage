@@ -238,7 +238,7 @@ public class EventCtrl extends Controller {
             this.links.add(Link.link("subscribers", controllers.routes.SubscriberCtrl.list(this.event.getId()).toString()));
             this.links.add(Link.link("contacts", controllers.routes.EventCtrl.addContacts(this.event.getId()).toString()));
             this.links.add(Link.link("securised", controllers.routes.EventCtrl.securised(this.event.getId()).toString()));
-            this.links.add(Link.link("topics", controllers.routes.ChatController.createTopic(this.event.getId()).toString()));
+            this.links.add(Link.link("topics", controllers.routes.ChatCtrl.createTopic(this.event.getId()).toString()));
             this.links.add(Link.link("pictoFinish", controllers.routes.Assets.at("icons/finish.png").toString()));
             this.links.add(Link.link("pictoCarDark", controllers.routes.Assets.at("icons/car_dark.png").toString()));
             this.links.add(Link.link("pictoCar", controllers.routes.Assets.at("icons/car_classic.png").toString()));

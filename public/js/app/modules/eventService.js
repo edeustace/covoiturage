@@ -205,7 +205,7 @@ angular.module('eventService', ['mapService'], function($provide){
                                 car.passengers.push(
                                 {
                                     name:passenger.surname+' '+passenger.name,
-                                    id : passenger,
+                                    id : passenger.userRef,
                                     subscriber :passenger,
                                     deleteRight : (carOwner.userRef == $scope.currentSubscriber.userRef || $scope.currentSubscriber.userRef == ref)
                                 });
