@@ -290,6 +290,9 @@ angular.module('eventModule', [], function($provide){
                     }
                 }
             },
+            getCurrentCar : function(){
+                return $event.currentCar;
+            },
             setCurrentCar : function(car){
                 $event.currentCar = car;
                 for(var j in $listenersOnCurrentCar){
@@ -311,7 +314,6 @@ angular.module('eventModule', [], function($provide){
                 $http.put($service.getEventLinks().securised, {value:true}).success(function(data){
                     deferred.resolve(data);
                 }).error(function(error){
-                    //TODO gérer les erreurs
                     deferred.reject(error);
                 });
                 return deferred.promise ;

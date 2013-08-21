@@ -505,6 +505,50 @@ describe('eventServiceSpec', function() {
         });
     });
 
+    describe('load car ', function() {
+        it('no car', function() {
+            var currentEvent = clone(eventMockFull);
+            service.setEvent(currentEvent);
+            service.indexSubscribers(currentEvent.subscribers);
+            service.loadCurrentCar();
+            expect(service.getCurrentCar()).toBe(null);
+        });
+
+        it('current user is driver', function() {
+            var carOwner = "51cdb98744ae8fb5cb9d970b";
+            var currentEvent = clone(eventMockFull);
+            service.setEvent(currentEvent);
+            service.indexSubscribers(currentEvent.subscribers);
+            service.setCurrentSubscriber(service.getSubscriber(carOwner));
+
+            service.loadCurrentCar();
+            expect(service.getCurrentCar()).not.toBe(undefined);
+            expect(service.getCurrentCar().driver).not.toBe(undefined);
+            expect(service.getCurrentCar().driver.id).toEqual(carOwner);
+            expect(service.getCurrentCar().driver.subscriber.userRef).toEqual(carOwner);
+            expect(service.getCurrentCar().passengers.length).toEqual(1);
+            expect(service.getCurrentCar().passengers[0].id).toEqual("51cb52ec44aec7e661521c4d");
+            expect(service.getCurrentCar().passengers[0].subscriber.userRef).toEqual("51cb52ec44aec7e661521c4d");
+        });
+
+        it('current user is passenger', function() {
+            var currentUser = "51cb52ec44aec7e661521c4d";
+            var currentEvent = clone(eventMockFull);
+            service.setEvent(currentEvent);
+            service.indexSubscribers(currentEvent.subscribers);
+            service.setCurrentSubscriber(service.getSubscriber(currentUser));
+
+            service.loadCurrentCar();
+            expect(service.getCurrentCar()).not.toBe(undefined);
+            expect(service.getCurrentCar().driver).not.toBe(undefined);
+            expect(service.getCurrentCar().driver.id).toEqual("51cdb98744ae8fb5cb9d970b");
+            expect(service.getCurrentCar().driver.subscriber.userRef).toEqual("51cdb98744ae8fb5cb9d970b");
+            expect(service.getCurrentCar().passengers.length).toEqual(1);
+            expect(service.getCurrentCar().passengers[0].id).toEqual(currentUser);
+            expect(service.getCurrentCar().passengers[0].subscriber.userRef).toEqual(currentUser);
+        });
+    });
+
     describe('load event ', function() {
         it('load !', function() {
             var ok = false;
