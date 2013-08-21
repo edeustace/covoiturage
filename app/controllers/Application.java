@@ -87,7 +87,14 @@ public class Application extends Controller {
 	public static Result jsRoutes() {
 		return ok(
 				Routes.javascriptRouter("jsRoutes",
-						controllers.routes.javascript.Signup.forgotPassword()))
+						controllers.routes.javascript.Signup.forgotPassword(),
+                        controllers.routes.javascript.SubscriberCtrl.listNotifications(),
+                        controllers.routes.javascript.ChatCtrl.getTopics(),
+                        controllers.routes.javascript.ChatCtrl.createTopic(),
+                        controllers.routes.javascript.ChatCtrl.getMessages(),
+                        controllers.routes.javascript.ChatCtrl.createMessage(),
+                        controllers.routes.javascript.ChatCtrl.addSubscribers()
+                        ))
 				.as("text/javascript");
 	}
 

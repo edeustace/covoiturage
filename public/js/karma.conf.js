@@ -10,9 +10,13 @@ basePath = '';
 files = [
   JASMINE,
   JASMINE_ADAPTER,
-  'lib/*.js',
-  'app/*.js',
-  'test/**/*Spec.js'
+  'lib/angular.js',
+  'lib/angular-*.js',
+  'test/lib/angular-mocks.js',
+  //'app/*.js',
+  //'app/modules/mapService.js',
+  'app/modules/*.js',
+  'test/modules/*.js'
 ];
 
 

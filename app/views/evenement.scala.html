@@ -20,7 +20,8 @@
     <script type="text/javascript" src="@routes.Assets.at("js/app/directives/scrollglue.js")"></script>
     <script type="text/javascript" src="@routes.Assets.at("js/app/directives/ng-infinite-scroll.min.js")"></script>
     <script type="text/javascript" src="@routes.Assets.at("js/app/modules/mailUtils.js")"></script>
-    <script type="text/javascript" src="@routes.Assets.at("js/app/modules/eventService.js")"></script>
+    <script type="text/javascript" src="@routes.Assets.at("js/app/modules/eventService2.js")"></script>
+    <script type="text/javascript" src="@routes.Assets.at("js/app/modules/chatModule.js")"></script>
     <script type="text/javascript" src="@routes.Assets.at("js/app/modules/mapService.js")"></script>
     <script type="text/javascript" src="@routes.Assets.at("js/app/event/app.js")"></script>
     <script type="text/javascript" src="@routes.Assets.at("js/app/event/controller.js")"></script>
@@ -119,7 +120,7 @@
 
                 <alert ng-repeat="alert in alerts | orderBy: '-date' " type="alert.type" close="closeAlert($index)">{{alert.msg}}</alert>
                 <br/>
-                    <div ng-repeat="marker in myMarkers" ui-map-marker="myMarkers[$index]"
+                    <div ng-repeat="marker in getMarkers()" ui-map-marker="getMarker($index)"
                          ui-event="{'map-click': 'openMarkerInfo(marker)'}">
                     </div>
                     <div ui-map-info-window="myInfoWindow">
@@ -129,7 +130,7 @@
                                 Passagers :
                                 <ul>
                                     <li ng-repeat="aPassenger in currentInfoWindowsSubscriber.car.passengers" >
-                                        {{refSubscribers[aPassenger].surname}} {{refSubscribers[aPassenger].name}}
+                                        {{getSubscriber(aPassenger).surname}} {{getSubscriber(aPassenger).name}}
                                     </li>
                                 </ul>
                                 {{currentInfoWindowsSubscriber.car.nbPlaces - currentInfoWindowsSubscriber.car.passengers.length}} places restantes
@@ -165,8 +166,8 @@
                             Adresse : <address><strong>{{currentInfoWindowsEvent.address}}</strong></address>
                         </div>
                     </div>
-                    <div id="map_canvas" ui-map="myMap" class="map"
-                         ui-options="mapOptions">
+                    <div id="map_canvas" ui-map="map" class="map"
+                         ui-options="getMapOptions()">
                     </div>
             </div>
 
@@ -281,7 +282,7 @@
                             <strong>En attente : </strong>
                             <ul>
                                 <li ng-repeat="passenger in currentSubscriber.car.waitings" >
-                                    {{refSubscribers[passenger].surname}} {{refSubscribers[passenger].name}}
+                                    {{getSubscriber(passenger).surname}} {{getSubscriber(passenger).name}}
                                     <button class="btn btn-success btn-mini" type="button" ng-click="validatePassenger(currentSubscriber, passenger)" >Valider</button>
                                     <button class="btn btn-warning btn-mini" type="button" ng-click="removeWaitingGuy(currentSubscriber, passenger)" >Annuler</button>
                                 </li>
@@ -320,12 +321,12 @@
                                 <th>Nom</th>
                                 <th>Adresse</th>
                                 <th class="hidden-phone">places restantes</th>
-                                <th ng-show="currentSubscriber.locomotion == 'AUTOSTOP'">Monter/Descendre</th>
+                                <th ng-show="currentSubscriber.locomotion == 'AUTOSTOP'">Reservations</th>
                                 <th ng-show="currentSubscriber.locomotion == 'CAR'">Prendre/Ne plus prendre</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr ng-repeat="subscriber in subscribers | auto:filterUsers:markers  | filter:query" ng-show="!subscriber.current" class="{{subscriber.class}}" >
+                            <tr ng-repeat="subscriber in getSubscribers() | auto:filterUsers:markers  | filter:query" ng-show="!subscriber.current" class="{{subscriber.class}}" >
                                 <td>
                                     <a ng-click="openSubscriberInfo(subscriber)"><img ng-src="{{subscriber.picto}}" /></a>
                                     <a ng-click="createTopic(subscriber)" ><i class=" icon-comment" tooltip="Démarrer une discussion" ></i></a>
@@ -374,10 +375,10 @@
                 <p class="nav-header">
                     Mur
                 </p>
-                    <textarea class="input-block-level" rows="2" ng-model="mainChat.currentMessage" ui-keypress="{13:'sendMessageToMainChat(mainChat.currentMessage)'}" ></textarea>
+                    <textarea class="input-block-level" rows="2" ng-model="mainChat.currentMessage" ui-keypress="{13:'sendMessageToWall(mainChat.currentMessage)'}" ></textarea>
                 <p ng-repeat="msg in mainChat.messages | orderBy: '-date' | limitTo: eltsInMainChat" class="dl-horizontalli">
                     <strong ng-show="msg.from != currentSubscriber.userRef" tooltip-placement="left" tooltip="{{msg.date | date:'à HH:mm:ss le dd/MM'}}">
-                        {{refSubscribers[msg.from].surname}} {{refSubscribers[msg.from].name}} :
+                        {{getSubscriber(msg.from).surname}} {{getSubscriber(msg.from).name}} :
                     </strong>
                     <strong ng-show="msg.from == currentSubscriber.userRef" tooltip-placement="left" tooltip="{{msg.date | date:'à HH:mm:ss le dd/MM'}}">
                         Moi :
@@ -398,10 +399,10 @@
                 <div class="tabbable tabs-right" >
                     <ul class="nav nav-tabs">
                         <li class="nav-header">Mes conversations</li>
-                        <li ng-repeat="topic in topics  | orderBy: '-update'" ng-class="{'active' : topic.active}">
+                        <li ng-repeat="topic in chat.topics  | orderBy: '-update'" ng-class="{'active' : topic.active}">
                             <a href="javascript:void" ng-click="loadMessages(topic)">
                                 <ul ng-show="topic.categorie=='chat'">
-                                    <li ng-show="chaters != currentSubscriber.userRef" ng-repeat="chaters in topic.subscribers">{{refSubscribers[chaters].surname}} {{refSubscribers[chaters].name}}, </li>
+                                    <li ng-show="chaters != currentSubscriber.userRef" ng-repeat="chaters in topic.subscribers">{{getSubscriber(chaters).surname}} {{getSubscriber(chaters).name}}, </li>
                                 </ul>
                                 <ul ng-show="topic.categorie=='carChat'">
                                     <li>Ma voiture</li>
@@ -417,14 +418,14 @@
                     <div class="tab-content" class="span3">
                         <div class="row-fluid">
                             <p class="nav-header">
-                                Ma conversation avec : <strong ng-show="chaters != currentSubscriber.userRef" ng-repeat="chaters in chat.currentTopic.subscribers">{{refSubscribers[chaters].surname}} {{refSubscribers[chaters].name}}, </strong>
+                                Ma conversation avec : <strong ng-show="chaters != currentSubscriber.userRef" ng-repeat="chaters in chat.currentTopic.subscribers">{{getSubscriber(chaters).surname}} {{getSubscriber(chaters).name}}, </strong>
                                 <button ng-show="!editAddTopic" class="btn btn-mini" type="button" ng-click="setEditAddTopic(true)" tooltip="Ajouter à la conversation">+</button>
                                 <button ng-show="editAddTopic" class="btn btn-mini" type="button" ng-click="setEditAddTopic(false)" tooltip="Ajouter à la conversation">-</button>
                             </p>
 
                             <div ng-show="editAddTopic">
                                 <div>
-                                    <alert ng-repeat="newSubsc in chat.currentTopic.newTopicSubscribers" type="info" close="removeNewTopicSubscriber($index)">{{refSubscribers[newSubsc].surname}} {{refSubscribers[newSubsc].name}}</alert>
+                                    <alert ng-repeat="newSubsc in chat.currentTopic.newTopicSubscribers" type="info" close="removeNewTopicSubscriber($index)">{{getSubscriber(newSubsc).surname}} {{getSubscriber(newSubsc).name}}</alert>
                                     <button ng-show="chat.currentTopic.newTopicSubscribers" class="btn btn-primary" type="button" ng-click="addToTopic()">Valider</button>
                                 </div>
                                 <div>
@@ -442,7 +443,7 @@
                             <div style="max-height:200px;overflow:auto;" scroll-glue >
                                 <p ng-repeat="message in chat.messages | orderBy: 'date' " >
                                     <strong ng-show="message.from != currentSubscriber.userRef" tooltip-placement="left" tooltip="{{message.date | date:'à HH:mm:ss le dd/MM'}}">
-                                        {{refSubscribers[message.from].surname}} {{refSubscribers[message.from].name}} :
+                                        {{getSubscriber(message.from).surname}} {{getSubscriber(message.from).name}} :
                                     </strong>
                                     <strong ng-show="message.from == currentSubscriber.userRef" tooltip-placement="left" tooltip="{{message.date | date:'à HH:mm:ss le dd/MM'}}">
                                         Moi :

@@ -15,7 +15,7 @@ object ApplicationBuild extends Build {
         "net.vz.mongodb.jackson" %% "play-mongo-jackson-mapper" % "1.1.0"
   )
 
-  val main = PlayProject(appName, appVersion, appDependencies, mainLang = JAVA)
+  val main = play.Project(appName, appVersion, appDependencies)
     .settings(
           resolvers += Resolver.url("Objectify Play Repository (release)", url("http://schaloner.github.com/releases/"))(Resolver.ivyStylePatterns),
           resolvers += Resolver.url("Objectify Play Repository (snapshot)", url("http://schaloner.github.com/snapshots/"))(Resolver.ivyStylePatterns),
