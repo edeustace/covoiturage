@@ -459,15 +459,19 @@ angular.module('eventModule', [], function($provide){
 
             formatErrors : function(data, callback){
                 var result = new Array();
-                if(data.errors){
+                if(data && data.errors){
                     var obj = JSON.parse(JSON.stringify(data.errors));
                     var someErrors = data.errors;
                     for(var anError in someErrors){
                         var msgs = someErrors[anError];
-                        for(var i in msgs){
-                            if(callback){
-                                callback(msgs[i]);
-                            }
+                        if(typeof msgs === 'string'){
+                            callback(msgs);
+                        }else{
+                           for(var i in msgs){
+                               if(callback){
+                                   callback(msgs[i]);
+                               }
+                           }
                         }
                     }
                 }else{

@@ -549,6 +549,51 @@ describe('eventServiceSpec', function() {
         });
     });
 
+    describe('format error ', function() {
+        it('Errors as array', function() {
+            var ok = false;
+
+            var msgErrors = new Array();
+            service.formatErrors({errors:{
+                "champs1.champs2" : ["un message"],
+                "champs3.champs4" : ["un autre message"],
+            }}, function(error){
+                ok = true;
+                msgErrors.push(error);
+            });
+            expect(msgErrors.length).toEqual(2);
+            expect(ok).toBe(true);
+        });
+
+        it('Errors as string', function() {
+            var ok = false;
+
+            var msgErrors = new Array();
+            service.formatErrors({errors:{
+                "champs1.champs2" : "un message",
+                "champs3.champs4" : "un autre message",
+            }}, function(error){
+                ok = true;
+                msgErrors.push(error);
+            });
+            expect(msgErrors.length).toEqual(2);
+            expect(ok).toBe(true);
+        });
+
+        it('No errors ', function() {
+            var ok = false;
+
+            var msgErrors = new Array();
+            service.formatErrors(null, function(error){
+                ok = true;
+                expect(error).toBe(null);
+            });
+
+            expect(ok).toBe(true);
+        });
+
+    });
+
     describe('load event ', function() {
         it('load !', function() {
             var ok = false;
