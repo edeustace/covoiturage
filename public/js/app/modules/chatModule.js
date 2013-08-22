@@ -1,8 +1,9 @@
 
 
 
-angular.module('chatService', [], function($provide){
-    $provide.factory('chatService', function($http, $q) {
+angular.module('chatModule', [], function($provide){
+
+    $provide.factory('chatService', ['$http', '$q', function($http, $q) {
 
         function generateId(){
             return Math.floor((Math.random()*1000)+1);
@@ -22,10 +23,12 @@ angular.module('chatService', [], function($provide){
                 var currentTopic = $data.chat.topics[i];
                 if(currentTopic.id === id){
                     currentTopic.active = true;
+                    $data.chat.currentTopic = currentTopic;
                 }else{
                     currentTopic.active = false;
                 }
             }
+
         }
         function addTopicToList(topic, topics, idCurrentUser){
             if(topics){
@@ -68,7 +71,7 @@ angular.module('chatService', [], function($provide){
                 if(!$data.chat.topics){
                     $data.chat.topics = new Array();
                 }
-                addTopic(topic);
+                pushTopic(topic);
                 var url = jsRoutes.controllers.ChatCtrl.createTopic(idEvent);
                 $http.post(url.url, topic).success(function(aTopic){
                     $chatService.loadMessages(aTopic);
@@ -76,8 +79,9 @@ angular.module('chatService', [], function($provide){
                 }).error(function(){
                     deferred.reject(aTopic);
                 });
+            }else{
+                $chatService.loadMessages(aTopic);
             }
-            $chatService.loadMessages(aTopic);
             return deferred.promise;
         }
         function addMessageToTopic(message, messages, idCurrentUser){
@@ -166,7 +170,7 @@ angular.module('chatService', [], function($provide){
                 $onMessageAddedOnWallListeners[i](message);
             }
         }
-        function addTopic(topic){
+        function pushTopic(topic){
             $data.chat.topics.push(topic);
             for(var i in $onMessageAddedListeners){
                 $onTopicAddedListeners[i](message);
@@ -215,31 +219,38 @@ angular.module('chatService', [], function($provide){
             addListenerOnMessageAddedOnWallListeners : function(callback){
                 $onMessageAddedOnWallListeners.push(callback);
             },
+            pushTopic : function(topic){
+                pushTopic(topic);
+            },
             loadTopics :  function(eventId, currentUserId){
                 var deferred = $q.defer();
-                var url = jsRoutes.controllers.ChatCtrl.getTopics(eventId, null, currentUserId);
-                $http.get(url.url).success(function(topics){
-                    if(topics){
-                        $data.chat.topics = new Array();
-                        var maxDate = null;
-                        var maxDateTopic = null;
-                        for(var i in topics){
-                            var topic = topics[i];
-                            topic.active = false;
-                            topic.date = new Date(topic.date);
-                            if((!maxDate) || (topic.update > maxDate)){
-                                maxDate=topic.update;
-                                maxDateTopic = topic;
+                if(eventId && currentUserId){
+                    var url = jsRoutes.controllers.ChatCtrl.getTopics(eventId, null, currentUserId);
+                    $http.get(url.url).success(function(topics){
+                        if(topics){
+                            $data.chat.topics = new Array();
+                            var maxDate = null;
+                            var maxDateTopic = null;
+                            for(var i in topics){
+                                var topic = topics[i];
+                                topic.active = false;
+                                topic.date = new Date(topic.date);
+                                if((!maxDate) || (topic.update > maxDate)){
+                                    maxDate=topic.update;
+                                    maxDateTopic = topic;
+                                }
+                                topic.update = new Date(topic.update);
+                                pushTopic(topic);
                             }
-                            topic.update = new Date(topic.update);
-                            addTopic(topic);
+                            $chatService.loadMessages(maxDateTopic);
                         }
-                        $chatService.loadMessages(maxDateTopic);
-                    }
-                    deferred.resolve(topics);
-                }).error(function(error){
-                    deferred.reject(error);
-                });
+                        deferred.resolve(topics);
+                    }).error(function(error){
+                        deferred.reject(error);
+                    });
+                }else{
+                    deferred.reject();
+                }
                 return deferred.promise;
             },
             loadWall : function(eventId){
@@ -338,17 +349,15 @@ angular.module('chatService', [], function($provide){
                     $data.eltsInChat = 10;
                     aTopic.alert = null;
                     setCurrentTopic(aTopic.id);
-                    $data.chat.currentTopic = aTopic;
                     var url = jsRoutes.controllers.ChatCtrl.getMessages(aTopic.id);
                     $http.get(url.url).success(function(messages){
                         $data.chat.messages = messages;
-                        $data.chat.currentTopic = aTopic;
                         formatMessages();
                     });
                 }
             },
 
-            addTopic : function(topic){
+            addTopic : function(topic, idUser){
                 if(topic){
                     var exist = false;
                     topic.date = new Date(topic.date);
@@ -357,7 +366,7 @@ angular.module('chatService', [], function($provide){
                         $data.wall.topic = topic;
                     }else{
                         topic.active = false;
-                        addTopicToList(topic, $data.chat.topics);
+                        addTopicToList(topic, $data.chat.topics, idUser);
                     }
                 }
             },
@@ -409,5 +418,5 @@ angular.module('chatService', [], function($provide){
 
         return $chatService;
 
-    });
+    }]);
 });
