@@ -132,19 +132,26 @@ public class SubscriberCtrl extends Controller {
             JsonNode node = request().body().asJson();
             String locomotion = node.get("locomotion").getTextValue();
             if(locomotion!=null){
-                if(locomotion.equals("CAR")){
+                if(locomotion.equals("CAR") && subsc.getLocomotion().equals(Locomotion.AUTOSTOP)){
                     if(subsc.getPossibleCars()!=null){
                         subsc.getPossibleCars().clear();
                     }
                     for(Subscriber subscriber : event.getSubscribers()){
-                        if(subscriber.getCar()!=null && subscriber.getCar().getWaiting()!=null){
-                            subscriber.getCar().getWaiting().remove(idSub);
+                        if(subscriber.getCar()!=null){
+                            if( subscriber.getCar().getWaiting()!=null){
+                                subscriber.getCar().getWaiting().remove(idSub);
+                            }
+                            if( subscriber.getCar().getPassengers()!=null){
+                                subscriber.getCar().getPassengers().remove(idSub);
+                            }
                         }
                     }
                     subsc.setCar(new Car());
+                    subsc.setCarRef(null);
                     subsc.setLocomotion(Locomotion.CAR);
-                }else if(locomotion.equals("AUTOSTOP")){
+                }else if(locomotion.equals("AUTOSTOP") && subsc.getLocomotion().equals(Locomotion.CAR)){
                     event.removeCar(idSub);
+                    subsc.setCar(null);
                     subsc.setLocomotion(Locomotion.AUTOSTOP);
                 }
             }

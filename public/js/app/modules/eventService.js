@@ -305,6 +305,8 @@ angular.module('eventModule', [], function($provide){
                         $service.setCurrentCar(buildCarObject($event.currentSubscriber));
                     }else if( $event.currentSubscriber.locomotion=='AUTOSTOP' && $event.currentSubscriber.carRef){
                         $service.setCurrentCar(buildCarObject($service.getSubscriber($event.currentSubscriber.carRef)));
+                    }else{
+                        $service.setCurrentCar();
                     }
                 }
             },
