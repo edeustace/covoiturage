@@ -21,10 +21,32 @@ function EventCtrl($scope, $http, $location, $compile, $filter, mailUtils, mapSe
         backdropFade: true,
         dialogFade:true
       };
-    $scope.editAddTopic = false;
 
+    $scope.editAddTopic = false;
+    $scope.filter = {
+        car : false,
+        autostop : false
+    }
 
 	//////////////  SCOPE METHODS  ///////////////////
+    $scope.setFilterToCar = function(){
+        if($scope.filter && $scope.filter.car){
+            $scope.filterUsers = null;
+        }else{
+            $scope.filter.autostop = false;
+            $scope.filterUsers = 'CAR';
+        }
+    };
+    $scope.setFilterToAutostop = function(){
+        if($scope.filter && $scope.filter.autostop){
+            $scope.filterUsers = null;
+        }else{
+            $scope.filter.car = false;
+            $scope.filterUsers = 'AUTOSTOP'
+
+        }
+    };
+
 	$scope.getMapOptions = function(){
 	    return mapService.getMapOptions();
 	};

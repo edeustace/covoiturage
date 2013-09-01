@@ -302,9 +302,8 @@
                     <span><strong>Afficher : </strong></span>
                     <br/>
                      <div class="btn-group">
-                        <button type="button" class="btn btn-primary" ng-model="filterUsers" btn-radio="'CAR'">Les conducteurs</button>
-                        <button type="button" class="btn btn-primary" ng-model="filterUsers" btn-radio="'AUTOSTOP'">Les passagers</button>
-                        <button type="button" class="btn btn-primary" ng-model="filterUsers" btn-radio="''">Tout le monde</button>
+                        <button type="button" class="btn btn-primary" ng-click="setFilterToCar()" ng-model="filter.car" btn-checkbox>Les conducteurs</button>
+                        <button type="button" class="btn btn-primary" ng-click="setFilterToAutostop()" ng-model="filter.autostop" btn-checkbox>Les passagers</button>
                     </div>
 
 		<br/>
