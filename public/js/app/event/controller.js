@@ -189,7 +189,9 @@ function EventCtrl($scope, $http, $location, $compile, $filter, mailUtils, mapSe
             $scope.addedContact = null;
             $scope.newContacts = new Array();
         }).error(function(error){
-            alert("Error "+error);
+            eventService.formatErrors(error, function(msg){
+                $scope.alerts.push({type:"error", msg:msg});
+            });
         });
 
     };
@@ -425,7 +427,9 @@ function EventCtrl($scope, $http, $location, $compile, $filter, mailUtils, mapSe
 			});
 		}
 	}).error(function(error){
-		alert('error : '+error);
+		eventService.formatErrors(error, function(msg){
+           $scope.alerts.push({type:"error", msg:msg});
+       });
 	});
     
     /////////   PRIVATE   ////////////////
