@@ -128,6 +128,7 @@ function EventCtrl($scope, $http, $location, $compile, $filter, mailUtils, mapSe
 	};
 	//CAR OWNER 
     $scope.proposeSeat = function(passenger){
+        var carRef = $scope.user.id;
         eventService.proposeSeat(passenger, carRef).then(function(subscriber){
             $scope.myInfoWindow.close();
         });
@@ -248,7 +249,7 @@ function EventCtrl($scope, $http, $location, $compile, $filter, mailUtils, mapSe
         chatService.createTopic($scope.idEvent, subscriber, eventService.getCurrentSubscriber()).then(function(){
             $scope.scrollTo('discussion');
         }, function(){
-
+            console.log("Erreur à la creation d'un topic");
         });
     };
     $scope.createTopicForCar = function(){

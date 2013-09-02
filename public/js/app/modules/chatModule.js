@@ -81,6 +81,7 @@ angular.module('chatModule', [], function($provide){
                 });
             }else{
                 $chatService.loadMessages(aTopic);
+                deferred.resolve(aTopic);
             }
             return deferred.promise;
         }

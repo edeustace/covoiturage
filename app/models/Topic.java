@@ -24,8 +24,11 @@ import java.util.List;
 @MongoCollection(name="topics")
 public class Topic {
 
+
+
     @Id
     @ObjectId
+
     public String id;
 
     @NotNull
@@ -151,5 +154,43 @@ public class Topic {
             collection = MongoDB.getCollection(Topic.class, String.class);
         }
         return collection;
+    }
+
+
+
+    public String getId() {
+        return id;
+    }
+
+    public String getIdEvent() {
+        return idEvent;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public String getCategorie() {
+        return categorie;
+    }
+
+    public String getTmpId() {
+        return tmpId;
+    }
+
+    public Date getDate() {
+        return date;
+    }
+
+    public Date getUpdate() {
+        return update;
+    }
+
+    public String getCreator() {
+        return creator;
+    }
+
+    public List<String> getSubscribers() {
+        return subscribers;
     }
 }

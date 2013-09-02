@@ -149,10 +149,12 @@ public class SubscriberCtrl extends Controller {
                     subsc.setCar(new Car());
                     subsc.setCarRef(null);
                     subsc.setLocomotion(Locomotion.CAR);
+                    SubscriberActor.notifySubscriberUpdate(id, subsc.getUserRef(), subsc, new Date());
                 }else if(locomotion.equals("AUTOSTOP") && subsc.getLocomotion().equals(Locomotion.CAR) || subsc.getLocomotion().equals(Locomotion.DONT_KNOW_YET)){
                     event.removeCar(idSub);
                     subsc.setCar(null);
                     subsc.setLocomotion(Locomotion.AUTOSTOP);
+                    SubscriberActor.notifySubscriberUpdate(id, subsc.getUserRef(), subsc, new Date());
                 }
             }
 

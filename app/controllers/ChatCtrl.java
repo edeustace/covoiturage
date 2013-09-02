@@ -79,10 +79,12 @@ public class ChatCtrl extends Controller {
             Topic existing = Topic.exists(topic);
             if(existing==null){
                 topic.save();
+            }else{
+                topic = existing;
             }
             SubscriberActor.publishTopic(topic);
             try {
-                return ok(objectMapper.writeValueAsString(existing)).as("application/json");
+                return ok(objectMapper.writeValueAsString(topic)).as("application/json");
             } catch (IOException e) {
                 Logger.error("Erreur", e);
                 return internalServerError(e.getMessage()).as("application/json");
