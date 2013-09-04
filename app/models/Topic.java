@@ -24,7 +24,9 @@ import java.util.List;
 @MongoCollection(name="topics")
 public class Topic {
 
-
+    public static enum TopicCategorie {
+        carChat, chat, wall
+    }
 
     @Id
     @ObjectId
@@ -36,7 +38,7 @@ public class Topic {
 
     public String type = "topic";
 
-    public String categorie;
+    public TopicCategorie categorie;
 
     public String tmpId;
 
@@ -57,13 +59,16 @@ public class Topic {
 
     ////////////  STATIC  ////////////////
     public Topic save(){
-
-
-
         WriteResult<Topic, String> result = collection().save(this);
         this.id = result.getSavedId();
         return this;
     }
+
+    public Topic update(){
+        WriteResult<Topic, String> result = collection().updateById(this.id, this);
+        return this;
+    }
+
 
     public static Topic getById(String id){
         return collection().findOneById(id);
@@ -126,13 +131,39 @@ public class Topic {
         return super.equals(obj);    //To change body of overridden methods use File | Settings | File Templates.
     }
 
-    public static List<Topic> findByIdEventAndCategorie(String idEvent, String categorie){
+    public static boolean subscribersEquals(List<String> subscribers1, List<String> subscribers2){
+        if(subscribers2!=null && !subscribers2.isEmpty() && subscribers1!=null && !subscribers1.isEmpty()){
+            List<String> current = new ArrayList<String>();
+            current.addAll(subscribers1);
+            List<String> other = new ArrayList<String>();
+            other.addAll(subscribers2);
+
+            current.removeAll(other);
+            if(!current.isEmpty()){
+                return false;
+            }
+            current = new ArrayList<String>();
+            current.addAll(subscribers1);
+
+            other.removeAll(current);
+            if(other.isEmpty()){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static List<Topic> findByIdEventAndCategorie(String idEvent, TopicCategorie categorie){
         DBCursor<Topic> cursor = collection().find(DBQuery.and(DBQuery.is("categorie", categorie), DBQuery.is("idEvent", idEvent)));
         List<Topic> result = new ArrayList<Topic>();
         while(cursor.hasNext()){
             result.add(cursor.next());
         }
         return result;
+    }
+
+    public static Topic findByIdEventCategorieAndCreator(String idEvent, TopicCategorie categorie, String idCreator){
+        return  collection().findOne(DBQuery.and(DBQuery.is("categorie", categorie), DBQuery.is("idEvent", idEvent), DBQuery.is("creator", idCreator)));
     }
 
     public static List<Topic> findByIdEventAndIdUser(String idEvent, String idUser){
@@ -170,7 +201,7 @@ public class Topic {
         return type;
     }
 
-    public String getCategorie() {
+    public TopicCategorie getCategorie() {
         return categorie;
     }
 

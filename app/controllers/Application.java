@@ -91,6 +91,7 @@ public class Application extends Controller {
                         controllers.routes.javascript.SubscriberCtrl.listNotifications(),
                         controllers.routes.javascript.ChatCtrl.getTopics(),
                         controllers.routes.javascript.ChatCtrl.createTopic(),
+                        controllers.routes.javascript.ChatCtrl.updateTopic(),
                         controllers.routes.javascript.ChatCtrl.getMessages(),
                         controllers.routes.javascript.ChatCtrl.createMessage(),
                         controllers.routes.javascript.ChatCtrl.addSubscribers()

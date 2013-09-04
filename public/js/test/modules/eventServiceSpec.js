@@ -511,7 +511,7 @@ describe('eventServiceSpec', function() {
             service.setEvent(currentEvent);
             service.indexSubscribers(currentEvent.subscribers);
             service.loadCurrentCar();
-            expect(service.getCurrentCar()).toBe(null);
+            expect(service.getCurrentCar()).toBeUndefined();
         });
 
         it('current user is driver', function() {

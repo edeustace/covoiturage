@@ -4,11 +4,9 @@ import static play.data.Form.form;
 
 import java.io.IOException;
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Date;
+import java.util.*;
 
+import static com.google.common.collect.Sets.newHashSet;
 import models.*;
 import models.Car.CarIsFullException;
 import models.enums.Locomotion;
@@ -75,7 +73,7 @@ public class SubscriberCtrl extends Controller {
                 event.update();
                 Subscriber subsc = event.getSubscriberByMail(subscriber.getEmail());
                 SubscriberModel subscriberModel = new SubscriberModel(subsc, event.getId());
-                SubscriberActor.notifySubscriberUpdate(id, subscriber.getUserRef(), subscriber, new Date());
+                SubscriberActor.notifySubscriberUpdated(id, subscriber.getUserRef(), subscriber, new Date());
                 return ok(objectMapper.writeValueAsString(subscriberModel)).as("application/json");
             }
         } catch (Exception e){
@@ -100,7 +98,7 @@ public class SubscriberCtrl extends Controller {
                 event.addAndMergeSubscriber(subscriber);
                 event.update();
                 Subscriber subsc = event.getSubscriberByMail(subscriber.getEmail());
-                SubscriberActor.notifySubscriberUpdate(id, subsc.getUserRef(), subsc, new Date());
+                SubscriberActor.notifySubscriberUpdated(id, subsc.getUserRef(), subsc, new Date());
                 SubscriberModel subscriberModel = new SubscriberModel(subsc, event.getId());
                 return ok(objectMapper.writeValueAsString(subscriberModel)).as("application/json");
             }
@@ -149,12 +147,12 @@ public class SubscriberCtrl extends Controller {
                     subsc.setCar(new Car());
                     subsc.setCarRef(null);
                     subsc.setLocomotion(Locomotion.CAR);
-                    SubscriberActor.notifySubscriberUpdate(id, subsc.getUserRef(), subsc, new Date());
+                    SubscriberActor.notifySubscriberUpdated(id, subsc.getUserRef(), subsc, new Date());
                 }else if(locomotion.equals("AUTOSTOP") && subsc.getLocomotion().equals(Locomotion.CAR) || subsc.getLocomotion().equals(Locomotion.DONT_KNOW_YET)){
                     event.removeCar(idSub);
                     subsc.setCar(null);
                     subsc.setLocomotion(Locomotion.AUTOSTOP);
-                    SubscriberActor.notifySubscriberUpdate(id, subsc.getUserRef(), subsc, new Date());
+                    SubscriberActor.notifySubscriberUpdated(id, subsc.getUserRef(), subsc, new Date());
                 }
             }
 
@@ -179,6 +177,9 @@ public class SubscriberCtrl extends Controller {
     public static Result updateCar(String id, String idSub){
         try{
             Event event = Event.read(id);
+            Car car = event.getSubscriberById(idSub).getCar();
+            Set<String> usersToNotify = newHashSet(car.getPassengers());
+
             JsonNode node = request().body().asJson();
             String idPassenger = node.get("passenger").getTextValue();
             event.addPassenger(idPassenger, idSub);
@@ -188,6 +189,8 @@ public class SubscriberCtrl extends Controller {
             String to = getToUser(from, idSub, idPassenger);
             
             String[] args = {sub.getSurname(), sub.getName()};
+
+            SubscriberActor.notifyCarUpdated(id, idSub, event.getSubscriberById(idSub).getCar(), usersToNotify);
             if(sub.getLocomotion().equals(Locomotion.CAR)){
             	MessageFormat msg = new MessageFormat("{0} {1} a validé votre demande et vous serez son passager");
             	msg.format(args);
@@ -204,7 +207,7 @@ public class SubscriberCtrl extends Controller {
                     if(!topic.subscribers.contains(idPassenger)){
                         topic.subscribers.add(idPassenger);
                         topic.save();
-                        SubscriberActor.publishTopic(topic);
+                        SubscriberActor.publishTopicUpdated(topic);
                         break;
                     }
                 }
@@ -221,12 +224,17 @@ public class SubscriberCtrl extends Controller {
     public static Result deletePassenger(String id, String idSub, String idPassenger){
     	try{
 	    	Event event = Event.read(id);
+            Car car = event.getSubscriberById(idSub).getCar();
+            Set<String> subscribersToNotify = newHashSet(car.getPassengers());
 	    	event.deletePassenger(idPassenger, idSub);
 	    	event.update();
             String from = getCurrentUserRef();
             String to = getToUser(from, idSub, idPassenger);
             Subscriber sub = event.getSubscriberById(from);
             String[] args = {sub.getSurname(), sub.getName()};
+
+            SubscriberActor.notifyCarUpdated(id, idSub, event.getSubscriberById(idSub).getCar(), subscribersToNotify);
+
             if(sub.getLocomotion().equals(Locomotion.CAR)){
             	MessageFormat msg = new MessageFormat("vous ne faites plus parti de la voiture de {0} {1}");
             	msg.format(args);

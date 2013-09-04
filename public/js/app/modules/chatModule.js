@@ -30,23 +30,45 @@ angular.module('chatModule', [], function($provide){
             }
 
         }
-        function addTopicToList(topic, topics, idCurrentUser){
+        function removeTopic(topic){
+            var id = topic.id;
+            var indice;
+            for(var i in $data.chat.topics){
+                var currentTopic=$data.chat.topics[i];
+                 if(currentTopic.id && topic.id && currentTopic.id == topic.id){
+                    indice = i;
+                    break;
+                 }
+            }
+            if(indice){
+                $data.chat.topics.splice(indice, 1);
+                if($data.chat.currentTopic && $data.chat.currentTopic.id == id){
+                    $data.chat.currentTopic = null;
+                    $data.chat.messages = new Array();
+                }
+            }
+
+        }
+        function addTopicToList(topic, topics, idCurrentUser, action){
             if(topics){
                 var found = false;
                 for(var i in topics){
                     var currentTopic=topics[i];
-                    if((currentTopic.id && topic.id && currentTopic.id == topic.id) || ((!currentTopic.id || !topic.id) && currentTopic.tmpId && topic.tmpId && currentTopic.tmpId == topic.tmpId)){
-                        found = true;
-                        currentTopic.id = topic.id;
-                        currentTopic.date = topic.date;
-                        currentTopic.update = topic.update;
-                        currentTopic.statut = 'RECEIVED';
-                        currentTopic.subscribers = topic.subscribers;
+                    if(action=='UPDATE' || action=='CREATE'){
+                        if((currentTopic.id && topic.id && currentTopic.id == topic.id) || ((!currentTopic.id || !topic.id) && currentTopic.tmpId && topic.tmpId && currentTopic.tmpId == topic.tmpId)){
+                            found = true;
+                            var active = currentTopic.active;
+                            topics[i] = topic;
+                            if(active){
+                                setCurrentTopic(topic.id);
+                            }
+                            topics[i].statut = 'RECEIVED';
+                        }
                     }
                 }
                 if(!found){
                     if(topics.length == 0){
-                        topic.active;
+                        topic.active = true;
                     }
                     topics.push(topic);
                     if(topic.creator === idCurrentUser || topic.active){
@@ -55,16 +77,31 @@ angular.module('chatModule', [], function($provide){
                 }
             }
         }
-        function createTopic(topic, idEvent){
-            var deferred = $q.defer();
-            var aTopic = null;
-            for(var i in $data.chat.topics){
-                var currentTopic = $data.chat.topics[i];
-                if(compareArrays(currentTopic.subscribers, topic.subscribers)){
-                    aTopic = currentTopic;
-                    break;
+        function topicExists(topic){
+            if(topic){
+                if(topic.categorie==='carChat'){
+                    for(var i in $data.chat.topics){
+                        var currentTopic = $data.chat.topics[i];
+                        if(currentTopic.categorie=='carChat'){
+                            return currentTopic;
+                        }
+                    }
+                }else{
+                    for(var i in $data.chat.topics){
+                        var currentTopic = $data.chat.topics[i];
+                        if(compareArrays(currentTopic.subscribers, topic.subscribers)){
+                            return currentTopic;
+                        }
+                    }
                 }
             }
+            return null;
+        }
+
+        function createTopic(topic, idEvent){
+            var deferred = $q.defer();
+            var aTopic = topicExists(topic);
+
             if(!aTopic){
                 var tmpIdTopic = generateId();
                 topic.tmpId = tmpIdTopic;
@@ -74,6 +111,15 @@ angular.module('chatModule', [], function($provide){
                 pushTopic(topic);
                 var url = jsRoutes.controllers.ChatCtrl.createTopic(idEvent);
                 $http.post(url.url, topic).success(function(aTopic){
+                    $chatService.loadMessages(aTopic);
+                    deferred.resolve(aTopic);
+                }).error(function(){
+                    deferred.reject(aTopic);
+                });
+            }else if(aTopic.subscribers.length != topic.subscribers.length){
+                aTopic.subscribers = topic.subscribers;
+                var url = jsRoutes.controllers.ChatCtrl.updateTopic(idEvent, aTopic.id);
+                $http.put(url.url, topic).success(function(aTopic){
                     $chatService.loadMessages(aTopic);
                     deferred.resolve(aTopic);
                 }).error(function(){
@@ -176,6 +222,16 @@ angular.module('chatModule', [], function($provide){
             for(var i in $onMessageAddedListeners){
                 $onTopicAddedListeners[i](message);
             }
+        }
+        function inArray(value, array){
+            if(array && value){
+                for(var i in array){
+                    if(value==array[i]){
+                        return true;
+                    }
+                }
+            }
+            return false;
         }
 
         var $data = {
@@ -301,7 +357,7 @@ angular.module('chatModule', [], function($provide){
 
             },
             createTopicForCar : function(idEvent, currentCar){
-                if(currentCar){
+                if(currentCar && currentCar.driver){
                     var subscribers = new Array();
                     subscribers.push(currentCar.driver.id);
                     for(var i in currentCar.passengers){
@@ -358,16 +414,23 @@ angular.module('chatModule', [], function($provide){
                 }
             },
 
-            addTopic : function(topic, idUser){
-                if(topic){
-                    var exist = false;
-                    topic.date = new Date(topic.date);
-                    topic.update = new Date(topic.update);
-                    if(topic.categorie=='wall'){
-                        $data.wall.topic = topic;
+            addTopic : function(message, idUser){
+                if(message && message.data){
+                    var topic = message.data;
+                    if(message.action == 'DELETE'){
+                        removeTopic(topic);
+                    }else if(message.action == 'UPDATE' && !inArray(idUser, topic.subscribers)){
+                        removeTopic(topic);
                     }else{
-                        topic.active = false;
-                        addTopicToList(topic, $data.chat.topics, idUser);
+                        var exist = false;
+                        topic.date = new Date(topic.date);
+                        topic.update = new Date(topic.update);
+                        if(topic.categorie=='wall'){
+                            $data.wall.topic = topic;
+                        }else{
+                            topic.active = false;
+                            addTopicToList(topic, $data.chat.topics, idUser, message.action);
+                        }
                     }
                 }
             },

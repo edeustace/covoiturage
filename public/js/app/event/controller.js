@@ -253,7 +253,7 @@ function EventCtrl($scope, $http, $location, $compile, $filter, mailUtils, mapSe
         });
     };
     $scope.createTopicForCar = function(){
-        chatService.createTopicForCar($scope.currentCar).then(function(){
+        chatService.createTopicForCar($scope.idEvent, $scope.currentCar).then(function(){
             $scope.scrollTo('discussion');
         });
     };
@@ -279,7 +279,7 @@ function EventCtrl($scope, $http, $location, $compile, $filter, mailUtils, mapSe
     $scope.addTopic = function(msg){
         var topic = JSON.parse(msg.data);
         if(topic.type && topic.type=='topic'){
-            chatService.addTopic(topic);
+            chatService.addTopic(topic, $scope.user.id);
             $scope.$apply();
         }
     };
@@ -287,14 +287,16 @@ function EventCtrl($scope, $http, $location, $compile, $filter, mailUtils, mapSe
     $scope.addMessage = function(msg){
         var message = JSON.parse(msg.data);
         if(message.type=='message'){
+            message = message.data;
             chatService.addMessage(message, $scope.user.id);
             $scope.$apply();
         }
     };
 
     $scope.addNotification = function(msg){
-        var notification = JSON.parse(msg.data);
-        if(notification.type == 'notification'){
+        var message= JSON.parse(msg.data);
+        if(message.type == 'notification'){
+            var notification = message.data;
             $scope.alerts.push({type:notification.type, msg:notification.message, notification:notification});
             eventService.reloadSubscribers($scope);
         }
@@ -302,7 +304,7 @@ function EventCtrl($scope, $http, $location, $compile, $filter, mailUtils, mapSe
 
     $scope.handleSubscriberUpdated = function(msg){
         var notification = JSON.parse(msg.data);
-        if(!notification.type){
+        if(!notification.type == 'subscriber'){
             eventService.reloadSubscribers($scope);
         }
     };

@@ -23,6 +23,9 @@ describe('chatSpec', function() {
 
                         return {url:url};
                     },
+                    updateTopic : function(eventId, idTopic){
+                       return {url:'/rest/events/'+eventId+'/topics/'+idTopic};
+                    },
                     getMessages : function(id){
                         return {url:'/rest/messages/'+id};
                     },
@@ -71,6 +74,10 @@ describe('chatSpec', function() {
             $httpBackend.when('POST', '/rest/events/123456/topics').respond({
                 id:'1'
             });
+            $httpBackend.when('PUT', '/rest/events/123456/topics/1').respond({
+                id:'1'
+            });
+
             service = $injector.get('chatService');
         });
     });
@@ -165,7 +172,11 @@ describe('chatSpec', function() {
             });
 
             service.addTopic({
-                id : '2',
+                action : 'CREATE',
+                data :{
+                    id : '2',
+                    subscribers:['1']
+                }
             }, '1');
             expect(data.chat.topics).not.toBe(undefined);
             expect(data.chat.topics).not.toBe(null);
@@ -181,11 +192,16 @@ describe('chatSpec', function() {
             });
 
             service.addTopic({
-                id : '1',
-            }, '1');
+                 action : 'UPDATE',
+                 data :{
+                     id : '1',
+                     subscribers : ['1','2']
+                 }
+             }, '1');
             expect(data.chat.topics).not.toBe(undefined);
             expect(data.chat.topics).not.toBe(null);
             expect(data.chat.topics.length).toEqual(1);
+            expect(data.chat.topics[0].subscribers.length).toEqual(2);
         });
 
         it('Topic existant 2', function() {
@@ -205,7 +221,45 @@ describe('chatSpec', function() {
             expect(data.chat.topics).not.toBe(null);
             expect(data.chat.topics.length).toEqual(1);
         });
+        it('Topic a supprimer ', function() {
+            var data = {};
+            service.init(data);
+            data.chat.topics.push({
+                id : '1',
+                subscribers :['1', '2']
+            });
 
+            service.addTopic({
+                action : 'UPDATE',
+                 data :{
+                     id : '1',
+                     subscribers : ['2','3']
+                 }
+             }, '1');
+            expect(data.chat.topics).not.toBe(undefined);
+            expect(data.chat.topics).not.toBe(null);
+            expect(data.chat.topics.length).toEqual(0);
+        });
+
+        it('Topic a supprimer 2', function() {
+            var data = {};
+            service.init(data);
+            data.chat.topics.push({
+                id : '1',
+                subscribers :['1', '2']
+            });
+
+            service.addTopic({
+                action : 'DELETE',
+                 data :{
+                     id : '1',
+                     subscribers : ['1','2']
+                 }
+             }, '1');
+            expect(data.chat.topics).not.toBe(undefined);
+            expect(data.chat.topics).not.toBe(null);
+            expect(data.chat.topics.length).toEqual(0);
+        });
 
     });
 
@@ -250,6 +304,83 @@ describe('chatSpec', function() {
             expect(data.chat.messages[0].date).toEqual(new Date(1374692153917));
             expect(data.chat.messages[0].message).toEqual('test');
 
+        });
+    });
+
+    describe('createTopic for car', function() {
+
+        it('Déjà existant', function() {
+
+            $httpBackend.expectGET('/rest/messages/1');
+            var data = {};
+            service.init(data);
+            data.chat.topics.push({
+                id : '1',
+                tmpId : '3',
+                categorie:'carChat',
+                subscribers :['1', '2', '3']
+            });
+            service.createTopicForCar('123456', {driver:{id:'1'}, passengers:[{id:'2'},{id:'3'}]});
+            $httpBackend.flush();
+            expect(data.chat.topics).not.toBe(undefined);
+            expect(data.chat.topics).not.toBe(null);
+            expect(data.chat.topics.length).toEqual(1);
+
+            expect(data.chat.messages[0].id).toEqual('1');
+            expect(data.chat.messages[0].date).toEqual(new Date(1374692153917));
+            expect(data.chat.messages[0].message).toEqual('test');
+
+        });
+        it('Déjà existant avec maj', function() {
+
+            $httpBackend.expectGET('/rest/messages/1');
+            var data = {};
+            service.init(data);
+            data.chat.topics.push({
+                id : '1',
+                tmpId : '3',
+                categorie:'carChat',
+                subscribers :['1', '2']
+            });
+            service.createTopicForCar('123456', {driver:{id:'1'}, passengers:[{id:'2'},{id:'3'}]});
+            $httpBackend.flush();
+            expect(data.chat.topics).not.toBe(undefined);
+            expect(data.chat.topics).not.toBe(null);
+            expect(data.chat.topics.length).toEqual(1);
+            expect(data.chat.topics[0].id).toEqual('1');
+            expect(data.chat.topics[0].subscribers.length).toEqual(3);
+            expect(data.chat.topics[0].subscribers[0]).toEqual('1');
+            expect(data.chat.topics[0].subscribers[1]).toEqual('2');
+            expect(data.chat.topics[0].subscribers[2]).toEqual('3');
+
+            expect(data.chat.messages[0].id).toEqual('1');
+            expect(data.chat.messages[0].date).toEqual(new Date(1374692153917));
+            expect(data.chat.messages[0].message).toEqual('test');
+
+
+        });
+        it('Nouveau', function() {
+
+            var data = {};
+            service.init(data);
+            data.chat.topics.push({
+                id : '2',
+                tmpId : '3',
+                subscribers :['3', '2']
+            });
+            service.createTopicForCar('123456', {driver:{id:'1'}, passengers:[{id:'2'},{id:'3'}]});
+            $httpBackend.flush();
+            expect(data.chat.topics).not.toBe(undefined);
+            expect(data.chat.topics).not.toBe(null);
+            expect(data.chat.topics.length).toEqual(2);
+            expect(data.chat.topics[1].categorie).toEqual('carChat');
+            expect(data.chat.topics[1].subscribers.length).toEqual(3);
+            expect(data.chat.topics[1].subscribers[0]).toEqual('1');
+            expect(data.chat.topics[1].subscribers[1]).toEqual('2');
+            expect(data.chat.topics[1].subscribers[2]).toEqual('3');
+            expect(data.chat.messages[0].id).toEqual('1');
+            expect(data.chat.messages[0].date).toEqual(new Date(1374692153917));
+            expect(data.chat.messages[0].message).toEqual('test');
         });
     });
 });

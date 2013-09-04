@@ -88,6 +88,7 @@ DELETE  /rest/events/:id/subscribers/:idSub/notifications/:idNotif  controllers.
 
 GET     /rest/events/:idEvent/topics                            controllers.ChatCtrl.getTopics(idEvent :String, categorie : String ?= null, user :String ?=null)
 POST    /rest/events/:idEvent/topics                            controllers.ChatCtrl.createTopic(idEvent :String)
+PUT     /rest/events/:idEvent/topics/:idTopic                   controllers.ChatCtrl.updateTopic(idEvent: String, idTopic: String)
 POST    /rest/events/:idEvent/topics/:idTopic/messages          controllers.ChatCtrl.createMessage(idEvent :String, idTopic :String)
 PUT     /rest/events/:idEvent/topics/:idTopic/subscribers       controllers.ChatCtrl.addSubscribers(idEvent :String, idTopic :String)
 
