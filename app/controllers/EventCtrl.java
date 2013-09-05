@@ -4,6 +4,7 @@ import be.objectify.deadbolt.java.actions.Dynamic;
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
 import be.objectify.deadbolt.java.actions.SubjectPresent;
+import cache.CacheHandler;
 import com.feth.play.module.mail.Mailer;
 import com.feth.play.module.mail.Mailer.Mail.Body;
 import controllers.decorators.Link;
@@ -22,6 +23,7 @@ import play.i18n.Lang;
 import play.mvc.BodyParser;
 import play.mvc.Controller;
 import play.mvc.Result;
+import security.EventPermissionHandler;
 import views.html.evenement;
 
 import java.io.IOException;
@@ -180,6 +182,7 @@ public class EventCtrl extends Controller {
             sendMail(event, contacts);
             String link = controllers.routes.EventCtrl.getEvent(event.getId()).toString();
             LigthEvent responseBody = new LigthEvent(event, Link.link(Link.SELF, link));
+            CacheHandler.resetCachedEvent(id);
             return ok(objectMapper.writeValueAsString(responseBody)).as("application/json");
         }catch (Exception e){
             return internalServerError().as("application/json");
@@ -196,6 +199,7 @@ public class EventCtrl extends Controller {
             event.setContactsOnly(securised);
             event.save();
         	String link = controllers.routes.EventCtrl.getEvent(event.getId()).toString();
+            CacheHandler.resetCachedEvent(id);
             LigthEvent responseBody = new LigthEvent(event, Link.link(Link.SELF, link));
             return ok(objectMapper.writeValueAsString(responseBody)).as("application/json");
         }catch (Exception e){

@@ -31,8 +31,8 @@ public class MessageBuilder {
         return this;
     }
 
-    public MessageBuilder setAction(Message.Action action) {
-        this.message.action = action;
+    public MessageBuilder setAction(Message.Statut action) {
+        this.message.statut = action;
         return this;
     }
 

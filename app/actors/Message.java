@@ -11,13 +11,13 @@ import java.util.List;
  */
 public class Message {
 
-    public static enum Action {CREATE, UPDATE, DELETE, NA};
+    public static enum Statut {CREATED, UPDATED, DELETE, NA};
 
     public String idEvent;
 
     public String type;
 
-    public Action action;
+    public Statut statut;
 
     public Object data;
 
@@ -28,10 +28,10 @@ public class Message {
     public Message() {
     }
 
-    public Message(String idEvent, String type, Action action, Object data, String from, List<String> to) {
+    public Message(String idEvent, String type, Statut action, Object data, String from, List<String> to) {
         this.idEvent = idEvent;
         this.type = type;
-        this.action = action;
+        this.statut = action;
         this.data = data;
         this.from = from;
         this.to = to;

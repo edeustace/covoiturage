@@ -1,15 +1,14 @@
 package security;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import models.Event;
-import models.Subscriber;
-import models.User;
-import play.mvc.Http.Context;
 import be.objectify.deadbolt.core.models.Subject;
 import be.objectify.deadbolt.java.DeadboltHandler;
 import be.objectify.deadbolt.java.DynamicResourceHandler;
+import cache.CacheHandler;
+import models.User;
+import play.mvc.Http.Context;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class EventPermissionHandler implements DynamicResourceHandler {
 
@@ -30,22 +29,15 @@ public class EventPermissionHandler implements DynamicResourceHandler {
 		String path = context.request().path();
 		String idEvent = getEventId(path);
 		if(idEvent!=null){
-			Event event = Event.read(idEvent);
+            CacheHandler.CachedEvent event = CacheHandler.getCachedEvent(idEvent);
 			
 			if(event!=null && event.getContactsOnly()){
 				Subject subject = deadboltHandler.getSubject(context);
 				String id = subject.getIdentifier();
-				User user = User.findById(id);
-				if(event.getContacts().contains(user.getEmail())){
-					return true;
-				}else if(event.getCreatorRef()!=null && event.getCreatorRef().equals(user.getId())){
+				CacheHandler.CachedUser user = CacheHandler.getCachedUser(id);
+				if(event.getMails().contains(user.email) || event.getIds().contains(user.id)){
 					return true;
 				}else{
-					for (Subscriber subscriber : event.getSubscribers()) {
-						if(subscriber.getUserRef()!=null && subscriber.getUserRef().equals(user.getId())){
-							return true;
-						}
-					}
 					return false;
 				}
 			}
@@ -63,5 +55,5 @@ public class EventPermissionHandler implements DynamicResourceHandler {
 		}
 		return null;
 	}
-	
+
 }

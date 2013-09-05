@@ -25,44 +25,32 @@ import static com.google.common.collect.ImmutableList.of;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static play.data.Form.form;
 
-public class SubscriberActor extends UntypedActor{
+public class MessagesHandler extends UntypedActor{
 
     private static Form<Topic> topicForm = form(Topic.class);
     private static Form<ChatMessage> messageForm = form(ChatMessage.class);
 
-	static ActorRef subActorRef = Akka.system().actorOf(new Props(SubscriberActor.class));
+	static ActorRef subActorRef = Akka.system().actorOf(new Props(MessagesHandler.class));
 	
 	public static void notifySubscriberUpdated(final String idEvent, final String userRef, Subscriber subscriber, Date date){
-        subActorRef.tell(new Message(idEvent, "subscriber", Message.Action.UPDATE, null, userRef, new ArrayList<String>()), null);
+        subActorRef.tell(new Message(idEvent, "subscriber", Message.Statut.UPDATED, null, userRef, new ArrayList<String>()), null);
 	}
 	
 	public static void sendNotification(final String idEvent, final String from, final String to, final String type, final String message, final Date date){
 		Notification msg = new Notification(idEvent, from, to, type, message, date);
-        subActorRef.tell(new Message(idEvent, "notification", Message.Action.NA, msg, from, of(to)), null);
+        subActorRef.tell(new Message(idEvent, "notification", Message.Statut.NA, msg, from, of(to)), null);
 	}
 
     public static void notifyCarUpdated(String idEvent, String idCarOwner, Car car, Set<String> subscribersToNotify){
         subActorRef.tell(new CarUpdated(idEvent, idCarOwner, car, subscribersToNotify), null);
     }
 
-    public static void publishTopicCreated(Topic topic){
-        publishTopic(topic, Message.Action.CREATE);
-    }
-
-    public static void publishTopicUpdated(Topic topic){
-        publishTopic(topic, Message.Action.UPDATE);
-    }
-
-    public static void publishTopicDeleted(Topic topic){
-        publishTopic(topic, Message.Action.DELETE);
-    }
-
-    public static void publishTopic(Topic topic, Message.Action action){
+    public static void publishTopic(Topic topic, Message.Statut action){
         subActorRef.tell(new Message(topic.idEvent, "topic", action, topic, topic.creator, copyOf(topic.subscribers)), null);
     }
 
     public static void publishChatMessage(ChatMessage message){
-        subActorRef.tell(new Message(message.topic.idEvent, "message", Message.Action.CREATE, message, message.from, copyOf(message.topic.subscribers)), null);
+        subActorRef.tell(new Message(message.topic.idEvent, "message", Message.Statut.CREATED, message, message.from, copyOf(message.topic.subscribers)), null);
         subActorRef.tell(message, null);
     }
 
@@ -99,7 +87,7 @@ public class SubscriberActor extends UntypedActor{
             Join join = (Join)message;
             join(join);
         }else if(message instanceof CarUpdated)  {
-            handlerCarUpdated((CarUpdated)message);
+            handleCarUpdated((CarUpdated) message);
         }else if(message instanceof Quit)  {
             Quit quit = (Quit)message;
             Map<String, ServerSentEventChunk> event = events.get(quit.idEvent);
@@ -154,7 +142,7 @@ public class SubscriberActor extends UntypedActor{
     }
 
 
-    public void handlerCarUpdated(CarUpdated car){
+    public void handleCarUpdated(CarUpdated car){
         Topic topic = Topic.findByIdEventCategorieAndCreator(car.idEvent, Topic.TopicCategorie.carChat, car.idCarOwner);
         if(topic.getSubscribers()!=null && car.car!=null && car.car.getPassengers()!=null &&
                 !Topic.subscribersEquals(topic.getSubscribers(), car.car.getPassengers())){
@@ -162,9 +150,9 @@ public class SubscriberActor extends UntypedActor{
             topic.subscribers.add(car.idCarOwner);
             topic.update();
             car.subscribersToNotify.addAll(car.car.getPassengers());
-            publishMessage(new Message(car.idEvent, "topic", Message.Action.UPDATE, topic, topic.creator, newArrayList(car.subscribersToNotify)));
+            publishMessage(new Message(car.idEvent, "topic", Message.Statut.UPDATED, topic, topic.creator, newArrayList(car.subscribersToNotify)));
 
-            publishTopicUpdated(topic);
+            publishTopic(topic, Message.Statut.UPDATED);
         }
     }
 

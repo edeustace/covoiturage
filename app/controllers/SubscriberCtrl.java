@@ -7,6 +7,9 @@ import java.text.MessageFormat;
 import java.util.*;
 
 import static com.google.common.collect.Sets.newHashSet;
+
+import actors.Message;
+import actors.MessagesHandler;
 import models.*;
 import models.Car.CarIsFullException;
 import models.enums.Locomotion;
@@ -21,7 +24,6 @@ import play.libs.Json;
 import play.mvc.BodyParser;
 import play.mvc.Controller;
 import play.mvc.Result;
-import actors.SubscriberActor;
 
 import com.feth.play.module.pa.PlayAuthenticate;
 import com.feth.play.module.pa.user.AuthUser;
@@ -73,7 +75,7 @@ public class SubscriberCtrl extends Controller {
                 event.update();
                 Subscriber subsc = event.getSubscriberByMail(subscriber.getEmail());
                 SubscriberModel subscriberModel = new SubscriberModel(subsc, event.getId());
-                SubscriberActor.notifySubscriberUpdated(id, subscriber.getUserRef(), subscriber, new Date());
+                MessagesHandler.notifySubscriberUpdated(id, subscriber.getUserRef(), subscriber, new Date());
                 return ok(objectMapper.writeValueAsString(subscriberModel)).as("application/json");
             }
         } catch (Exception e){
@@ -98,7 +100,7 @@ public class SubscriberCtrl extends Controller {
                 event.addAndMergeSubscriber(subscriber);
                 event.update();
                 Subscriber subsc = event.getSubscriberByMail(subscriber.getEmail());
-                SubscriberActor.notifySubscriberUpdated(id, subsc.getUserRef(), subsc, new Date());
+                MessagesHandler.notifySubscriberUpdated(id, subsc.getUserRef(), subsc, new Date());
                 SubscriberModel subscriberModel = new SubscriberModel(subsc, event.getId());
                 return ok(objectMapper.writeValueAsString(subscriberModel)).as("application/json");
             }
@@ -147,12 +149,12 @@ public class SubscriberCtrl extends Controller {
                     subsc.setCar(new Car());
                     subsc.setCarRef(null);
                     subsc.setLocomotion(Locomotion.CAR);
-                    SubscriberActor.notifySubscriberUpdated(id, subsc.getUserRef(), subsc, new Date());
+                    MessagesHandler.notifySubscriberUpdated(id, subsc.getUserRef(), subsc, new Date());
                 }else if(locomotion.equals("AUTOSTOP") && subsc.getLocomotion().equals(Locomotion.CAR) || subsc.getLocomotion().equals(Locomotion.DONT_KNOW_YET)){
                     event.removeCar(idSub);
                     subsc.setCar(null);
                     subsc.setLocomotion(Locomotion.AUTOSTOP);
-                    SubscriberActor.notifySubscriberUpdated(id, subsc.getUserRef(), subsc, new Date());
+                    MessagesHandler.notifySubscriberUpdated(id, subsc.getUserRef(), subsc, new Date());
                 }
             }
 
@@ -190,15 +192,15 @@ public class SubscriberCtrl extends Controller {
             
             String[] args = {sub.getSurname(), sub.getName()};
 
-            SubscriberActor.notifyCarUpdated(id, idSub, event.getSubscriberById(idSub).getCar(), usersToNotify);
+            MessagesHandler.notifyCarUpdated(id, idSub, event.getSubscriberById(idSub).getCar(), usersToNotify);
             if(sub.getLocomotion().equals(Locomotion.CAR)){
             	MessageFormat msg = new MessageFormat("{0} {1} a validé votre demande et vous serez son passager");
             	msg.format(args);
-                SubscriberActor.sendNotification(id, from, to, "success", msg.format(args), new Date());
+                MessagesHandler.sendNotification(id, from, to, "success", msg.format(args), new Date());
             }else if(sub.getLocomotion().equals(Locomotion.AUTOSTOP)){
             	MessageFormat msg = new MessageFormat("{0} {1} a validé votre demande et sera votre passager");
             	msg.format(args);
-                SubscriberActor.sendNotification(id, from, to, "success", msg.format(args), new Date());
+                MessagesHandler.sendNotification(id, from, to, "success", msg.format(args), new Date());
             }
 
             List<Topic> topics = Topic.findByIdEventAndIdUser(id, idSub);
@@ -207,7 +209,7 @@ public class SubscriberCtrl extends Controller {
                     if(!topic.subscribers.contains(idPassenger)){
                         topic.subscribers.add(idPassenger);
                         topic.save();
-                        SubscriberActor.publishTopicUpdated(topic);
+                        MessagesHandler.publishTopic(topic, Message.Statut.UPDATED);
                         break;
                     }
                 }
@@ -233,18 +235,18 @@ public class SubscriberCtrl extends Controller {
             Subscriber sub = event.getSubscriberById(from);
             String[] args = {sub.getSurname(), sub.getName()};
 
-            SubscriberActor.notifyCarUpdated(id, idSub, event.getSubscriberById(idSub).getCar(), subscribersToNotify);
+            MessagesHandler.notifyCarUpdated(id, idSub, event.getSubscriberById(idSub).getCar(), subscribersToNotify);
 
             if(sub.getLocomotion().equals(Locomotion.CAR)){
             	MessageFormat msg = new MessageFormat("vous ne faites plus parti de la voiture de {0} {1}");
             	msg.format(args);
-                SubscriberActor.sendNotification(id, from, to, "error", msg.format(args), new Date());
+                MessagesHandler.sendNotification(id, from, to, "error", msg.format(args), new Date());
             }else if(sub.getLocomotion().equals(Locomotion.AUTOSTOP)){
             	MessageFormat msg = new MessageFormat("{0} {1} ne fait plus parti de votre voiture");
             	msg.format(args);
-                SubscriberActor.sendNotification(id, from, to, "error", msg.format(args), new Date());
+                MessagesHandler.sendNotification(id, from, to, "error", msg.format(args), new Date());
             }
-            SubscriberActor.sendNotification(id, from, to, "deletePassenger", "", new Date());
+            MessagesHandler.sendNotification(id, from, to, "deletePassenger", "", new Date());
 	    	return ok().as("application/json");
 	    } catch (Exception e){
 	        return internalServerError(e.getMessage()).as("application/json");
@@ -271,7 +273,7 @@ public class SubscriberCtrl extends Controller {
             String[] args = {sub.getSurname(), sub.getName()};
         	MessageFormat msg = new MessageFormat("{0} {1} souhaite être passager de votre voiture");
         	msg.format(args);
-            SubscriberActor.sendNotification(id, from, to, "success", msg.format(args), new Date());
+            MessagesHandler.sendNotification(id, from, to, "success", msg.format(args), new Date());
             return ok().as("application/json");
         } catch (Exception e){
             return internalServerError(e.getMessage()).as("application/json");
@@ -293,7 +295,7 @@ public class SubscriberCtrl extends Controller {
             String[] args = {sub.getSurname(), sub.getName()};
         	MessageFormat msg = new MessageFormat("{0} {1} a décliné votre proposition être passager de votre voiture");
         	msg.format(args);
-            SubscriberActor.sendNotification(id, from, to, "error", msg.format(args), new Date());
+            MessagesHandler.sendNotification(id, from, to, "error", msg.format(args), new Date());
             return ok().as("application/json");
         } catch (CarIsFullException e){
         	return badRequest("{message: 'La voiture est pleine'}").as("application/json");
@@ -326,7 +328,7 @@ public class SubscriberCtrl extends Controller {
             String[] args = {sub.getSurname(), sub.getName()};
         	MessageFormat msg = new MessageFormat("{0} {1} vous propose d'être passager de sa voiture");
         	msg.format(args);
-            SubscriberActor.sendNotification(id, from, to, "success", msg.format(args), new Date());
+            MessagesHandler.sendNotification(id, from, to, "success", msg.format(args), new Date());
             return ok().as("application/json");
         } catch (Exception e){
             return internalServerError(e.getMessage()).as("application/json");
@@ -347,7 +349,7 @@ public class SubscriberCtrl extends Controller {
             String[] args = {sub.getSurname(), sub.getName()};
         	MessageFormat msg = new MessageFormat("{0} {1} a décliné votre proposition d'être passager de sa voiture");
         	msg.format(args);
-            SubscriberActor.sendNotification(id, from, to, "error", msg.format(args), new Date());
+            MessagesHandler.sendNotification(id, from, to, "error", msg.format(args), new Date());
             return ok().as("application/json");
         } catch (Exception e){
             return internalServerError(e.getMessage()).as("application/json");
@@ -373,7 +375,7 @@ public class SubscriberCtrl extends Controller {
             // Called when the stream is ready
             public void onReady(ServerSentEventChunk out) {
                 try{
-                    SubscriberActor.join(idEvent, userRef, out);
+                    MessagesHandler.join(idEvent, userRef, out);
                 }catch(Exception e){
                     Logger.error("", e);
                 }

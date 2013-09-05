@@ -1,6 +1,7 @@
 package controllers;
 
-import actors.SubscriberActor;
+import actors.Message;
+import actors.MessagesHandler;
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
 import models.ChatMessage;
@@ -81,7 +82,7 @@ public class ChatCtrl extends Controller {
             }else{
                 topic = existing;
             }
-            SubscriberActor.publishTopicCreated(topic);
+            MessagesHandler.publishTopic(topic, Message.Statut.CREATED);
             try {
                 return ok(objectMapper.writeValueAsString(topic)).as("application/json");
             } catch (IOException e) {
@@ -106,7 +107,7 @@ public class ChatCtrl extends Controller {
             }
             topic.id = existing.id;
             topic.save();
-            SubscriberActor.publishTopicUpdated(topic);
+            MessagesHandler.publishTopic(topic, Message.Statut.UPDATED);
             try {
                 return ok(objectMapper.writeValueAsString(topic)).as("application/json");
             } catch (IOException e) {
@@ -134,7 +135,7 @@ public class ChatCtrl extends Controller {
             }
             topic.save();
         }
-        SubscriberActor.publishTopicUpdated(topic);
+        MessagesHandler.publishTopic(topic, Message.Statut.UPDATED);
         try {
             return ok(objectMapper.writeValueAsString(topic)).as("application/json");
         } catch (IOException e) {
@@ -156,7 +157,7 @@ public class ChatCtrl extends Controller {
             Topic topic = Topic.getById(idTopic);
             topic.update = new Date();
             topic.save();
-            SubscriberActor.publishChatMessage(message);
+            MessagesHandler.publishChatMessage(message);
             try {
                 return ok(objectMapper.writeValueAsString(message)).as("application/json");
             } catch (IOException e) {

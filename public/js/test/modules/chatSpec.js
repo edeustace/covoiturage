@@ -172,7 +172,7 @@ describe('chatSpec', function() {
             });
 
             service.addTopic({
-                action : 'CREATE',
+                statut : 'CREATED',
                 data :{
                     id : '2',
                     subscribers:['1']
@@ -192,7 +192,7 @@ describe('chatSpec', function() {
             });
 
             service.addTopic({
-                 action : 'UPDATE',
+                 statut : 'UPDATED',
                  data :{
                      id : '1',
                      subscribers : ['1','2']
@@ -230,7 +230,7 @@ describe('chatSpec', function() {
             });
 
             service.addTopic({
-                action : 'UPDATE',
+                statut : 'UPDATED',
                  data :{
                      id : '1',
                      subscribers : ['2','3']
@@ -250,7 +250,7 @@ describe('chatSpec', function() {
             });
 
             service.addTopic({
-                action : 'DELETE',
+                statut : 'DELETED',
                  data :{
                      id : '1',
                      subscribers : ['1','2']
@@ -356,8 +356,6 @@ describe('chatSpec', function() {
             expect(data.chat.messages[0].id).toEqual('1');
             expect(data.chat.messages[0].date).toEqual(new Date(1374692153917));
             expect(data.chat.messages[0].message).toEqual('test');
-
-
         });
         it('Nouveau', function() {
 

@@ -49,12 +49,12 @@ angular.module('chatModule', [], function($provide){
             }
 
         }
-        function addTopicToList(topic, topics, idCurrentUser, action){
+        function addTopicToList(topic, topics, idCurrentUser, statut){
             if(topics){
                 var found = false;
                 for(var i in topics){
                     var currentTopic=topics[i];
-                    if(action=='UPDATE' || action=='CREATE'){
+                    if(statut=='UPDATED' || statut=='CREATED'){
                         if((currentTopic.id && topic.id && currentTopic.id == topic.id) || ((!currentTopic.id || !topic.id) && currentTopic.tmpId && topic.tmpId && currentTopic.tmpId == topic.tmpId)){
                             found = true;
                             var active = currentTopic.active;
@@ -417,9 +417,9 @@ angular.module('chatModule', [], function($provide){
             addTopic : function(message, idUser){
                 if(message && message.data){
                     var topic = message.data;
-                    if(message.action == 'DELETE'){
+                    if(message.statut == 'DELETED'){
                         removeTopic(topic);
-                    }else if(message.action == 'UPDATE' && !inArray(idUser, topic.subscribers)){
+                    }else if(message.statut == 'UPDATED' && !inArray(idUser, topic.subscribers)){
                         removeTopic(topic);
                     }else{
                         var exist = false;
@@ -429,7 +429,7 @@ angular.module('chatModule', [], function($provide){
                             $data.wall.topic = topic;
                         }else{
                             topic.active = false;
-                            addTopicToList(topic, $data.chat.topics, idUser, message.action);
+                            addTopicToList(topic, $data.chat.topics, idUser, message.statut);
                         }
                     }
                 }
