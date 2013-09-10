@@ -1,47 +1,25 @@
 package models;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import javax.persistence.Id;
-import javax.validation.constraints.NotNull;
-
+import be.objectify.deadbolt.core.models.Subject;
+import com.feth.play.module.pa.providers.password.UsernamePasswordAuthUser;
 import com.feth.play.module.pa.user.*;
+import dao.UserDao;
 import models.enums.Locomotion;
-import net.vz.mongodb.jackson.DBCursor;
-import net.vz.mongodb.jackson.DBQuery;
-import net.vz.mongodb.jackson.JacksonDBCollection;
 import net.vz.mongodb.jackson.MongoCollection;
 import net.vz.mongodb.jackson.ObjectId;
-import net.vz.mongodb.jackson.WriteResult;
-
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.hibernate.validator.constraints.Email;
-
 import play.data.format.Formats.DateTime;
-import play.modules.mongodb.jackson.MongoDB;
-import be.objectify.deadbolt.core.models.Subject;
 
-import com.feth.play.module.pa.providers.password.UsernamePasswordAuthUser;
+import javax.persistence.Id;
+import javax.validation.constraints.NotNull;
+import java.util.*;
 
 @MongoCollection(name="users")
 public class User implements Subject {
 	
-	private static JacksonDBCollection<User, String> collection = null;
-	public static void collection(JacksonDBCollection<User, String> collection){
-        User.collection = collection;
-    }
-    public static JacksonDBCollection<User, String> collection(){
-        if(collection==null){
-            collection = MongoDB.getCollection(User.class, String.class);
-        }
-        return collection;
-    }
+
 
     @Override
     @JsonIgnore
@@ -152,9 +130,7 @@ public class User implements Subject {
     }
     
     public User save(){
-        WriteResult<User, String> result = collection().save(this);
-        this.id = result.getSavedObject().id;
-        return this;
+        return dao.save(this);
     }
 
 
@@ -204,23 +180,32 @@ public class User implements Subject {
     //////////////////////////////////////////////
     /////////        STATIC //////////////////////
     //////////////////////////////////////////////
-    
+
+    private static UserDao dao;
+
+    private static UserDao getDao(){
+        return dao;
+    }
+
+    public static void setDao(UserDao dao){
+        User.dao = dao;
+    }
+
     public static User merge(final AuthUser oldUser, final AuthUser newUser) {
         return User.findByAuthUserIdentity(oldUser).merge(
                 User.findByAuthUserIdentity(newUser));
     }
 
     public static User findById(String id){
-        return collection().findOneById(id);
+        return dao.get(id);
     }
 
     public static Boolean isUserWithEmailExists(String email){
-        DBCursor<User> cursor = collection().find(DBQuery.is("email",email));
-        return cursor.hasNext();
+        return dao.isUserWithEmailExists(email);
     }
 
     public static User getUserwithEmail(String email){
-        return collection().findOne(DBQuery.is("email",email));
+        return dao.getUserwithEmail(email);
     }
 
     public static User create(final AuthUser authUser) {
@@ -301,9 +286,7 @@ public class User implements Subject {
         if (identity instanceof UsernamePasswordAuthUser) {
             return findByUsernamePasswordIdentity((UsernamePasswordAuthUser) identity);
         } else {
-            return collection().findOne(DBQuery.and(DBQuery.is("active", true),
-                    DBQuery.is("linkedAccounts.providerUserId", identity.getId()),
-                    DBQuery.is("linkedAccounts.providerKey", identity.getProvider())));
+            return dao.findByProvider(identity.getId(), identity.getProvider());
         }
     }
 
@@ -318,7 +301,7 @@ public class User implements Subject {
         }
         return null;
     }
-    
+
     @Id
     @ObjectId
     public String getId() {

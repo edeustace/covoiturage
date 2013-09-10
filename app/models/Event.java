@@ -10,6 +10,7 @@ import javax.persistence.Id;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
+import dao.EventDao;
 import models.validators.EmailAlreadyUsed;
 import net.vz.mongodb.jackson.DBCursor;
 import net.vz.mongodb.jackson.DBQuery;
@@ -117,15 +118,11 @@ public class Event {
             this.setFromDate(new Date());
         }
         this.setCreator(null);
-        WriteResult<Event, String> result = collection().save(this);
-        this.id = result.getSavedId();
-        return this;
+        return getDao().save(this);
     }
     
     public Event update(){
-        WriteResult<Event, String> result = collection().save(this);
-        this.id = result.getSavedId();
-        return this;
+        return getDao().save(this);
     }
 
     public Event addPassenger(String idPassenger, String idCarOwner){
@@ -238,30 +235,26 @@ public class Event {
     //////////////////////////////////////////////
     /////////        STATIC //////////////////////
     //////////////////////////////////////////////
-    public static ObjectMapper objectMapper = new ObjectMapper();
-    public static JacksonDBCollection<Event, String> collection = null;
 
-    public static void collection(JacksonDBCollection<Event, String> collection) {
-        Event.collection = collection;
+    private static EventDao dao;
+
+    private static EventDao getDao(){
+        return Event.dao;
     }
-    public static JacksonDBCollection<Event, String> collection(){
-        if(collection==null){
-            collection = MongoDB.getCollection(Event.class, String.class);
-        }
-        return collection;
+
+    public static void setDao(EventDao dao){
+        Event.dao = dao;
     }
+
+    public static ObjectMapper objectMapper = new ObjectMapper();
+
 
     public static List<Event> listByUser(String idUser){
-    	DBCursor<Event> cursor = collection().find(DBQuery.or(DBQuery.is("subscribers.userRef", idUser), DBQuery.is("creatorRef", idUser)));
-    	List<Event> result = new ArrayList<Event>();
-    	while(cursor.hasNext()){
-    		result.add(cursor.next());
-    	}
-    	return result;
+    	return getDao().listByUser(idUser);
     }
     
     public static Event read(String id){
-        return collection().findOneById(id);
+        return getDao().get(id);
     }
 
     public static Event event(){

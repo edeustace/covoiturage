@@ -1,6 +1,8 @@
 package models;
 
 
+import dao.TokenActionDao;
+import dao.TopicDao;
 import net.vz.mongodb.jackson.DBQuery;
 import net.vz.mongodb.jackson.JacksonDBCollection;
 import net.vz.mongodb.jackson.MongoCollection;
@@ -13,17 +15,6 @@ import java.util.Date;
 
 @MongoCollection(name="tokens")
 public class TokenAction {
-
-    private static JacksonDBCollection<TokenAction, String> collection = null;
-    public static void collection(JacksonDBCollection<TokenAction, String> collection){
-        TokenAction.collection = collection;
-    }
-    public static JacksonDBCollection<TokenAction, String> collection(){
-        if(collection==null){
-            collection = MongoDB.getCollection(TokenAction.class, String.class);
-        }
-        return collection;
-    }
 
 	public enum Type {
 		EMAIL_VERIFICATION,
@@ -52,12 +43,22 @@ public class TokenAction {
 
 	public Date expires;
 
+    private static TokenActionDao dao;
+
+    private static TokenActionDao getDao(){
+        return TokenAction.dao;
+    }
+
+    public static void setDao(TokenActionDao dao){
+        TokenAction.dao = dao;
+    }
+
 	public static TokenAction findByToken(final String token, final Type type) {
-        return collection().findOne(DBQuery.and(DBQuery.is("token", token), DBQuery.is("type", type)));
+        return getDao().findByToken(token, type);
 	}
 
 	public static void deleteByUser(final User u, final Type type) {
-        collection().remove(DBQuery.and(DBQuery.is("targetUser", u.getId()), DBQuery.is("type", type)));
+        getDao().deleteByUser(u, type);
 	}
 
     @JsonIgnore
@@ -66,9 +67,7 @@ public class TokenAction {
 	}
 
     public TokenAction save(){
-        net.vz.mongodb.jackson.WriteResult<TokenAction, String> result = collection().save(this);
-        this.id = result.getSavedObject().id;
-        return this;
+        return getDao().save(this);
     }
 
     public static TokenAction create(final Type type, final String token,

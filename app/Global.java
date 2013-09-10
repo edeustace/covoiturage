@@ -1,3 +1,6 @@
+import dao.*;
+import dao.mongodb.*;
+import models.*;
 import play.Application;
 import play.GlobalSettings;
 import play.mvc.Call;
@@ -62,5 +65,28 @@ public class Global extends GlobalSettings {
                 return super.onException(e);
             }
         });
+
+        //Init des Daos
+        UserDao userDao = new MongoDbUserDao();
+        userDao.init();
+        User.setDao(userDao);
+
+        EventDao eventDao = new MongoDbEventDao();
+        eventDao.init();
+        Event.setDao(eventDao);
+
+        TopicDao topicDao = new MongoDbTopicDao();
+        topicDao.init();
+        Topic.setDao(topicDao);
+
+        ChatMessageDao chatMessageDao = new MongoDbChatMessageDao();
+        chatMessageDao.init();
+        ChatMessage.setDao(chatMessageDao);
+
+        TokenActionDao tokenActionDao = new MongoDbTokenActionDao();
+        tokenActionDao.init();
+        TokenAction.setDao(tokenActionDao);
+
+
     }
 }

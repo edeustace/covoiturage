@@ -1,5 +1,7 @@
 package models;
 
+import dao.ChatMessageDao;
+import dao.TopicDao;
 import net.vz.mongodb.jackson.*;
 import play.modules.mongodb.jackson.MongoDB;
 
@@ -52,32 +54,22 @@ public class ChatMessage {
         if(this.topicRef==null){
             this.topicRef = topic.id;
         }
-        WriteResult<ChatMessage, String> result = collection().save(this);
-        this.id = result.getSavedId();
-        return this;
+        return getDao().save(this);
     }
 
+
+    private static ChatMessageDao dao;
+
+    private static ChatMessageDao getDao(){
+        return ChatMessage.dao;
+    }
+
+    public static void setDao(ChatMessageDao dao){
+        ChatMessage.dao = dao;
+    }
 
 
     public static List<ChatMessage> findByIdTopic(String idTopic){
-        DBCursor<ChatMessage> cursor = collection().find(DBQuery.is("topicRef", idTopic));
-        List<ChatMessage> result = new ArrayList<ChatMessage>();
-        while(cursor.hasNext()){
-            result.add(cursor.next());
-        }
-        return result;
+        return getDao().findByIdTopic(idTopic);
     }
-
-    public static JacksonDBCollection<ChatMessage, String> collection = null;
-
-    public static void collection(JacksonDBCollection<ChatMessage, String> collection) {
-        ChatMessage.collection = collection;
-    }
-    public static JacksonDBCollection<ChatMessage, String> collection(){
-        if(collection==null){
-            collection = MongoDB.getCollection(ChatMessage.class, String.class);
-        }
-        return collection;
-    }
-
 }

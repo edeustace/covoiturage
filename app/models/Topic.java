@@ -1,14 +1,12 @@
 package models;
 
-import net.vz.mongodb.jackson.*;
-import org.springframework.util.CollectionUtils;
-import play.data.validation.Constraints;
-import play.modules.mongodb.jackson.MongoDB;
+import dao.TopicDao;
+import net.vz.mongodb.jackson.MongoCollection;
+import net.vz.mongodb.jackson.ObjectId;
 
 import javax.persistence.Id;
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -58,26 +56,36 @@ public class Topic {
     }
 
     ////////////  STATIC  ////////////////
+
+    private static TopicDao dao;
+
+    private static TopicDao getDao(){
+        return Topic.dao;
+    }
+
+    public static void setDao(TopicDao dao){
+        Topic.dao = dao;
+    }
+
+
+
     public Topic save(){
-        WriteResult<Topic, String> result = collection().save(this);
-        this.id = result.getSavedId();
-        return this;
+        return getDao().save(this);
     }
 
     public Topic update(){
-        WriteResult<Topic, String> result = collection().updateById(this.id, this);
-        return this;
+        return getDao().update(this.id, this);
     }
 
 
     public static Topic getById(String id){
-        return collection().findOneById(id);
+        return getDao().get(id);
     }
 
     public static Topic exists(Topic topic){
 
         if(topic.id != null){
-            Topic db = collection().findOneById(topic.id);
+            Topic db = getById(topic.id);
             if(db!=null)
                 return db;
         }
@@ -154,40 +162,16 @@ public class Topic {
     }
 
     public static List<Topic> findByIdEventAndCategorie(String idEvent, TopicCategorie categorie){
-        DBCursor<Topic> cursor = collection().find(DBQuery.and(DBQuery.is("categorie", categorie), DBQuery.is("idEvent", idEvent)));
-        List<Topic> result = new ArrayList<Topic>();
-        while(cursor.hasNext()){
-            result.add(cursor.next());
-        }
-        return result;
+        return getDao().findByIdEventAndCategorie(idEvent, categorie);
     }
 
     public static Topic findByIdEventCategorieAndCreator(String idEvent, TopicCategorie categorie, String idCreator){
-        return  collection().findOne(DBQuery.and(DBQuery.is("categorie", categorie), DBQuery.is("idEvent", idEvent), DBQuery.is("creator", idCreator)));
+        return getDao().findByIdEventCategorieAndCreator(idEvent, categorie, idCreator);
     }
 
     public static List<Topic> findByIdEventAndIdUser(String idEvent, String idUser){
-        DBCursor<Topic> cursor = collection().find(DBQuery.and(DBQuery.is("subscribers", idUser), DBQuery.is("idEvent", idEvent)));
-        List<Topic> result = new ArrayList<Topic>();
-        while(cursor.hasNext()){
-            result.add(cursor.next());
-        }
-        return result;
+        return getDao().findByIdEventAndIdUser(idEvent, idUser);
     }
-
-    public static JacksonDBCollection<Topic, String> collection = null;
-
-    public static void collection(JacksonDBCollection<Topic, String> collection) {
-        Topic.collection = collection;
-    }
-    public static JacksonDBCollection<Topic, String> collection(){
-        if(collection==null){
-            collection = MongoDB.getCollection(Topic.class, String.class);
-        }
-        return collection;
-    }
-
-
 
     public String getId() {
         return id;
