@@ -105,7 +105,7 @@ public class ChatCtrl extends Controller {
             if(existing==null){
                 return badRequest("Topic not existing").as("application/json");
             }
-            topic.id = existing.id;
+            topic.setId(existing.getId());
             topic.save();
             MessagesHandler.publishTopic(topic, Message.Statut.UPDATED);
             try {

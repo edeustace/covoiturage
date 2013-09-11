@@ -53,9 +53,6 @@ public class EventCtrlTest {
      */
     @Test
     public void testCreateWithErrors() {
-        Event.collection = JacksonDBCollection.wrap(currentDataBase.getCollection("events"), Event.class, String.class);
-        User.collection(JacksonDBCollection.wrap(currentDataBase.getCollection("users"), User.class, String.class));
-
         running(testServer(3333), new Runnable() {
             public void run() {
                 User user = User.user().setEmail("toto@gmail.com").setPassword("123456").save();
@@ -81,8 +78,6 @@ public class EventCtrlTest {
 
     @Test
     public void testKoUserAlreadyExisting() {
-        Event.collection = JacksonDBCollection.wrap(currentDataBase.getCollection("events"), Event.class, String.class);
-        User.collection(JacksonDBCollection.wrap(currentDataBase.getCollection("users"), User.class, String.class));
 
         running(testServer(3333), new Runnable() {
             public void run() {
@@ -111,8 +106,6 @@ public class EventCtrlTest {
 
     @Test
     public void testCreateOk() {
-        Event.collection = JacksonDBCollection.wrap(currentDataBase.getCollection("events"), Event.class, String.class);
-        User.collection(JacksonDBCollection.wrap(currentDataBase.getCollection("users"), User.class, String.class));
 
         running(testServer(3333), new Runnable() {
             public void run() {
@@ -142,8 +135,6 @@ public class EventCtrlTest {
 
     @Test
     public void testGet() {
-        Event.collection = JacksonDBCollection.wrap(currentDataBase.getCollection("events"), Event.class, String.class);
-        User.collection(JacksonDBCollection.wrap(currentDataBase.getCollection("users"), User.class, String.class));
 
         running(testServer(3333), new Runnable() {
             public void run() {

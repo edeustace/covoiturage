@@ -13,7 +13,7 @@ public interface Dao<T> {
 
     T save(T obj);
 
-    T update(String id, T obj);
+    T update(T obj);
 
     void init();
 }

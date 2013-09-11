@@ -1,6 +1,7 @@
 package dao.mongodb;
 
 import dao.Dao;
+import models.AbstractModel;
 import net.vz.mongodb.jackson.JacksonDBCollection;
 import net.vz.mongodb.jackson.WriteResult;
 import play.modules.mongodb.jackson.MongoDB;
@@ -12,12 +13,12 @@ import play.modules.mongodb.jackson.MongoDB;
  * Time: 20:41
  * To change this template use File | Settings | File Templates.
  */
-public abstract class AbstractMongoDao <T> implements Dao<T> {
+public abstract class AbstractMongoDao <T extends AbstractModel> implements Dao<T> {
 
     private JacksonDBCollection<T, String> collection = null;
 
-    public T update(String id, T obj) {
-        return getCollection().updateById(id, obj).getSavedObject();
+    public T update(T obj) {
+        return getCollection().updateById(obj.getId(), obj).getSavedObject();
     }
 
     public AbstractMongoDao() {
@@ -32,7 +33,8 @@ public abstract class AbstractMongoDao <T> implements Dao<T> {
 
     public T save(T data){
         WriteResult<T, String> result = this.getCollection().save(data);
-        return  result.getSavedObject();
+        data.setId(result.getSavedObject().getId());
+        return  data;
     }
 
     public T get(String id){

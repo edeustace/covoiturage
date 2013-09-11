@@ -17,17 +17,15 @@ import javax.validation.constraints.NotNull;
 import java.util.*;
 
 @MongoCollection(name="users")
-public class User implements Subject {
-	
+public class User extends AbstractModel implements Subject {
+
 
 
     @Override
     @JsonIgnore
     public String getIdentifier() {
-        return id;
+        return this.getId();
     }
-
-    private String id;
 
     private String version = "1";
     
@@ -63,7 +61,7 @@ public class User implements Subject {
 
     @JsonIgnore
     public Boolean isEmpty(){
-        return id==null && email == null &&
+        return getId()==null && email == null &&
                 password==null && name==null &&
                 surname == null && address==null;
     }
@@ -302,22 +300,8 @@ public class User implements Subject {
         return null;
     }
 
-    @Id
-    @ObjectId
-    public String getId() {
-        return id;
-    }
-    
     public static User user() {
         return new User();
-    }
-
-    @Id
-    @ObjectId
-    @JsonProperty("id")
-    public User setId(String id) {
-        this.id = id;
-        return this;
     }
 
     @JsonProperty("email")

@@ -29,14 +29,12 @@ import org.codehaus.jackson.map.ObjectReader;
 import play.modules.mongodb.jackson.MongoDB;
 
 @MongoCollection(name="events")
-public class Event {
+public class Event extends AbstractModel {
 
 	public static @interface Update{}
 	public static @interface Create{}
 	
     ///////////    FIELDS  /////////////////////
-    private String id;
-
     private String version = "1";
 
 	@NotNull
@@ -273,11 +271,6 @@ public class Event {
     //////////////////////////////////////////////
     /////////  GETTERS AND SETTERS ///////////////
     //////////////////////////////////////////////
-    @Id
-    @ObjectId
-    public String getId() {
-        return id;
-    }
 
     @JsonProperty("name")
     public String getName() {
@@ -393,13 +386,6 @@ public class Event {
     @JsonProperty("creator")
     public Event setCreator(User creator) {
         this.creator = creator;
-        return this;
-    }
-
-    @Id
-    @ObjectId
-    public Event setId(String id) {
-        this.id = id;
         return this;
     }
 

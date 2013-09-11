@@ -32,8 +32,6 @@ public class EventIntegrationTest {
     public void simpleInsert(){
         running(fakeApplication(), new Runnable() {
             public void run() {
-                Event.collection = JacksonDBCollection.wrap(currentDataBase.getCollection("events"), Event.class, String.class);
-                User.collection(JacksonDBCollection.wrap(currentDataBase.getCollection("users"), User.class, String.class));
 
                 Event event = Event.event().setName("a getName").save();
                 assertThat(event.getId()).isNotNull();
@@ -56,8 +54,6 @@ public class EventIntegrationTest {
     public void insertwithCreator(){
         running(fakeApplication(), new Runnable() {
             public void run() {
-                Event.collection(JacksonDBCollection.wrap(currentDataBase.getCollection("events"), Event.class, String.class));
-                User.collection(JacksonDBCollection.wrap(currentDataBase.getCollection("users"), User.class, String.class));
 
                 //Test
                 Event event = Event.event().setName("a getName");
@@ -92,8 +88,6 @@ public class EventIntegrationTest {
     public void insertwithCreatorAlreadyExisting(){
         running(fakeApplication(), new Runnable() {
             public void run() {
-                Event.collection = JacksonDBCollection.wrap(currentDataBase.getCollection("events"), Event.class, String.class);
-                User.collection(JacksonDBCollection.wrap(currentDataBase.getCollection("users"), User.class, String.class));
 
                 User creator = User.user().setEmail("toto@gmail.com").save();
                 //Test :
@@ -128,8 +122,6 @@ public class EventIntegrationTest {
     public void testCreateEventAndAddSubriber(){
         running(fakeApplication(), new Runnable() {
             public void run() {
-                Event.collection = JacksonDBCollection.wrap(currentDataBase.getCollection("events"), Event.class, String.class);
-                User.collection(JacksonDBCollection.wrap(currentDataBase.getCollection("users"), User.class, String.class));
                 Event event = Event.event().setName("a getName");
                 event.setCreator(User.user().setEmail("toto@gmail.com"));
                 Subscriber subsc = Subscriber.subscriber()
@@ -172,8 +164,6 @@ public class EventIntegrationTest {
     public void testCreateEventAndAddSubriberTwice(){
         running(fakeApplication(), new Runnable() {
             public void run() {
-                Event.collection = JacksonDBCollection.wrap(currentDataBase.getCollection("events"), Event.class, String.class);
-                User.collection(JacksonDBCollection.wrap(currentDataBase.getCollection("users"), User.class, String.class));
                 Event event = Event.event().setName("a getName");
                 event.setCreator(User.user().setEmail("toto@gmail.com"));
                 Subscriber subsc = Subscriber.subscriber()
@@ -219,8 +209,6 @@ public class EventIntegrationTest {
     public void testAddAndMergeSubscriber(){
         running(fakeApplication(), new Runnable() {
             public void run() {
-                Event.collection = JacksonDBCollection.wrap(currentDataBase.getCollection("events"), Event.class, String.class);
-                User.collection(JacksonDBCollection.wrap(currentDataBase.getCollection("users"), User.class, String.class));
                 Event event = Event.event().setName("a getName");
                 Subscriber subsc = Subscriber.subscriber()
                         .setAddress(Address.address().setDescription("An adress"))
@@ -246,8 +234,6 @@ public class EventIntegrationTest {
     public void testAddAndReplaceSubscriber(){
         running(fakeApplication(), new Runnable() {
             public void run() {
-                Event.collection = JacksonDBCollection.wrap(currentDataBase.getCollection("events"), Event.class, String.class);
-                User.collection(JacksonDBCollection.wrap(currentDataBase.getCollection("users"), User.class, String.class));
                 Event event = Event.event().setName("a getName");
                 Subscriber subsc = Subscriber.subscriber()
                         .setAddress(Address.address().setDescription("An adress"))

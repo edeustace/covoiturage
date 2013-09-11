@@ -20,16 +20,12 @@ import java.util.List;
 
 
 @MongoCollection(name="topics")
-public class Topic {
+public class Topic extends AbstractModel {
 
     public static enum TopicCategorie {
         carChat, chat, wall
     }
 
-    @Id
-    @ObjectId
-
-    public String id;
 
     @NotNull
     public String idEvent;
@@ -74,7 +70,7 @@ public class Topic {
     }
 
     public Topic update(){
-        return getDao().update(this.id, this);
+        return getDao().update(this);
     }
 
 
@@ -84,8 +80,8 @@ public class Topic {
 
     public static Topic exists(Topic topic){
 
-        if(topic.id != null){
-            Topic db = getById(topic.id);
+        if(topic.getId() != null){
+            Topic db = getById(topic.getId());
             if(db!=null)
                 return db;
         }
@@ -105,7 +101,7 @@ public class Topic {
 
         if(obj instanceof Topic){
             Topic topic = (Topic)obj;
-            if(topic.id != null && this.id!=null && topic.id.equals(this.id)){
+            if(topic.getId() != null && this.getId()!=null && topic.getId().equals(this.getId())){
                 return true;
             }
             if(topic.categorie != null && this.categorie!=null && topic.categorie.equals(this.categorie) &&
@@ -171,10 +167,6 @@ public class Topic {
 
     public static List<Topic> findByIdEventAndIdUser(String idEvent, String idUser){
         return getDao().findByIdEventAndIdUser(idEvent, idUser);
-    }
-
-    public String getId() {
-        return id;
     }
 
     public String getIdEvent() {

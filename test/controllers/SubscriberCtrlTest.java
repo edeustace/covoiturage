@@ -49,9 +49,6 @@ public class SubscriberCtrlTest {
 
     @Test
     public void testCreateOk() {
-        Event.collection = JacksonDBCollection.wrap(currentDataBase.getCollection("events"), Event.class, String.class);
-        User.collection(JacksonDBCollection.wrap(currentDataBase.getCollection("users"), User.class, String.class));
-
         running(testServer(3333), new Runnable() {
             public void run() {
                 Event event = Event.event()

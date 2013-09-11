@@ -35,7 +35,8 @@ public class UserModel {
     @Id
     @ObjectId
     public User setId(String id) {
-        return user.setId(id);
+        user.setId(id);
+        return user;
     }
 
     @JsonProperty("id")

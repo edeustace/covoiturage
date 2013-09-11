@@ -14,7 +14,7 @@ import javax.persistence.Id;
 import java.util.Date;
 
 @MongoCollection(name="tokens")
-public class TokenAction {
+public class TokenAction extends AbstractModel {
 
 	public enum Type {
 		EMAIL_VERIFICATION,
@@ -27,10 +27,6 @@ public class TokenAction {
 	 * Defaults to one week
 	 */
 	private final static long VERIFICATION_TIME = 7 * 24 * 3600;
-
-	@Id
-    @ObjectId
-	public String id;
 
 	//Doit etre unique
 	public String token;

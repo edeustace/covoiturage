@@ -43,7 +43,6 @@ public class UserIntegrationTest {
     public void simpleInsert(){
         running(fakeApplication(), new Runnable() {
             public void run() {
-                User.collection(JacksonDBCollection.wrap(currentDataBase.getCollection("users"), User.class, String.class));
 
                 User user = User.user().setName("a getName").save();
                 assertThat(user.getId()).isNotNull();
@@ -63,7 +62,6 @@ public class UserIntegrationTest {
     public void findByAuthUserIdentity(){
         running(fakeApplication(), new Runnable() {
             public void run() {
-                User.collection(JacksonDBCollection.wrap(currentDataBase.getCollection("users"), User.class, String.class));
 
                 User user = User.user().setName("a getName").setEmail("email@toto.com");
                 user.getLinkedAccounts().add(LinkedAccount.linkedAccount().setId("123456").setProviderKey("larouss").setProviderUserId("654321"));
@@ -86,7 +84,6 @@ public class UserIntegrationTest {
     public void findByAuthUserIdentityWithUsernamePasswordAuthUser(){
         running(fakeApplication(), new Runnable() {
             public void run() {
-                User.collection(JacksonDBCollection.wrap(currentDataBase.getCollection("users"), User.class, String.class));
 
                 User user = User.user().setName("a getName").setEmail("email@toto.com");
                 user.getLinkedAccounts().add(LinkedAccount.linkedAccount().setId("123456").setProviderKey("larouss").setProviderUserId("654321"));
@@ -109,7 +106,6 @@ public class UserIntegrationTest {
 	public void testAddLinkedAccount() throws Exception {
 		running(fakeApplication(), new Runnable() {
             public void run() {
-                User.collection(JacksonDBCollection.wrap(currentDataBase.getCollection("users"), User.class, String.class));
 
                 User user = User.user().setName("a getName").setEmail("email@toto.com");
                 user.getLinkedAccounts().add(LinkedAccount.linkedAccount().setId("123456").setProviderKey("larouss").setProviderUserId("654321"));
@@ -135,7 +131,6 @@ public class UserIntegrationTest {
 	public void existsByAuthUserIdentity(){
 		running(fakeApplication(), new Runnable() {
             public void run() {
-                User.collection(JacksonDBCollection.wrap(currentDataBase.getCollection("users"), User.class, String.class));
 
                 User user = User.user().setName("a getName").setEmail("email@toto.com");
                 user.getLinkedAccounts().add(LinkedAccount.linkedAccount().setId("123456").setProviderKey("larouss").setProviderUserId("654321"));
@@ -157,7 +152,6 @@ public class UserIntegrationTest {
 	public void createNonExisting(){
 		running(fakeApplication(), new Runnable() {
             public void run() {
-                User.collection(JacksonDBCollection.wrap(currentDataBase.getCollection("users"), User.class, String.class));
 
                 AuthUser current = new AuthUserIdentityMock("654321", "larouss") ;
                 User.create(current);
@@ -172,7 +166,7 @@ public class UserIntegrationTest {
 	public void createExisting(){
 		running(fakeApplication(), new Runnable() {
             public void run() {
-                User.collection(JacksonDBCollection.wrap(currentDataBase.getCollection("users"), User.class, String.class));
+
                 User user = User.user().setName("a getName").setEmail("email@toto.com");
                 user.getLinkedAccounts().add(LinkedAccount.linkedAccount().setId("123456").setProviderKey("larouss").setProviderUserId("654321"));
                 user.setActive(true);
@@ -196,7 +190,7 @@ public class UserIntegrationTest {
 	public void createExistingWithNewIdentity(){
 		running(fakeApplication(), new Runnable() {
             public void run() {
-                User.collection(JacksonDBCollection.wrap(currentDataBase.getCollection("users"), User.class, String.class));
+
                 User user = User.user().setName("a getName").setEmail("email@toto.com");
                 user.getLinkedAccounts().add(LinkedAccount.linkedAccount().setId("123456").setProviderKey("larouss").setProviderUserId("654321"));
                 user.setActive(true);
@@ -220,7 +214,7 @@ public class UserIntegrationTest {
 	public void createExistingWithWrongMail(){
 		running(fakeApplication(), new Runnable() {
             public void run() {
-                User.collection(JacksonDBCollection.wrap(currentDataBase.getCollection("users"), User.class, String.class));
+
                 User user = User.user().setName("a getName").setEmail("email@toto.com");
                 user.getLinkedAccounts().add(LinkedAccount.linkedAccount().setId("123456").setProviderKey("larouss").setProviderUserId("654321"));
                 user.setActive(true);
@@ -235,7 +229,7 @@ public class UserIntegrationTest {
                 assertThat(userFromDb).isNotNull();
                 assertThat(userFromDb.getName()).isNull();
                 assertThat(userFromDb.getEmail()).isEqualTo("adelegue@toto.com");
-                assertThat(userFromDb.getEmailValidated()).isFalse();
+                assertThat(userFromDb.getEmailValidated()).isTrue();
                 assertThat(userFromDb.getLinkedAccounts().size()).isEqualTo(1);
                 
             }

@@ -17,10 +17,10 @@ public class ChatControllerTest {
     public void testEqualsIds(){
 
         Topic topic1 = new Topic();
-        topic1.id = "123";
+        topic1.setId("123");
 
         Topic topic2 = new Topic();
-        topic2.id = "123";
+        topic2.setId("123");
 
         assertThat(topic1).isEqualTo(topic2);
     }
@@ -30,13 +30,13 @@ public class ChatControllerTest {
 
         Topic topic1 = new Topic();
         topic1.idEvent = "1";
-        topic1.categorie = "chat";
+        topic1.categorie = Topic.TopicCategorie.carChat;
         topic1.subscribers.add("1");
         topic1.subscribers.add("2");
 
         Topic topic2 = new Topic();
         topic2.idEvent = "1";
-        topic2.categorie = "chat";
+        topic2.categorie = Topic.TopicCategorie.carChat;
         topic2.subscribers.add("1");
         topic2.subscribers.add("2");
 
@@ -47,11 +47,11 @@ public class ChatControllerTest {
 
         Topic topic1 = new Topic();
         topic1.idEvent = "1";
-        topic1.categorie = "mainChat";
+        topic1.categorie = Topic.TopicCategorie.carChat;
 
         Topic topic2 = new Topic();
         topic2.idEvent = "1";
-        topic2.categorie = "mainChat";
+        topic2.categorie = Topic.TopicCategorie.carChat;
 
         assertThat(topic1.equals(topic2)).isEqualTo(true);
     }
@@ -61,14 +61,14 @@ public class ChatControllerTest {
 
         Topic topic1 = new Topic();
         topic1.idEvent = "1";
-        topic1.categorie = "chat";
+        topic1.categorie = Topic.TopicCategorie.carChat;
         topic1.subscribers.add("1");
         topic1.subscribers.add("2");
         topic1.subscribers.add("3");
 
         Topic topic2 = new Topic();
         topic2.idEvent = "1";
-        topic2.categorie = "chat";
+        topic2.categorie = Topic.TopicCategorie.carChat;
         topic2.subscribers.add("1");
         topic2.subscribers.add("2");
 
@@ -80,14 +80,14 @@ public class ChatControllerTest {
 
         Topic topic1 = new Topic();
         topic1.idEvent = "1";
-        topic1.categorie = "chat";
+        topic1.categorie = Topic.TopicCategorie.carChat;
         topic1.subscribers.add("1");
         topic1.subscribers.add("2");
 
 
         Topic topic2 = new Topic();
         topic2.idEvent = "1";
-        topic2.categorie = "chat";
+        topic2.categorie = Topic.TopicCategorie.carChat;
         topic2.subscribers.add("1");
         topic2.subscribers.add("2");
         topic2.subscribers.add("3");
@@ -101,14 +101,14 @@ public class ChatControllerTest {
 
         Topic topic1 = new Topic();
         topic1.idEvent = "1";
-        topic1.categorie = "chat";
+        topic1.categorie = Topic.TopicCategorie.wall;
         topic1.subscribers.add("1");
         topic1.subscribers.add("2");
 
 
         Topic topic2 = new Topic();
         topic2.idEvent = "1";
-        topic2.categorie = "chat1";
+        topic2.categorie = Topic.TopicCategorie.carChat;
         topic2.subscribers.add("1");
         topic2.subscribers.add("2");
 

@@ -20,11 +20,7 @@ import java.util.List;
  */
 
 @MongoCollection(name="messages")
-public class ChatMessage {
-
-    @Id
-    @ObjectId
-    public String id;
+public class ChatMessage extends AbstractModel {
 
     public String type = "message";
 
@@ -52,7 +48,7 @@ public class ChatMessage {
     ////////////  STATIC  ////////////////
     public ChatMessage save(){
         if(this.topicRef==null){
-            this.topicRef = topic.id;
+            this.topicRef = topic.getId();
         }
         return getDao().save(this);
     }

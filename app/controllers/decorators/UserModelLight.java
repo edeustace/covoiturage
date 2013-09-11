@@ -34,7 +34,8 @@ public class UserModelLight {
     @Id
     @ObjectId
     public User setId(String id) {
-        return user.setId(id);
+        user.setId(id);
+        return user;
     }
 
     @JsonProperty("id")
