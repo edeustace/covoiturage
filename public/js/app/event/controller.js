@@ -16,7 +16,7 @@ function EventCtrl($scope, $http, $location, $compile, $filter, mailUtils, mapSe
 	$scope.editMode = false;
 	$scope.alerts = [];
 	$scope.eltsInChat = 10;
-	$scope.eltsInMainChat = 10;
+	$scope.eltsInWall = 10;
 	$scope.opts = {
         backdropFade: true,
         dialogFade:true
@@ -259,7 +259,7 @@ function EventCtrl($scope, $http, $location, $compile, $filter, mailUtils, mapSe
     };
     $scope.sendMessageToWall = function(currentMessage){
         chatService.sendMessageToWall(currentMessage, $scope.user.id, $scope.idEvent);
-        $scope.mainChat.currentMessage = null;
+        $scope.wall.currentMessage = null;
     };
 
     $scope.sendMessage = function(currentMessage){
@@ -267,8 +267,8 @@ function EventCtrl($scope, $http, $location, $compile, $filter, mailUtils, mapSe
         $scope.chat.currentMessage = null;
     };
 
-    $scope.loadMainChatMessages = function(){
-        chatService.loadMainChatMessages();
+    $scope.loadWallMessages = function(){
+        chatService.loadWallMessages();
     };
 
     $scope.loadMessages = function(aTopic){

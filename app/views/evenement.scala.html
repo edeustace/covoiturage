@@ -374,8 +374,8 @@
                 <p class="nav-header">
                     Mur
                 </p>
-                    <textarea class="input-block-level" rows="2" ng-model="mainChat.currentMessage" ui-keypress="{13:'sendMessageToWall(mainChat.currentMessage)'}" ></textarea>
-                <p ng-repeat="msg in mainChat.messages | orderBy: '-date' | limitTo: eltsInMainChat" class="dl-horizontalli">
+                    <textarea class="input-block-level" rows="2" ng-model="wall.currentMessage" ui-keypress="{13:'sendMessageToWall(wall.currentMessage)'}" ></textarea>
+                <p ng-repeat="msg in wall.messages | orderBy: '-date' | limitTo: eltsInWall" class="dl-horizontalli">
                     <strong ng-show="msg.from != currentSubscriber.userRef" tooltip-placement="left" tooltip="{{msg.date | date:'à HH:mm:ss le dd/MM'}}">
                         {{getSubscriber(msg.from).surname}} {{getSubscriber(msg.from).name}} :
                     </strong>
@@ -389,8 +389,8 @@
                     <small class="text-error" ng-show="msg.statut && msg.statut == 'FAILURE'">Erreur le message n'a pas été envoyé</small>
                 </p>
                 <p>
-                    <a ng-click="eltsInMainChat = eltsInMainChat + 5 ">Plus ...</a>
-                    <a class="pull-right" ng-show="eltsInMainChat > 10" ng-click="eltsInMainChat = eltsInMainChat - 5 ">... moins</a>
+                    <a ng-click="eltsInWall = eltsInWall + 5 ">Plus ...</a>
+                    <a class="pull-right" ng-show="eltsInWall > 10" ng-click="eltsInWall = eltsInWall - 5 ">... moins</a>
                 </p>
             </div>
 

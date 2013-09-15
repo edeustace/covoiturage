@@ -133,7 +133,7 @@ angular.module('chatModule', [], function($provide){
         }
         function addMessageToTopic(message, messages, idCurrentUser){
             var found = false;
-            if(message.from == idCurrentUser || message.topic.categorie == 'mainChat'){
+            if(message.from == idCurrentUser || message.topic.categorie == 'wall'){
                 for(var i in messages){
                     var msg = messages[i];
                     if((msg.id && message.id && msg.id == message.id) || ((!msg.id || !message.id) && msg.tmpId && message.tmpId && msg.tmpId == message.tmpId)){
@@ -179,14 +179,14 @@ angular.module('chatModule', [], function($provide){
             };
             if(topic.categorie == "chat" || topic.categorie == "carChat"){
                 addMessage(messageToSend);
-            }else if(topic.categorie == "mainChat"){
+            }else if(topic.categorie == "wall"){
                 addMessageToWall(messageToSend);
             }
             var url = jsRoutes.controllers.ChatCtrl.createMessage(idEvent, topic.id);
             $http.post(url.url, messageToSend).success(function(message){
                 if(topic.categorie == "chat" || topic.categorie == "carChat"){
                     addMessageToTopic(message, $data.chat.messages, idCurrentUser);
-                }else if(topic.categorie == "mainChat"){
+                }else if(topic.categorie == "wall"){
                     addMessageToTopic(message, $data.wall.messages);
                 }
             }).error(function(){
@@ -196,7 +196,7 @@ angular.module('chatModule', [], function($provide){
                             $data.chat.messages[i].statut = "FAILURE";
                         }
                     }
-                }else if(topic.categorie == "mainChat"){
+                }else if(topic.categorie == "wall"){
                     for(var i in $data.wall.messages){
                         if(!$data.wall.messages[i].id && $data.wall.messages[i].tmpId == tmpIdMessage){
                             $data.wall.messages[i].statut = "FAILURE";
