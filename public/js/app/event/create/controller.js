@@ -5,8 +5,9 @@
 
 /* Controllers */
 
-function EventCreationCtrl($scope, $http, $location, mailUtils) {
+function EventCreationCtrl($scope, $http, $location, mailUtils, errorService) {
 	$scope.event = {};
+	$scope.alerts = new Array();
 	$scope.minDate = new Date();
 	$scope.items = [
 	                  { id: "CAR", name: 'en voiture' },
@@ -21,6 +22,7 @@ function EventCreationCtrl($scope, $http, $location, mailUtils) {
 		$scope.event.contacts = mailUtils.pushMails($scope.contact, $scope.event.contacts);
 		$scope.contact = null;
 	};
+
 	$scope.remove = function(index){
 		$scope.event.contacts.splice(index, 1);
 	}
@@ -42,18 +44,16 @@ function EventCreationCtrl($scope, $http, $location, mailUtils) {
 		$http.post('/rest/events', theEvent).success(function(data){
 			window.location = /evenement/+data.id;
 		}).error(function(data){
-		    var msg = '';
-            if(data.errors){
-                var someErrors = data.errors;
-                for(var anError in someErrors){
-                    msg += anError + ' : '+someErrors[anError]+'<br/>';
-                }
-                alert(msg);
-            }else{
-                alert('error '+data);
-            }
+		    $scope.alerts = new Array();
+		    errorService.formatErrors(data, function(msg){
+               $scope.alerts.push({type:"error", msg:msg});
+           });
 		});
-	}
+	};
+
+	$scope.closeAlert = function(index) {
+        $scope.alerts.splice(index, 1);
+    };
 }
 // EventCtrl.$inject = ['$scope','register'];
 

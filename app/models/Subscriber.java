@@ -33,13 +33,13 @@ public class Subscriber {
     @JsonIgnore
     private String surname;
 
-    @JsonIgnore @NotNull @Email
+    @JsonIgnore @NotNull(message = "subscriber.email.notNull") @Email(message = "subscriber.email.notValid")
     private String email;
 
-    @JsonIgnore @NotNull @Valid
+    @JsonIgnore @NotNull(message = "subscriber.address.notNull") @Valid
     private Address address;
 
-    @JsonIgnore @NotNull
+    @JsonIgnore @NotNull(message = "subscriber.locomotion.notNull")
     private Locomotion locomotion;
 
     private Car car; 

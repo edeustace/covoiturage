@@ -37,7 +37,7 @@ public class Event extends AbstractModel {
     ///////////    FIELDS  /////////////////////
     private String version = "1";
 
-	@NotNull
+	@NotNull(message = "event.name.notNull")
     private String name;
 
     private String description;
@@ -52,7 +52,7 @@ public class Event extends AbstractModel {
 
     private Boolean updated = Boolean.FALSE;
 
-    @NotNull @Valid
+    @NotNull(message = "event.address.notNull") @Valid
     private Address address;
 
     @Valid @NotNull

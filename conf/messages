@@ -129,6 +129,19 @@ playauthenticate.navigation.createEvent=Créer un événement
 playauthenticate.navigation.myEvents = Mes événements
 playauthenticate.navigation.signup=Créer son compte
 
+
+event.name.notNull = Le nom de l''événement est obligatoire
+event.address.notNull = L''adresse de l''événement est obligatoire
+event.address.valid = L''adresse saisie n'est pas valide
+
+address.description.notNull = L''adresse saise n'est pas valide
+address.location.notNull = L''adresse saise n'est pas valide
+
+subscriber.email.notNull = l''email doit être renseigné
+subscriber.email.notValid = Le format de l''email n'est pas valide
+subscriber.address.notNull = L'adresse doit être renseigné
+subscriber.locomotion.notNull = Le moyen de locomotion doit être renseigné
+
 # play-authenticate: Handler
 playauthenticate.handler.loginfirst=Vous devez vous connecter pour accéder à: ''{0}''
 

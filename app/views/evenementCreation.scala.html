@@ -13,6 +13,7 @@
     <script type="text/javascript" src="@routes.Assets.at("js/app/directives/bootstrap-timepicker.js")"></script>
     <script type="text/javascript" src="@routes.Assets.at("js/app/directives/googleplace.js")"></script>
 	<script type="text/javascript" src="@routes.Assets.at("js/app/modules/mailUtils.js")"></script>
+    <script type="text/javascript" src="@routes.Assets.at("js/app/modules/errorModule.js")"></script>
 	<script type="text/javascript" src="@routes.Assets.at("js/app/event/create/app.js")"></script>
 	<script type="text/javascript" src="@routes.Assets.at("js/app/event/create/controller.js")"></script>
 	
@@ -26,6 +27,7 @@
 				
 				<div class="row-fluid" >
 					<div class="span4">
+                        <alert ng-repeat="alert in alerts | orderBy: '-date' " type="alert.type" close="closeAlert($index)">{{alert.msg}}</alert>
 						<label>Nom</label> 
 						<input ng-model="event.name" type="text" ></input>
                         <label>Description</label>

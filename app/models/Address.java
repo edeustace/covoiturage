@@ -7,9 +7,9 @@ import javax.validation.constraints.NotNull;
 public class Address {
 
     ///////////    FIELDS  /////////////////////
-    @NotNull
+    @NotNull(message = "address.description.notNull")
 	private String description;
-    @NotNull
+    @NotNull(message = "address.location.notNull")
 	private Location location;
 
     ///////////  CLASS METHODS /////////////////

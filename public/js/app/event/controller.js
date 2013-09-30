@@ -6,7 +6,7 @@
 
 /* Controllers */
 
-function EventCtrl($scope, $http, $location, $compile, $filter, mailUtils, mapService, eventService, chatService, $anchorScroll, $modal) {
+function EventCtrl($scope, $http, $location, $compile, $filter, mailUtils, mapService, eventService, chatService, $anchorScroll, $modal, errorService) {
 	//////////////  ATTRIBUTS  ///////////////////
 	$scope.items = [
 	                  { id: "CAR", name: 'en voiture' },
@@ -71,7 +71,7 @@ function EventCtrl($scope, $http, $location, $compile, $filter, mailUtils, mapSe
                 $scope.alerts.push({type:"success", msg:"Vous participez à l'événement !"});
             },
             function(data){
-                eventService.formatErrors(data, function(msg){
+                errorService.formatErrors(data, function(msg){
                     $scope.alerts.push({type:"error", msg:msg});
                 });
 	        });
@@ -110,7 +110,7 @@ function EventCtrl($scope, $http, $location, $compile, $filter, mailUtils, mapSe
                $scope.setEditMode(false);
             },
             function(data){
-                eventService.formatErrors(data, function(msg){
+                errorService.formatErrors(data, function(msg){
                     $scope.alerts.push({type:"error", msg:msg});
                 });
 	        });
@@ -212,7 +212,7 @@ function EventCtrl($scope, $http, $location, $compile, $filter, mailUtils, mapSe
             $scope.addedContact = null;
             $scope.newContacts = new Array();
         }).error(function(error){
-            eventService.formatErrors(error, function(msg){
+            errorService.formatErrors(error, function(msg){
                 $scope.alerts.push({type:"error", msg:msg});
             });
         });
@@ -452,7 +452,7 @@ function EventCtrl($scope, $http, $location, $compile, $filter, mailUtils, mapSe
 			});
 		}
 	}).error(function(error){
-		eventService.formatErrors(error, function(msg){
+		errorService.formatErrors(error, function(msg){
            $scope.alerts.push({type:"error", msg:msg});
        });
 	});

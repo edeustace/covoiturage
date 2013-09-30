@@ -362,7 +362,7 @@ angular.module('eventModule', [], function($provide){
                         $service.reloadSubscribers();
                         deferred.resolve(data);
                     }).error(function(error){
-                        deferred.reject(data);
+                        deferred.reject(error);
                     });
                 }else{
                     deferred.reject();

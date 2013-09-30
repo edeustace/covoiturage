@@ -19,11 +19,11 @@ import org.codehaus.jackson.annotate.JsonProperty;
 import org.codehaus.jackson.map.ObjectMapper;
 import play.Logger;
 import play.data.Form;
+import play.data.validation.ValidationError;
 import play.i18n.Lang;
 import play.mvc.BodyParser;
 import play.mvc.Controller;
 import play.mvc.Result;
-import security.EventPermissionHandler;
 import views.html.evenement;
 
 import java.io.IOException;
@@ -217,6 +217,12 @@ public class EventCtrl extends Controller {
         try{
             Map<String, Object> errors = new HashMap<String, Object>();
             errors.put("errors", form.errorsAsJson());
+
+            Map<String, List<ValidationError>> theErrors = form.errors();
+            for (String error : theErrors.keySet()){
+
+            }
+
             return badRequest(objectMapper.writeValueAsString(errors)).as("application/json");
         }catch (Exception e){
             return internalServerError().as("application/json");
