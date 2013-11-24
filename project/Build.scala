@@ -8,10 +8,11 @@ object ApplicationBuild extends Build {
   val appVersion = "1.0-SNAPSHOT"
 
   val appDependencies = Seq(
+	  "be.objectify"  %%  "deadbolt-java"     % "2.2-RC2" ,
+    "com.feth"      %%  "play-authenticate" % "0.5.2-SNAPSHOT" ,
+    "net.vz.mongodb.jackson" %% "play-mongo-jackson-mapper" % "1.1.0" exclude("org.scala-stm", "scala-stm_2.10.0"),
     javaCore,
-	  "be.objectify"  %%  "deadbolt-java"     % "2.1-RC2",
-    "com.feth"      %%  "play-authenticate" % "0.3.3-SNAPSHOT",
-    "net.vz.mongodb.jackson" %% "play-mongo-jackson-mapper" % "1.1.0"
+    cache
   )
 
   val main = play.Project(appName, appVersion, appDependencies)

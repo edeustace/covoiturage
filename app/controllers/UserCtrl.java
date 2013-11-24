@@ -12,10 +12,7 @@ import controllers.decorators.UserModelLight;
 import models.Event;
 import models.User;
 
-import org.codehaus.jackson.JsonGenerationException;
-import org.codehaus.jackson.map.JsonMappingException;
-import org.codehaus.jackson.map.ObjectMapper;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
 import play.data.Form;
 import play.mvc.BodyParser;
 import play.mvc.Controller;

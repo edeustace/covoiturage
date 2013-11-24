@@ -14,9 +14,9 @@ import models.Address;
 import models.Event;
 import models.Subscriber;
 import models.User;
-import org.codehaus.jackson.JsonNode;
-import org.codehaus.jackson.annotate.JsonProperty;
-import org.codehaus.jackson.map.ObjectMapper;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import play.Logger;
 import play.data.Form;
 import play.data.validation.ValidationError;
@@ -194,7 +194,7 @@ public class EventCtrl extends Controller {
 	public static Result securised(String id) throws IOException {
         try{
         	JsonNode node = request().body().asJson();
-        	Boolean securised = node.get("value").getBooleanValue();
+        	Boolean securised = node.get("value").booleanValue();
         	Event event = Event.read(id);
             event.setContactsOnly(securised);
             event.save();

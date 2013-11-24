@@ -14,9 +14,9 @@ import models.*;
 import models.Car.CarIsFullException;
 import models.enums.Locomotion;
 
-import org.codehaus.jackson.JsonNode;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.node.ObjectNode;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import play.Logger;
 import play.data.Form;
@@ -130,7 +130,7 @@ public class SubscriberCtrl extends Controller {
             Event event = Event.read(id);
             Subscriber subsc = event.getSubscriberById(idSub);
             JsonNode node = request().body().asJson();
-            String locomotion = node.get("locomotion").getTextValue();
+            String locomotion = node.findPath("locomotion").textValue();
             if(locomotion!=null){
                 if(locomotion.equals("CAR") && (subsc.getLocomotion().equals(Locomotion.AUTOSTOP) || subsc.getLocomotion().equals(Locomotion.DONT_KNOW_YET)) ){
                     if(subsc.getPossibleCars()!=null){
@@ -183,7 +183,7 @@ public class SubscriberCtrl extends Controller {
             Set<String> usersToNotify = newHashSet(car.getPassengers());
 
             JsonNode node = request().body().asJson();
-            String idPassenger = node.get("passenger").getTextValue();
+            String idPassenger = node.findPath("passenger").textValue();
             event.addPassenger(idPassenger, idSub);
             event.update();
             String from = getCurrentUserRef();
@@ -257,7 +257,7 @@ public class SubscriberCtrl extends Controller {
         try{
             Event event = Event.read(id);
             JsonNode node = request().body().asJson();
-            String idPassenger = node.get("passenger").getTextValue();
+            String idPassenger = node.findPath("passenger").textValue();
             Subscriber subsc = event.getSubscriberById(idSub);
             Car car = subsc.getCar();
             if(car!=null){
@@ -313,7 +313,7 @@ public class SubscriberCtrl extends Controller {
         try{
             Event event = Event.read(id);
             JsonNode node = request().body().asJson();
-            String idCar = node.get("car").getTextValue();
+            String idCar = node.findPath("car").textValue();
             Subscriber subsc = event.getSubscriberById(idSub);
             if(subsc!=null){
             	if(!subsc.getPossibleCars().contains(idCar)){

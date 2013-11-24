@@ -1,18 +1,21 @@
 package security;
 
-import be.objectify.deadbolt.core.models.Subject;
+import models.User;
+import play.libs.F;
+import play.mvc.Http;
+import play.mvc.SimpleResult;
 import be.objectify.deadbolt.java.AbstractDeadboltHandler;
 import be.objectify.deadbolt.java.DynamicResourceHandler;
+import be.objectify.deadbolt.core.models.Subject;
+
 import com.feth.play.module.pa.PlayAuthenticate;
 import com.feth.play.module.pa.user.AuthUserIdentity;
-import models.User;
-import play.mvc.Http;
-import play.mvc.Result;
+
 
 public class MyDeadboltHandler extends AbstractDeadboltHandler {
 
 	@Override
-	public Result beforeAuthCheck(final Http.Context context) {
+	public F.Promise<SimpleResult> beforeAuthCheck(final Http.Context context) {
 		if (PlayAuthenticate.isLoggedIn(context.session())) {
 			// user is logged in
 			return null;
@@ -28,7 +31,12 @@ public class MyDeadboltHandler extends AbstractDeadboltHandler {
 
 			context.flash().put("error",
 					"Vous devez être connecté pour voir la page '" + originalUrl + "'");
-			return redirect(PlayAuthenticate.getResolver().login());
+            return F.Promise.promise(new F.Function0<SimpleResult>() {
+                @Override
+                public SimpleResult apply() throws Throwable {
+                    return redirect(PlayAuthenticate.getResolver().login());
+                }
+            });
 		}
 	}
 
@@ -45,12 +53,17 @@ public class MyDeadboltHandler extends AbstractDeadboltHandler {
 		return new EventPermissionHandler();
 	}
 
-	@Override
-	public Result onAuthFailure(final Http.Context context,
-			final String content) {
-		// if the user has a cookie with a valid user and the local user has
-		// been deactivated/deleted in between, it is possible that this gets
-		// shown. You might want to consider to sign the user out in this case.
-		return forbidden("Forbidden");
-	}
+    @Override
+    public F.Promise<SimpleResult> onAuthFailure(final Http.Context context,
+                                                 final String content) {
+        // if the user has a cookie with a valid user and the local user has
+        // been deactivated/deleted in between, it is possible that this gets
+        // shown. You might want to consider to sign the user out in this case.
+        return F.Promise.promise(new F.Function0<SimpleResult>() {
+            @Override
+            public SimpleResult apply() throws Throwable {
+                return forbidden("Forbidden");
+            }
+        });
+    }
 }
