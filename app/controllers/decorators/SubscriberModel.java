@@ -41,7 +41,7 @@ public class SubscriberModel {
     }
 
     @JsonProperty("links")
-    public List<Link> getLink() {
+    public List<Link> getLinks() {
         return links;
     }
 

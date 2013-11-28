@@ -392,7 +392,15 @@ angular.module('eventModule', [], function($provide){
                 var links = $service.getSubscriberLinks(car.userRef);
                 if(links && links.carlinks && links.carlinks.waitings){
                     var link = links.carlinks.waitings;
-                    $http.delete(link+'/'+passenger).success(function(data){
+                    $http({
+                        url: link+'/'+passenger,
+                        dataType: 'json',
+                        method: 'DELETE',
+                        data: {},
+                        headers: {
+                            "Content-Type": "application/json"
+                        }
+                    }).success(function(data){
                         $service.reloadSubscribers();
                         deferred.resolve(data);
                     }).error(function(data){
@@ -417,7 +425,15 @@ angular.module('eventModule', [], function($provide){
             removePassenger : function(car, passenger, callback, callbackError){
                 var deferred = $q.defer();
                 var link = $service.getSubscriberLinks(car.userRef).car;
-                $http.delete(link+'/'+passenger).success(function(data){
+                $http({
+                    url: link+'/'+passenger,
+                    dataType: 'json',
+                    method: 'DELETE',
+                    data: {},
+                    headers: {
+                        "Content-Type": "application/json"
+                    }
+                }).success(function(data){
                     $service.reloadSubscribers();
                     deferred.resolve(data);
                 }).error(function(data){
@@ -450,7 +466,15 @@ angular.module('eventModule', [], function($provide){
             removePossibleCar : function(passenger, carRef, callback, callbackError){
                 var deferred = $q.defer();
                 var link = $service.getSubscriberLinks(passenger.userRef).addPossibleCar;
-                $http.delete(link+'/'+carRef).success(function(data){
+                $http({
+                    url:link+'/'+carRef,
+                    dataType: 'json',
+                    method: 'DELETE',
+                    data: {},
+                    headers: {
+                        "Content-Type": "application/json"
+                    }
+                }).success(function(data){
                     $service.reloadSubscribers();
                     deferred.resolve(data);
                 }).error(function(data){

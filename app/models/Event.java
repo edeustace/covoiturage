@@ -11,6 +11,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
 import dao.EventDao;
+import dao.RepositoryLocator;
 import models.validators.EmailAlreadyUsed;
 import net.vz.mongodb.jackson.DBCursor;
 import net.vz.mongodb.jackson.DBQuery;
@@ -234,14 +235,8 @@ public class Event extends AbstractModel {
     /////////        STATIC //////////////////////
     //////////////////////////////////////////////
 
-    private static EventDao dao;
-
     private static EventDao getDao(){
-        return Event.dao;
-    }
-
-    public static void setDao(EventDao dao){
-        Event.dao = dao;
+        return RepositoryLocator.getRepositoryLocator().getEventDao();
     }
 
     public static ObjectMapper objectMapper = new ObjectMapper();

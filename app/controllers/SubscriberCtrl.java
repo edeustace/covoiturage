@@ -222,7 +222,7 @@ public class SubscriberCtrl extends Controller {
             return internalServerError(e.getMessage()).as("application/json");
         }
     }
-    
+
     public static Result deletePassenger(String id, String idSub, String idPassenger){
     	try{
 	    	Event event = Event.read(id);
@@ -334,7 +334,8 @@ public class SubscriberCtrl extends Controller {
             return internalServerError(e.getMessage()).as("application/json");
         }
     }
-    
+
+    @BodyParser.Of(BodyParser.AnyContent.class)
     public static Result deletePossibleCar(String id, String idSub, String idCar){
         try{
             Event event = Event.read(id);

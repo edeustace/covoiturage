@@ -1,5 +1,6 @@
 package models;
 
+import dao.RepositoryLocator;
 import dao.TopicDao;
 import net.vz.mongodb.jackson.MongoCollection;
 import net.vz.mongodb.jackson.ObjectId;
@@ -53,17 +54,9 @@ public class Topic extends AbstractModel {
 
     ////////////  STATIC  ////////////////
 
-    private static TopicDao dao;
-
     private static TopicDao getDao(){
-        return Topic.dao;
+        return RepositoryLocator.getRepositoryLocator().getTopicDao();
     }
-
-    public static void setDao(TopicDao dao){
-        Topic.dao = dao;
-    }
-
-
 
     public Topic save(){
         return getDao().save(this);

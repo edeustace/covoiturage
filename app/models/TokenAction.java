@@ -1,6 +1,7 @@
 package models;
 
 
+import dao.RepositoryLocator;
 import dao.TokenActionDao;
 import dao.TopicDao;
 import net.vz.mongodb.jackson.DBQuery;
@@ -39,14 +40,8 @@ public class TokenAction extends AbstractModel {
 
 	public Date expires;
 
-    private static TokenActionDao dao;
-
     private static TokenActionDao getDao(){
-        return TokenAction.dao;
-    }
-
-    public static void setDao(TokenActionDao dao){
-        TokenAction.dao = dao;
+        return RepositoryLocator.getRepositoryLocator().getTokenActionDao();
     }
 
 	public static TokenAction findByToken(final String token, final Type type) {

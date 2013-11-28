@@ -3,6 +3,7 @@ package models;
 import be.objectify.deadbolt.core.models.Subject;
 import com.feth.play.module.pa.providers.password.UsernamePasswordAuthUser;
 import com.feth.play.module.pa.user.*;
+import dao.RepositoryLocator;
 import dao.UserDao;
 import models.enums.Locomotion;
 import net.vz.mongodb.jackson.MongoCollection;
@@ -128,7 +129,7 @@ public class User extends AbstractModel implements Subject {
     }
     
     public User save(){
-        return dao.save(this);
+        return getDao().save(this);
     }
 
 
@@ -179,14 +180,8 @@ public class User extends AbstractModel implements Subject {
     /////////        STATIC //////////////////////
     //////////////////////////////////////////////
 
-    private static UserDao dao;
-
     private static UserDao getDao(){
-        return dao;
-    }
-
-    public static void setDao(UserDao dao){
-        User.dao = dao;
+        return RepositoryLocator.getRepositoryLocator().getUserDao();
     }
 
     public static User merge(final AuthUser oldUser, final AuthUser newUser) {
@@ -195,15 +190,15 @@ public class User extends AbstractModel implements Subject {
     }
 
     public static User findById(String id){
-        return dao.get(id);
+        return getDao().get(id);
     }
 
     public static Boolean isUserWithEmailExists(String email){
-        return dao.isUserWithEmailExists(email);
+        return getDao().isUserWithEmailExists(email);
     }
 
     public static User getUserwithEmail(String email){
-        return dao.getUserwithEmail(email);
+        return getDao().getUserwithEmail(email);
     }
 
     public static User create(final AuthUser authUser) {
@@ -284,7 +279,7 @@ public class User extends AbstractModel implements Subject {
         if (identity instanceof UsernamePasswordAuthUser) {
             return findByUsernamePasswordIdentity((UsernamePasswordAuthUser) identity);
         } else {
-            return dao.findByProvider(identity.getId(), identity.getProvider());
+            return getDao().findByProvider(identity.getId(), identity.getProvider());
         }
     }
 

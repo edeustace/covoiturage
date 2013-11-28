@@ -1,6 +1,7 @@
 package models;
 
 import dao.ChatMessageDao;
+import dao.RepositoryLocator;
 import dao.TopicDao;
 import net.vz.mongodb.jackson.*;
 import play.modules.mongodb.jackson.MongoDB;
@@ -53,15 +54,8 @@ public class ChatMessage extends AbstractModel {
         return getDao().save(this);
     }
 
-
-    private static ChatMessageDao dao;
-
     private static ChatMessageDao getDao(){
-        return ChatMessage.dao;
-    }
-
-    public static void setDao(ChatMessageDao dao){
-        ChatMessage.dao = dao;
+        return RepositoryLocator.getRepositoryLocator().getChatMessageDao();
     }
 
 

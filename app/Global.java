@@ -66,27 +66,7 @@ public class Global extends GlobalSettings {
             }
         });
 
-        //Init des Daos
-        UserDao userDao = new MongoDbUserDao();
-        userDao.init();
-        User.setDao(userDao);
-
-        EventDao eventDao = new MongoDbEventDao();
-        eventDao.init();
-        Event.setDao(eventDao);
-
-        TopicDao topicDao = new MongoDbTopicDao();
-        topicDao.init();
-        Topic.setDao(topicDao);
-
-        ChatMessageDao chatMessageDao = new MongoDbChatMessageDao();
-        chatMessageDao.init();
-        ChatMessage.setDao(chatMessageDao);
-
-        TokenActionDao tokenActionDao = new MongoDbTokenActionDao();
-        tokenActionDao.init();
-        TokenAction.setDao(tokenActionDao);
-
+        RepositoryLocator.load(new MongoDbUserDao(), new MongoDbEventDao(), new MongoDbTopicDao(), new MongoDbChatMessageDao(), new MongoDbTokenActionDao());
 
     }
 }

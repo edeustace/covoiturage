@@ -7,6 +7,7 @@ import static com.google.common.collect.Lists.newArrayList;
 import models.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.apache.commons.lang3.Validate;
 import play.Logger;
 import play.data.Form;
 import play.libs.Akka;
@@ -143,6 +144,7 @@ public class MessagesHandler extends UntypedActor{
 
 
     public void handleCarUpdated(CarUpdated car){
+        Validate.notNull(car);
         Topic topic = Topic.findByIdEventCategorieAndCreator(car.idEvent, Topic.TopicCategorie.carChat, car.idCarOwner);
         if(topic.getSubscribers()!=null && car.car!=null && car.car.getPassengers()!=null &&
                 !Topic.subscribersEquals(topic.getSubscribers(), car.car.getPassengers())){
