@@ -100,7 +100,7 @@
                         <button type="button" class="btn" data-toggle="timepicker"><i class="icon-time"></i></button>
                     </div>
                     <label>Adresse de l'évenement :</label>
-                    <input ng-model="event.address" googleplace type="text" ></input>
+                    <input ng-model="event.address" googleplace type="text" placeholder="{{event.address.description}}"></input>
 
                     <label>Liste de diffusion :</label>
                     <div class="controls">
@@ -173,6 +173,7 @@
             </div>
 
             <div ng-show="!currentSubscriber"  class="span4">
+                <alert ng-repeat="alert in alertsSubsc | orderBy: '-date' " type="alert.type" close="closeAlertSubsc($index)">{{alert.msg}}</alert>
                 <fieldsWallet>
                     <legend>Vous ne participez pas encore :</legend>
                     <label>Email</label>

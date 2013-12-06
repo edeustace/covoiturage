@@ -15,6 +15,7 @@ function EventCtrl($scope, $http, $location, $compile, $filter, mailUtils, mapSe
                   ];
 	$scope.editMode = false;
 	$scope.alerts = [];
+    $scope.alertsSubsc  = [];
 	$scope.eltsInChat = 10;
 	$scope.eltsInWall = 10;
 	$scope.opts = {
@@ -68,11 +69,11 @@ function EventCtrl($scope, $http, $location, $compile, $filter, mailUtils, mapSe
 	$scope.subscribe = function(){
 	    eventService.subscribe($scope.newSubscriber).then(
             function(data){
-                $scope.alerts.push({type:"success", msg:"Vous participez à l'événement !"});
+                $scope.alertsSubsc.push({type:"success", msg:"Vous participez à l'événement !"});
             },
             function(data){
                 errorService.formatErrors(data, function(msg){
-                    $scope.alerts.push({type:"error", msg:msg});
+                    $scope.alertsSubsc.push({type:"error", msg:msg});
                 });
 	        });
 	};
@@ -231,6 +232,9 @@ function EventCtrl($scope, $http, $location, $compile, $filter, mailUtils, mapSe
         }
         $scope.alerts.splice(index, 1);
     };
+    $scope.closeAlertSubsc = function(index) {
+        $scope.alertsSubsc.splice(index, 1);
+    };
     $scope.getSubscriber = function(ref){
         return eventService.getSubscriber(ref);
     };
@@ -298,34 +302,36 @@ function EventCtrl($scope, $http, $location, $compile, $filter, mailUtils, mapSe
         if(message.type == 'notification'){
             var notification = message.data;
             $scope.alerts.push({type:notification.type, msg:notification.message, notification:notification});
-            eventService.reloadSubscribers($scope);
+            eventService.reloadSubscribers();
         }
     };
 
     $scope.handleSubscriberUpdated = function(msg){
         var notification = JSON.parse(msg.data);
         if(!notification.type == 'subscriber'){
-            eventService.reloadSubscribers($scope);
+            eventService.reloadSubscribers();
         }
     };
 
     $scope.listen = function(currentSubscriber){
-        var feed = eventService.getSubscriberLinks(currentSubscriber.userRef).feed;
-        $scope.feed = new EventSource(feed);
-        $scope.feed.addEventListener("open", function(msg){
-            console.log(feed+' : sse open !');
-        }, false);
-        $scope.feed.addEventListener("error", function(e){
-            if (e.readyState == EventSource.CLOSED) {
-                console.log('connection close');
-            }else{
-                console.log(e);
-            }
-        }, false);
-        $scope.feed.addEventListener("message", $scope.addTopic, false);
-        $scope.feed.addEventListener("message", $scope.addMessage, false);
-        $scope.feed.addEventListener("message", $scope.addNotification, false);
-        $scope.feed.addEventListener("message", $scope.handleSubscriberUpdated, false);
+        if(currentSubscriber && currentSubscriber.userRef){
+            var feed = eventService.getSubscriberLinks(currentSubscriber.userRef).feed;
+            $scope.feed = new EventSource(feed);
+            $scope.feed.addEventListener("open", function(msg){
+                console.log(feed+' : sse open !');
+            }, false);
+            $scope.feed.addEventListener("error", function(e){
+                if (e.readyState == EventSource.CLOSED) {
+                    console.log('connection close');
+                }else{
+                    console.log(e);
+                }
+            }, false);
+            $scope.feed.addEventListener("message", $scope.addTopic, false);
+            $scope.feed.addEventListener("message", $scope.addMessage, false);
+            $scope.feed.addEventListener("message", $scope.addNotification, false);
+            $scope.feed.addEventListener("message", $scope.handleSubscriberUpdated, false);
+        }
     };
 
 
@@ -377,7 +383,7 @@ function EventCtrl($scope, $http, $location, $compile, $filter, mailUtils, mapSe
         }
         if(!$scope.event.updated && $scope.showEventEditButton){
             $scope.showUpdated = true;
-            $scope.eventEdit = true;
+            //$scope.eventEdit = true;
         }
     });
     eventService.addListenerOnSubscribers(function(subscribers){
@@ -423,9 +429,9 @@ function EventCtrl($scope, $http, $location, $compile, $filter, mailUtils, mapSe
             chatService.loadTopics(id, user.id);
             chatService.loadWall(id, user.id);
 
-			eventService.loadEvent(id, user.id, function(data){
+			eventService.loadEvent(id, user, function(data){
 
-                if(eventService.getSubscriberLinks(data.currentSubscriber.userRef).notifications){
+                if(data && data.currentSubscriber && eventService.getSubscriberLinks(data.currentSubscriber.userRef).notifications){
                     $http.get(eventService.getSubscriberLinks(data.currentSubscriber.userRef).notifications).success(function(notifications) {
                         for ( var int = 0; int < notifications.length; int++) {
                             var notification = notifications[int];

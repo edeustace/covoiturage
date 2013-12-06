@@ -139,7 +139,7 @@ address.location.notNull = L''adresse saise n'est pas valide
 
 subscriber.email.notNull = l''email doit être renseigné
 subscriber.email.notValid = Le format de l''email n'est pas valide
-subscriber.address.notNull = L'adresse doit être renseigné
+subscriber.address.notNull = L''adresse doit être renseigné
 subscriber.locomotion.notNull = Le moyen de locomotion doit être renseigné
 
 # play-authenticate: Handler

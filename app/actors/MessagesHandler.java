@@ -31,7 +31,7 @@ public class MessagesHandler extends UntypedActor{
     private static Form<Topic> topicForm = form(Topic.class);
     private static Form<ChatMessage> messageForm = form(ChatMessage.class);
 
-	static ActorRef subActorRef = Akka.system().actorOf(new Props(MessagesHandler.class));
+	static ActorRef subActorRef = Akka.system().actorOf(Props.create(MessagesHandler.class));
 	
 	public static void notifySubscriberUpdated(final String idEvent, final String userRef, Subscriber subscriber, Date date){
         subActorRef.tell(new Message(idEvent, "subscriber", Message.Statut.UPDATED, null, userRef, new ArrayList<String>()), null);

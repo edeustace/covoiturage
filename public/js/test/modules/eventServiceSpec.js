@@ -455,10 +455,10 @@ describe('eventServiceSpec', function() {
             expect(service.getCurrentSubscriber()).toEqual({});
         });
         it('subscriber', function() {
-            expect(service.getSubscriber()).toEqual({});
+            expect(service.getSubscriber()).toEqual(null);
         });
         it('subscriber2', function() {
-            expect(service.getSubscriber('1')).toEqual({});
+            expect(service.getSubscriber('1')).toEqual(null);
         });
         it('subscriber3', function() {
             service.indexSubscribers([

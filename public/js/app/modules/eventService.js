@@ -64,6 +64,7 @@ angular.module('eventModule', [], function($provide){
                 event : {}
             },
             event :{},
+            currentUser : {},
             currentSubscriber:{},
             subscribers : new Array(),
             currentCar : null,
@@ -100,7 +101,7 @@ angular.module('eventModule', [], function($provide){
                 if(subscriber){
                     return subscriber
                 }
-                return {};
+                return null;
             },
             getEventLinks : function(){
                 if($event.links.event){
@@ -121,11 +122,18 @@ angular.module('eventModule', [], function($provide){
                 return {};
             },
             setCurrentSubscriber : function(value){
-                $event.currentSubscriber = value;
-                $event.currentSubscriber.visible=true;
-                $event.currentSubscriber.current = true;
-                for(var j in $listenersOnCurrentSubscriber){
-                    $listenersOnCurrentSubscriber[j]($event.currentSubscriber);
+                if(value){
+                    $event.currentSubscriber = value;
+                    $event.currentSubscriber.visible=true;
+                    $event.currentSubscriber.current = true;
+                    for(var j in $listenersOnCurrentSubscriber){
+                        $listenersOnCurrentSubscriber[j]($event.currentSubscriber);
+                    }
+                }else{
+                    $event.currentSubscriber = value;
+                    for(var j in $listenersOnCurrentSubscriber){
+                        $listenersOnCurrentSubscriber[j]($event.currentSubscriber);
+                    }
                 }
             },
             getSubscribers : function(){
@@ -154,7 +162,9 @@ angular.module('eventModule', [], function($provide){
                     $listenersOnSubscribers[i]($event.subscribers);
                 }
             },
-            loadEvent : function(id, idUser, callback){
+            loadEvent : function(id, user, callback){
+                $event.currentUser = user;
+                var idUser = user.id;
                 $http.get('/rest/events/'+id).success(function(event) {
                     if(event){
                         $service.setEvent(event);
@@ -172,7 +182,15 @@ angular.module('eventModule', [], function($provide){
                 var subscribersLink = $service.getEventLinks().subscribers;
                 $http.get(subscribersLink).success(function (subscribers){
                     if(subscribers){
-                        $service.initSubscribers($event.currentSubscriber.userRef, subscribers);
+                        var idUser = null;
+                        if($event.currentSubscriber && $event.currentSubscriber.userRef){
+                            idUser = $event.currentSubscriber.userRef;
+                        }else if($event.currentUser){
+                            idUser = $event.currentUser.id;
+                        }
+                        if(idUser){
+                            $service.initSubscribers(idUser, subscribers);
+                        }
                     }
                 }).error(function(error){
                 });

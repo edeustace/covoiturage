@@ -48,7 +48,9 @@ public class SubscriberCtrl extends Controller {
             Event event = Event.read(id);
             Subscriber subsc = event.getSubscriberById(idSub);
             SubscriberModel subscriberModel = new SubscriberModel(subsc, event.getId());
-            return ok(objectMapper.writeValueAsString(subscriberModel)).as("application/json");
+            String reponse = objectMapper.writeValueAsString(subscriberModel);
+            Logger.debug("getSubscriber{idEvent: {}, idSub {} : {}", id, idSub, reponse);
+            return ok(reponse).as("application/json");
         } catch (Exception e){
             return internalServerError().as("application/json");
         }
@@ -57,26 +59,30 @@ public class SubscriberCtrl extends Controller {
     @BodyParser.Of(BodyParser.Json.class)
     public static Result createSubscriber(String id){
         try{
+            Logger.debug("createSubscriber {idEvent: {}, requestBody {} }", id, request().body().asJson());
             Form<Subscriber> form = subscriberForm.bindFromRequest();
             if(form.hasErrors()){
+                Logger.debug("Error : "+form.errorsAsJson());
                 return badRequest(form.errorsAsJson()).as("application/json");
             } else {
                 Subscriber subscriber = form.get();
+
                 Event event = Event.read(id);
                 String idSub = event.getIdSubscriber(subscriber);
                 if(idSub!=null){
-                	ObjectNode result = Json.newObject();
-                	result.put("id", idSub);
-                	result.put("message", "Déjà existant");
-                	result.put("status", "KO");
-                	return badRequest(result);
+                    ObjectNode result = Json.newObject();
+                    result.put("id", idSub);
+                    result.put("message", "Déjà existant");
+                    result.put("status", "KO");
+                    return badRequest(result);
                 }
                 event.addSubscriber(subscriber);
                 event.update();
                 Subscriber subsc = event.getSubscriberByMail(subscriber.getEmail());
                 SubscriberModel subscriberModel = new SubscriberModel(subsc, event.getId());
                 MessagesHandler.notifySubscriberUpdated(id, subscriber.getUserRef(), subscriber, new Date());
-                return ok(objectMapper.writeValueAsString(subscriberModel)).as("application/json");
+                String reponse = objectMapper.writeValueAsString(subscriberModel);
+                return ok().as("application/json");
             }
         } catch (Exception e){
         	e.printStackTrace();
