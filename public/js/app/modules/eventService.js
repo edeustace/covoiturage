@@ -215,7 +215,7 @@ angular.module('eventModule', [], function($provide){
                         if(subscriber.carRef == $event.currentSubscriber.userRef){
                             subscriber.picto = $service.getEventLinks().pictoMyPassenger
                             subscriber.inMyCar = true;
-                        }else if($event.currentSubscriber.car && $event.currentSubscriber.car.waitings && $event.currentSubscriber.car.waitings.length>0 && inArray(subscriber.userRef, $event.currentSubscriber.car.waitings)){
+                        }else if($event.currentSubscriber.car && $event.currentSubscriber.car.waitingList && $event.currentSubscriber.car.waitingList.length>0 && inArray(subscriber.userRef, $event.currentSubscriber.car.waitingList)){
                             subscriber.picto = $service.getEventLinks().pictoStop;
                             subscriber.waitingForMyCar = true;
                         }else if(inArray($event.currentSubscriber.userRef, subscriber.possibleCars)){
@@ -229,8 +229,8 @@ angular.module('eventModule', [], function($provide){
                         if($event.currentSubscriber.carRef === subscriber.userRef){
                             subscriber.picto = $service.getEventLinks().pictoMyCar;
                             subscriber.currentCar = true;
-                        }else if(subscriber.car && subscriber.car.waitings && subscriber.car.waitings.length>0 &&
-                                inArray($event.currentSubscriber.userRef, subscriber.car.waitings)){
+                        }else if(subscriber.car && subscriber.car.waitingList && subscriber.car.waitingList.length>0 &&
+                                inArray($event.currentSubscriber.userRef, subscriber.car.waitingList)){
                             subscriber.picto = $service.getEventLinks().pictoCar;
                             subscriber.iAskHim = true;
                         }else if(subscriber.userRef &&
@@ -408,8 +408,8 @@ angular.module('eventModule', [], function($provide){
             removeWaitingGuy : function(car, passenger, callback, callbackError){
                 var deferred = $q.defer();
                 var links = $service.getSubscriberLinks(car.userRef);
-                if(links && links.carlinks && links.carlinks.waitings){
-                    var link = links.carlinks.waitings;
+                if(links && links.carlinks && links.carlinks.waitingList){
+                    var link = links.carlinks.waitingList;
                     $http({
                         url: link+'/'+passenger,
                         dataType: 'json',
@@ -465,8 +465,8 @@ angular.module('eventModule', [], function($provide){
                 if($event.currentSubscriber){
                     var passenger = $event.currentSubscriber.userRef;
                     var links = $service.getSubscriberLinks(car.userRef);
-                    if(links && links.carlinks && links.carlinks.waitings){
-                        var link = links.carlinks.waitings;
+                    if(links && links.carlinks && links.carlinks.waitingList){
+                        var link = links.carlinks.waitingList;
                         $http.post(link, {passenger:passenger}).success(function(data){
                             $service.reloadSubscribers();
                             deferred.resolve(data);

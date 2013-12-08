@@ -21,7 +21,7 @@ public class CarModel {
 			this.car = car;	
 		}
 		this.links.add(Link.link(Link.SELF, controllers.routes.SubscriberCtrl.getCar(idEvent, idSub).toString()));
-		this.links.add(Link.link("waitings", controllers.routes.SubscriberCtrl.addToWaitingList(idEvent, idSub).toString()));
+		this.links.add(Link.link("waitingList", controllers.routes.SubscriberCtrl.addToWaitingList(idEvent, idSub).toString()));
 	}
 
 	@JsonProperty("links")
@@ -40,8 +40,8 @@ public class CarModel {
 		}
 		return nbPlaces;
 	}
-	@JsonProperty("waitings")
-	public List<String> getWaiting() {
-		return car.getWaiting();
+	@JsonProperty("waitingList")
+	public List<String> getWaitingList() {
+		return car.getWaitingList();
 	}
 }

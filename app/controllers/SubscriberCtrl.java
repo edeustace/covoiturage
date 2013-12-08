@@ -153,8 +153,8 @@ public class SubscriberCtrl extends Controller {
                     }
                     for(Subscriber subscriber : event.getSubscribers()){
                         if(subscriber.getCar()!=null){
-                            if( subscriber.getCar().getWaiting()!=null){
-                                subscriber.getCar().getWaiting().remove(idSub);
+                            if( subscriber.getCar().getWaitingList()!=null){
+                                subscriber.getCar().getWaitingList().remove(idSub);
                             }
                             if( subscriber.getCar().getPassengers()!=null){
                                 subscriber.getCar().getPassengers().remove(idSub);
@@ -286,8 +286,8 @@ public class SubscriberCtrl extends Controller {
             Subscriber subsc = event.getSubscriberById(idSub);
             Car car = subsc.getCar();
             if(car!=null){
-            	if(!car.getWaiting().contains(idPassenger)){
-            		car.getWaiting().add(idPassenger);	
+            	if(!car.getWaitingList().contains(idPassenger)){
+            		car.getWaitingList().add(idPassenger);
             	}
             }
             event.update();
@@ -313,7 +313,7 @@ public class SubscriberCtrl extends Controller {
             Subscriber subsc = event.getSubscriberById(idSub);
             Car car = subsc.getCar();
             if(car!=null){
-            	car.getWaiting().remove(idPassenger);
+            	car.getWaitingList().remove(idPassenger);
             }
             event.update();
             String from = getCurrentUserRef();

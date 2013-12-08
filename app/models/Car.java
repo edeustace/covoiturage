@@ -12,14 +12,14 @@ public class Car {
 	private Integer nbPlaces;
 	
 	private List<String> passengers = new ArrayList<String>();
-	private List<String> waiting = new ArrayList<String>();
+	private List<String> waitingList = new ArrayList<String>();
 
 	public Car addPassenger(String passenger){
 		if(getNbPlaces().equals(this.getPassengers().size())){
 			throw new CarIsFullException();
 		}
 		if(this!=null && !this.getPassengers().contains(passenger)){
-			this.getWaiting().remove(passenger);
+			this.getWaitingList().remove(passenger);
 			this.getPassengers().add(passenger);
     	}
 		return this;
@@ -44,12 +44,12 @@ public class Car {
 	public void setNbPlaces(Integer nbPlaces) {
 		this.nbPlaces = nbPlaces;
 	}
-	@JsonProperty("waiting")
-	public List<String> getWaiting() {
-		return waiting;
+	@JsonProperty("waitingList")
+	public List<String> getWaitingList() {
+		return waitingList;
 	}
-	@JsonProperty("waiting")
-	public void setWaiting(List<String> waiting) {
-		this.waiting = waiting;
+	@JsonProperty("waitingList")
+	public void setWaitingList(List<String> waiting) {
+		this.waitingList = waiting;
 	}
 }

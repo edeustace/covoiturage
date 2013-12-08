@@ -317,7 +317,7 @@ var eventMockFull =
                            "href" : "/rest/events/51cb46c544aec7e66152169d/subscribers/51c9f43c44aeec534e2a868f/car"
                         },
                         {
-                           "rel" : "waitings",
+                           "rel" : "waitingList",
                            "href" : "/rest/events/51cb46c544aec7e66152169d/subscribers/51c9f43c44aeec534e2a868f/waitings"
                         }
                      ],
@@ -325,7 +325,7 @@ var eventMockFull =
                   "passengers" :
                      [
                      ],
-                  "waitings" :
+                  "waitingList" :
                      [
                      ]
                },
@@ -547,7 +547,7 @@ var eventMockFull =
                            "href" : "/rest/events/51cb46c544aec7e66152169d/subscribers/51cdb98744ae8fb5cb9d970b/car"
                         },
                         {
-                           "rel" : "waitings",
+                           "rel" : "waitingList",
                            "href" : "/rest/events/51cb46c544aec7e66152169d/subscribers/51cdb98744ae8fb5cb9d970b/waitings"
                         }
                      ],
@@ -556,7 +556,7 @@ var eventMockFull =
                      [
                         "51cb52ec44aec7e661521c4d",
                      ],
-                  "waitings" :
+                  "waitingList" :
                      [
                         "51c34e2444ae97756acc3bcf"
                      ]
@@ -639,7 +639,7 @@ var eventMockFull =
                            "href" : "/rest/events/51cb46c544aec7e66152169d/subscribers/51cdbd2744ae8fb5cb9d9930/car"
                         },
                         {
-                           "rel" : "waitings",
+                           "rel" : "waitingList",
                            "href" : "/rest/events/51cb46c544aec7e66152169d/subscribers/51cdbd2744ae8fb5cb9d9930/waitings"
                         }
                      ],
@@ -647,7 +647,7 @@ var eventMockFull =
                   "passengers" :
                      [
                      ],
-                  "waitings" :
+                  "waitingList" :
                      [
                      ]
                },
@@ -940,7 +940,7 @@ var eventMockFull =
                            "href" : "/rest/events/51cb46c544aec7e66152169d/subscribers/52015d6a44ae8c9c8dbb5676/car"
                         },
                         {
-                           "rel" : "waitings",
+                           "rel" : "waitingList",
                            "href" : "/rest/events/51cb46c544aec7e66152169d/subscribers/52015d6a44ae8c9c8dbb5676/waitings"
                         }
                      ],
@@ -948,7 +948,7 @@ var eventMockFull =
                   "passengers" :
                      [
                      ],
-                  "waitings" :
+                  "waitingList" :
                      [
                      ]
                },

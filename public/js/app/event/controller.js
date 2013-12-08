@@ -101,20 +101,33 @@ function EventCtrl($scope, $http, $location, $compile, $filter, mailUtils, mapSe
         if($scope.currentSubscriber){
             if(locomotion=='AUTOSTOP' && $scope.currentSubscriber.locomotion == 'CAR' && !$scope.validationLocomotion){
                 $scope.validationLocomotion = true;
-                var modal = $modal({
-                  template: 'popin.html',
-                  show: true,
-                  backdrop: 'static',
-                  scope: $scope
-                });
+                $scope.openUpdateCarModal();
+
             }else{
                 $scope.validationLocomotion = false;
                 eventService.updateLocomotion(locomotion);
+                $scope.editedSubscriber.locomotion = locomotion;
             }
         }
     };
 
-	
+	$scope.openUpdateCarModal = function () {
+
+        var currentScope = $scope;
+        var modalInstance = $modal.open({
+            templateUrl: 'popin.html',
+                controller: function($scope, $modalInstance){
+                    $scope.cancel = function() {
+                        $modalInstance.dismiss();
+                    };
+
+                    $scope.updateLocomotion = function(val){
+                        currentScope.updateLocomotion(val);
+                        $modalInstance.dismiss();
+                    };
+                }
+            });
+      };
 
 	//Interaction car / passenger
 	$scope.getPropositions = function(){
@@ -149,7 +162,30 @@ function EventCtrl($scope, $http, $location, $compile, $filter, mailUtils, mapSe
 	        $scope.myInfoWindow.close();
 	    });
 	};
-	//AUTOSTOPER 
+	function oneSubscriberTrue(testFunction){
+	    var answer = false;
+	    var subscribers = eventService.getSubscribers();
+	    for ( var int = 0; int < subscribers.length; int++) {
+	        var test = testFunction(subscribers[int]);
+            if(test == true){
+                return true;
+            }
+        }
+        return answer;
+	}
+	$scope.isThereRequest = function(){
+        return oneSubscriberTrue(
+            function(subscriber){
+                return (subscriber.requestedByMe == true);
+            }
+         );
+	}
+	//AUTOSTOPER
+	$scope.isThereWaitingAsk = function(){
+	    return oneSubscriberTrue(function(subscriber){
+	        return (subscriber.iAskHim == true);
+	    });
+	};
 	$scope.askForSeat = function(car){
         eventService.askForSeat(car).then(function(subscriber){
 	        $scope.myInfoWindow.close();
@@ -326,11 +362,12 @@ function EventCtrl($scope, $http, $location, $compile, $filter, mailUtils, mapSe
     };
 
     $scope.listen = function(currentSubscriber){
-        if(currentSubscriber && currentSubscriber.userRef){
+        if(currentSubscriber && currentSubscriber.userRef && !$scope.feed){
             var feed = eventService.getSubscriberLinks(currentSubscriber.userRef).feed;
             $scope.feed = new EventSource(feed);
             $scope.feed.addEventListener("open", function(msg){
                 console.log(feed+' : sse open !');
+                //eventService.reloadSubscribers();
             }, false);
             $scope.feed.addEventListener("error", function(e){
                 if (e.readyState == EventSource.CLOSED) {
@@ -338,6 +375,8 @@ function EventCtrl($scope, $http, $location, $compile, $filter, mailUtils, mapSe
                 }else{
                     console.log(e);
                 }
+                $scope.feed = null;
+                eventService.reloadSubscribers();
             }, false);
             $scope.feed.addEventListener("message", $scope.addTopic, false);
             $scope.feed.addEventListener("message", $scope.addMessage, false);

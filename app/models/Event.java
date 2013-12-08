@@ -47,6 +47,9 @@ public class Event extends AbstractModel {
 
     private Date toDate;
 
+    private Integer hour;
+    private Integer minutes;
+
     private List<String> contacts = new ArrayList<String>();
     
     private Boolean contactsOnly = Boolean.FALSE;
@@ -99,6 +102,12 @@ public class Event extends AbstractModel {
         if(event.getContactsOnly()!=null){
             this.setContactsOnly(event.getContactsOnly());
         }
+        if(event.getHour()!=null) {
+            this.setHour(event.getHour());
+        }
+        if(event.getMinutes()!=null){
+            this.setMinutes(event.getMinutes());
+        }
     }
 
     @JsonIgnore
@@ -138,8 +147,8 @@ public class Event extends AbstractModel {
     				if(subscriber.getCar()!=null && subscriber.getCar().getPassengers().contains(idPassenger)){
     					subscriber.getCar().getPassengers().remove(idPassenger);
     				}
-					if(subscriber.getCar()!=null && subscriber.getCar().getWaiting().contains(idPassenger)){
-						subscriber.getCar().getWaiting().remove(idPassenger);
+					if(subscriber.getCar()!=null && subscriber.getCar().getWaitingList().contains(idPassenger)){
+						subscriber.getCar().getWaitingList().remove(idPassenger);
 					}
 				}
 			}
@@ -451,6 +460,24 @@ public class Event extends AbstractModel {
     @JsonProperty("updated")
     public Event setUpdated(Boolean updated) {
         this.updated = updated;
+        return this;
+    }
+    @JsonProperty("hour")
+    public Integer getHour() {
+        return hour;
+    }
+    @JsonProperty("hour")
+    public Event setHour(Integer hour) {
+        this.hour = hour;
+        return this;
+    }
+    @JsonProperty("minutes")
+    public Integer getMinutes() {
+        return minutes;
+    }
+    @JsonProperty("minutes")
+    public Event setMinutes(Integer minutes) {
+        this.minutes = minutes;
         return this;
     }
 }

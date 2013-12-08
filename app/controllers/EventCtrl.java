@@ -338,6 +338,16 @@ public class EventCtrl extends Controller {
         public Boolean getUpdated() {
             return event.getUpdated();
         }
+
+        @JsonProperty("minutes")
+        public Integer getMinutes() {
+            return event.getMinutes();
+        }
+
+        @JsonProperty("hour")
+        public Integer getHour() {
+            return event.getHour();
+        }
     }
 
     public static class LigthEvent{
