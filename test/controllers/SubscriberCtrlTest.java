@@ -15,8 +15,8 @@ import models.User;
 import models.enums.Locomotion;
 import net.vz.mongodb.jackson.JacksonDBCollection;
 
-import org.codehaus.jackson.JsonNode;
-import org.codehaus.jackson.map.ObjectMapper;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

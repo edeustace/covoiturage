@@ -15,8 +15,8 @@ import models.Location;
 import models.User;
 import net.vz.mongodb.jackson.JacksonDBCollection;
 
-import org.codehaus.jackson.JsonNode;
-import org.codehaus.jackson.map.ObjectMapper;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -126,7 +126,7 @@ public class EventCtrlTest {
                     System.err.println(""+resp);
                 } catch (IOException e) {}
                 assertThat(response.getStatus()).isEqualTo(OK);
-                assertThat(resp.get("name").getTextValue()).isEqualTo(event.getName());
+                assertThat(resp.get("name").asText()).isEqualTo(event.getName());
                // WS.Response read = WS.url("http://localhost:3333"+resp.get("link").get("href").getTextValue()).get().get();
                 assertThat(response.getStatus()).isEqualTo(OK);
             }
