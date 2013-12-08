@@ -67,17 +67,27 @@ function EventCtrl($scope, $http, $location, $compile, $filter, mailUtils, mapSe
     	})
 	};
 	$scope.subscribe = function(){
-	    eventService.subscribe($scope.newSubscriber).then(
+	    eventService.subscribe($scope.editedSubscriber).then(
             function(data){
                 $scope.alertsSubsc.push({type:"success", msg:"Vous participez à l'événement !"});
             },
             function(data){
                 errorService.formatErrors(data, function(msg){
-                    $scope.alertsSubsc.push({type:"error", msg:msg});
+                    $scope.alertsSubsc.push({type:"danger", msg:msg});
                 });
 	        });
 	};
-
+    $scope.saveCurrentSubscriber = function(){
+        eventService.saveSubscriber($scope.editedSubscriber).then(
+            function(data){
+               $scope.setEditMode(false);
+            },
+            function(data){
+                errorService.formatErrors(data, function(msg){
+                    $scope.alertsSubsc.push({type:"danger", msg:msg});
+                });
+            });
+    };
 
     $scope.opts = {
         backdropFade: true,
@@ -105,17 +115,7 @@ function EventCtrl($scope, $http, $location, $compile, $filter, mailUtils, mapSe
     };
 
 	
-	$scope.saveCurrentSubscriber = function(){
-	    eventService.saveSubscriber($scope.currentSubscriber).then(
-	        function(data){
-               $scope.setEditMode(false);
-            },
-            function(data){
-                errorService.formatErrors(data, function(msg){
-                    $scope.alerts.push({type:"error", msg:msg});
-                });
-	        });
-	};
+
 	//Interaction car / passenger
 	$scope.getPropositions = function(){
 		var result = new Array();
@@ -161,6 +161,9 @@ function EventCtrl($scope, $http, $location, $compile, $filter, mailUtils, mapSe
 	    });
 	};
     $scope.setEditMode = function(value){
+        if(value){
+            $scope.editedSubscriber = $scope.currentSubscriber;
+        }
     	$scope.editMode = value;	
     };
     $scope.openSubscriberInfo = function(subscriber) {
@@ -214,7 +217,7 @@ function EventCtrl($scope, $http, $location, $compile, $filter, mailUtils, mapSe
             $scope.newContacts = new Array();
         }).error(function(error){
             errorService.formatErrors(error, function(msg){
-                $scope.alerts.push({type:"error", msg:msg});
+                $scope.alerts.push({type:"danger", msg:msg});
             });
         });
 
@@ -245,6 +248,15 @@ function EventCtrl($scope, $http, $location, $compile, $filter, mailUtils, mapSe
 
     $scope.getMarker = function(i){
         return mapService.getMarker(i);
+    };
+
+    $scope.today = new Date();
+    $scope.dateOptions = {
+        'year-format': "'yy'",
+        'starting-day': 1
+    };
+    $scope.openCalendar = function(){
+      $scope.opened = true;
     };
 
     ///////////////  CHAT ////////////////////////////////
@@ -308,7 +320,7 @@ function EventCtrl($scope, $http, $location, $compile, $filter, mailUtils, mapSe
 
     $scope.handleSubscriberUpdated = function(msg){
         var notification = JSON.parse(msg.data);
-        if(!notification.type == 'subscriber'){
+        if(notification.type == 'subscriber'){
             eventService.reloadSubscribers();
         }
     };
@@ -402,7 +414,7 @@ function EventCtrl($scope, $http, $location, $compile, $filter, mailUtils, mapSe
     eventService.addListenerOnCurrentSubscriber(function(current){
         $scope.currentSubscriber = current;
         if(!current){
-            $scope.newSubscriber = {
+            $scope.editedSubscriber = {
                     userRef : $scope.user.id,
                     email : $scope.user.email,
                     name : $scope.user.name,
@@ -459,7 +471,7 @@ function EventCtrl($scope, $http, $location, $compile, $filter, mailUtils, mapSe
 		}
 	}).error(function(error){
 		errorService.formatErrors(error, function(msg){
-           $scope.alerts.push({type:"error", msg:msg});
+           $scope.alerts.push({type:"danger", msg:msg});
        });
 	});
     

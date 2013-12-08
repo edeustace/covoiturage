@@ -67,10 +67,10 @@ public class Event extends AbstractModel {
     ///////////  CLASS METHODS /////////////////
 
     public void merge(Event event){
-        if(event.getName()==null){
+        if(event.getName()!=null){
             this.setName(event.getName());
         }
-        if(event.getDescription()==null){
+        if(event.getDescription()!=null){
             this.setDescription(event.getDescription());
         }
         if(event.getUpdated()!=null){
@@ -95,6 +95,9 @@ public class Event extends AbstractModel {
             for(Subscriber subscriber : event.getSubscribers()){
                 this.addAndMergeSubscriber(subscriber);
             }
+        }
+        if(event.getContactsOnly()!=null){
+            this.setContactsOnly(event.getContactsOnly());
         }
     }
 

@@ -51,10 +51,13 @@ public class EventCtrl extends Controller {
 
 	@Restrict(@Group(Application.USER_ROLE))
 	public static Result getEvent(String id) {
-	    Event event = Event.read(id);
         try {
-            return ok(objectMapper.writeValueAsString(new EventModel(event))).as("application/json");
+            Event event = Event.read(id);
+            String reponse = objectMapper.writeValueAsString(new EventModel(event));
+            Logger.debug("getEvent : idEvent : {}, reponse : ", id, reponse);
+            return ok(reponse).as("application/json");
         } catch (IOException e) {
+            Logger.error("getEvent idEvent : "+id, e);
             return internalServerError("Error");
         }
     }
@@ -63,6 +66,7 @@ public class EventCtrl extends Controller {
 	public static Result createEvent() {
 		try{
             Form<Event> form = eventForm.bindFromRequest();
+            Logger.debug("createEvent : {}", request().body().asJson());
             if(form.hasErrors()){
                 return buildErrors(form);
             } else {
@@ -74,6 +78,7 @@ public class EventCtrl extends Controller {
                 return ok(objectMapper.writeValueAsString(responseBody)).as("application/json");
             }
         }catch (Exception e){
+            Logger.error("createEvent, body : "+request().body().asJson(), e);
             return internalServerError().as("application/json");
         }
 	}
@@ -147,6 +152,8 @@ public class EventCtrl extends Controller {
     @BodyParser.Of(BodyParser.Json.class)
 	public static Result updateEvent(String id) throws IOException {
         try{
+            Logger.debug("updateEvent, idEvent : {}, body ", id, request().body().asJson());
+
             Form<Event> form = eventForm.bindFromRequest();
             if(form.hasErrors()){
                 return buildErrors(form);
@@ -160,6 +167,7 @@ public class EventCtrl extends Controller {
                 return ok(objectMapper.writeValueAsString(responseBody)).as("application/json");
             }
         }catch (Exception e){
+            Logger.error("updateEvent idEvent : "+id+", body "+request().body().asJson(), e);
             return internalServerError().as("application/json");
         }
 	}
@@ -168,8 +176,9 @@ public class EventCtrl extends Controller {
     @BodyParser.Of(BodyParser.Json.class)
 	public static Result addContacts(String id) throws IOException {
         try{
-        	
-        	JsonNode node = request().body().asJson();
+            Logger.debug("addContact, idEvent {}, : {}", id, request().body().asJson());
+
+            JsonNode node = request().body().asJson();
         	JsonNode jsonContacts = node.get("contacts");
         	List<String> contacts = new ArrayList<String>();
         	if(jsonContacts.isArray()){
@@ -185,6 +194,7 @@ public class EventCtrl extends Controller {
             CacheHandler.resetCachedEvent(id);
             return ok(objectMapper.writeValueAsString(responseBody)).as("application/json");
         }catch (Exception e){
+            Logger.error("addContact idEvent : "+id+", body : "+request().body().asJson(), e);
             return internalServerError().as("application/json");
         }
 	}	
@@ -193,7 +203,9 @@ public class EventCtrl extends Controller {
     @BodyParser.Of(BodyParser.Json.class)
 	public static Result securised(String id) throws IOException {
         try{
-        	JsonNode node = request().body().asJson();
+            Logger.debug("securised id Event : {}, body", id, request().body().asJson());
+
+            JsonNode node = request().body().asJson();
         	Boolean securised = node.get("value").booleanValue();
         	Event event = Event.read(id);
             event.setContactsOnly(securised);
@@ -203,6 +215,7 @@ public class EventCtrl extends Controller {
             LigthEvent responseBody = new LigthEvent(event, Link.link(Link.SELF, link));
             return ok(objectMapper.writeValueAsString(responseBody)).as("application/json");
         }catch (Exception e){
+            Logger.error("securised, idEvent : "+id+", body : "+request().body().asJson());
             return internalServerError().as("application/json");
         }
 	}	

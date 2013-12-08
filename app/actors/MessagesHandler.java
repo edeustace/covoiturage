@@ -146,7 +146,7 @@ public class MessagesHandler extends UntypedActor{
     public void handleCarUpdated(CarUpdated car){
         Validate.notNull(car);
         Topic topic = Topic.findByIdEventCategorieAndCreator(car.idEvent, Topic.TopicCategorie.carChat, car.idCarOwner);
-        if(topic.getSubscribers()!=null && car.car!=null && car.car.getPassengers()!=null &&
+        if(topic!=null && topic.getSubscribers()!=null && car !=null && car.car!=null && car.car.getPassengers()!=null &&
                 !Topic.subscribersEquals(topic.getSubscribers(), car.car.getPassengers())){
             topic.subscribers = car.car.getPassengers();
             topic.subscribers.add(car.idCarOwner);

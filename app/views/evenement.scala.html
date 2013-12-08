@@ -4,18 +4,24 @@
 
 @main(Messages("playauthenticate.event.title"),"event") {
     <link rel="stylesheet" media="screen" href="@routes.Assets.at("css/demo.css")" />
+    <!--
     <link href="@routes.Assets.at("css/bootstrap-datepicker.css")" rel="stylesheet" />
     <link href="@routes.Assets.at("css/bootstrap-timepicker.css")" rel="stylesheet" />
-
+    -->
     <script src="http://maps.googleapis.com/maps/api/js?libraries=places&sensor=false&language=fr"></script>
     <script src="http://cdn.sockjs.org/sockjs-0.3.min.js"></script>
-    <script type="text/javascript" src="@routes.Assets.at("js/app/directives/ui-bootstrap-tpls-0.4.0.min.js")"></script>
+    <!--
+    <script type="text/javascript" src="@routes.Assets.at("js/app/directives/ui-bootstrap.min.js")"></script>
+    <script type="text/javascript" src="@routes.Assets.at("js/app/directives/ui-bootstrap-tpls.js")"></script>
+    -->
     <script type="text/javascript" src="@routes.Assets.at("js/app/directives/event.js")"></script>
     <script type="text/javascript" src="@routes.Assets.at("js/app/directives/keypress.js")"></script>
     <script type="text/javascript" src="@routes.Assets.at("js/app/directives/ui-map.js")"></script>
+    <!--
     <script type="text/javascript" src="@routes.Assets.at("js/app/directives/angular-strap.js")"></script>
     <script type="text/javascript" src="@routes.Assets.at("js/app/directives/bootstrap-datepicker.js")"></script>
     <script type="text/javascript" src="@routes.Assets.at("js/app/directives/bootstrap-timepicker.js")"></script>
+    -->
     <script type="text/javascript" src="@routes.Assets.at("js/app/directives/googleplace.js")"></script>
     <script type="text/javascript" src="@routes.Assets.at("js/app/directives/scrollglue.js")"></script>
     <script type="text/javascript" src="@routes.Assets.at("js/app/directives/ng-infinite-scroll.min.js")"></script>
@@ -34,87 +40,79 @@
 
     <div ng-controller="EventCtrl" >
 
-        <div class="row-fluid" >
-            <div class="span2">
+        <div class="row" >
+            <div class="col-md-2">
+
             </div>
-            <div class="span4">
+            <div class="col-md-4">
                 <div ng-show="!eventEdit">
                     <h1>
                     {{event.name}}
+                        <a>
+                            <i tooltip="Modifier l'évenement" class="glyphicon glyphicon-edit" ng-click="setEventEditMode(true)"></i>
+                        </a>
                     </h1>
-                    <p >
-                    Cet événement a lieu le <strong>{{event.fromDate | date:'dd-MM-yyyy'}}</strong> <strong ng-show="event.startTime">à {{event.startTime}}</strong>
-                    <address>Adresse : <strong>{{event.address.description}}</strong></address>
-                    </p>
-                    <accordion>
-                        <accordion-group heading="Détails :" >
-                            <dl>
-                                <dt>Description de l'événement :</dt>
-                                <dd>
-                                    <p class="text-rigth">
-                                    {{event.description}}
-                                    </p>
-                                </dd>
-                                <dt >Liste de diffusion : </dt>
-                                <dd>
-                                    <ul>
-                                        <li ng-repeat="contact in event.contacts" >{{contact}}</li>
-                                    </ul>
-                                    <div class="controls">
-                                        <div class="input-prepend input-append" ng-show="showEventEditButton">
-                                            <span class="add-on"><i class="icon-envelope"></i></span>
-                                            <input ng-model="contacts.addedContact" placeholder="email1;email2..." type="text"></input>
-                                            <button class="btn" type="button"  ng-click="addContact(contacts.addedContact)">Ajouter</button>
-                                        </div>
-                                    </div>
-                                    <button class="btn" type="button"  ng-show="!event.contactsOnly && showEventEditButton" ng-click="securise()" tooltip-placement="right" tooltip="L'évenement sera restreint à la liste de diffusion">Sécuriser cet évenement</button>
-                                    <button class="btn" type="button"  ng-show="event.contactsOnly && showEventEditButton" ng-click="unSecurise()">Ne plus sécuriser cet évenement</button>
-                                </dd>
-                            </dl>
-                        </accordion-group>
-                    </accordion>
+                    <blockquote >
+                        <p >
+                            {{event.description}}
+                        </p>
+                        <small >
+                            Cet événement a lieu le <strong>{{event.fromDate | date:'dd-MM-yyyy'}}</strong> <strong ng-show="event.startTime">à {{event.startTime}}</strong>
+                        <address>Adresse : <strong>{{event.address.description}}</strong></address>
+                        </small>
 
-
-                    <button ng-show="showEventEditButton" class="btn" type="button" ng-click="setEventEditMode(true)">Editer</button>
-
+                    </blockquote>
 
 
                 </div>
+                <!--
+                MODIFICATION DE L'EVENEMENT
+                -->
+
                 <div ng-show="eventEdit">
                     <div class="alert alert-info" ng-show="showUpdated">
                         <button type="button" class="close" data-dismiss="alert" ng-click="setToUpdated()">&times;</button>
                         Completez les informations de l'événement pour aider les participants !
                     </div>
                     <label>Nom</label>
-                    <input ng-model="event.name" type="text" ></input>
+                    <input class="form-control" ng-model="event.name" type="text" ></input>
                     <label>Description</label>
-                    <textarea ng-model="event.description" rows="3" cols="8"></textarea>
+                    <textarea class="form-control" ng-model="event.description" rows="3" cols="8"></textarea>
                     <label>Date de l'événement</label>
-                    <div class="control-group input-append">
-                        <input type="text" ng-model="event.fromDate" data-date-format="dd/mm/yyyy" bs-datepicker>
-                        <button type="button" class="btn" data-toggle="datepicker"><i class="icon-calendar"></i></button>
+                    <div class="input-group">
+                        <input class="form-control" type="text" datepicker-popup="dd/MM/yyyy" ng-model="event.fromDate" is-open="opened" min="today" max="'2015-06-22'" datepicker-options="dateOptions" date-disabled="disabled(date, mode)" ng-required="true" close-text="Close" />
+                        <span class="input-group-btn">
+                            <button ng-click="openCalendar()" type="button" class="btn btn-default" ><i class="glyphicon glyphicon-calendar"></i></button>
+                        </span>
                     </div>
                     <label>Heure de début</label>
-                    <div class="control-group input-append">
-                        <input type="text" ng-model="event.startTime" bs-timepicker>
-                        <button type="button" class="btn" data-toggle="timepicker"><i class="icon-time"></i></button>
+                    <div class="input-group">
+                        <input class="form-control" type="text" ng-model="event.startTime" bs-timepicker>
+                        <span class="input-group-btn">
+                            <button type="button" class="btn btn-default" data-toggle="timepicker"><i class="glyphicon glyphicon-time"></i></button>
+                        </span>
                     </div>
                     <label>Adresse de l'évenement :</label>
-                    <input ng-model="event.address" googleplace type="text" placeholder="{{event.address.description}}"></input>
+                    <input class="form-control" ng-model="event.address" googleplace type="text" placeholder="{{event.address.description}}"></input>
 
                     <label>Liste de diffusion :</label>
+                    <ul>
+                      <li ng-repeat="contact in event.contacts"><small>{{contact}}</small></li>
+                    </ul>
                     <div class="controls">
-                        <div class="input-prepend input-append" >
-                            <span class="add-on"><i class="icon-envelope"></i></span>
-                            <input ng-model="contacts.addedContact" placeholder="email1;email2..." type="text"></input>
-                            <button class="btn" type="button"  ng-click="addContact(contacts.addedContact)">Ajouter</button>
+                        <div class="input-group" >
+                            <span class="input-group-addon"><i class="glyphicon glyphicon-envelope"></i></span>
+                            <input class="form-control" ng-model="contacts.addedContact" placeholder="email1;email2..." type="text"></input>
+                            <span class="input-group-btn">
+                                <button class="btn btn-default" type="button"  ng-click="addContact(contacts.addedContact)">Inviter</button>
+                            </span>
                         </div>
                     </div>
-                    <button class="btn" type="button"  ng-show="!event.contactsOnly" ng-click="securise()" tooltip-placement="right" tooltip="L'évenement sera restreint à la liste de diffusion">Sécuriser cet évenement</button>
-                    <button class="btn" type="button"  ng-show="event.contactsOnly" ng-click="unSecurise()">Ne plus sécuriser cet évenement</button>
+                    <input type="checkbox" ng-model="event.contactsOnly" />
+                    <span tooltip-placement="right" tooltip="Si cette case est coché les événement sera accessible uniquement aux personnes correspondantes aux mails saisies">Restreindre l'accès à l'événement à cette liste de diffusion</span>
                     <br/>
                     <button class="btn btn-primary" type="button" ng-click="saveEvent()">Valider</button>
-                    <button class="btn" type="button" ng-click="setEventEditMode(false)">Annuler</button>
+                    <button class="btn btn-default" type="button" ng-click="setEventEditMode(false)">Annuler</button>
                 </div>
 
 
@@ -137,29 +135,29 @@
                                 {{currentInfoWindowsSubscriber.car.nbPlaces - currentInfoWindowsSubscriber.car.passengers.length}} places restantes
                             </div>
                             <div ng-show="currentSubscriber.locomotion == 'AUTOSTOP' && currentInfoWindowsSubscriber.normalCar" >
-                                <button class="btn btn-success btn-mini" type="button" ng-click="askForSeat(currentInfoWindowsSubscriber)" >Reserver une place</button>
+                                <button class="btn btn-success btn-xs" type="button" ng-click="askForSeat(currentInfoWindowsSubscriber)" >Reserver une place</button>
                             </div>
                             <div ng-show="currentSubscriber.locomotion == 'AUTOSTOP' && currentInfoWindowsSubscriber.currentCar" >
-                                <button class="btn btn-warning btn-mini" type="button" ng-click="removePassenger(currentInfoWindowsSubscriber, currentSubscriber.userRef)" >Annuler ma reservation</button>
+                                <button class="btn btn-warning btn-xs" type="button" ng-click="removePassenger(currentInfoWindowsSubscriber, currentSubscriber.userRef)" >Annuler ma reservation</button>
                             </div>
                             <div ng-show="currentSubscriber.locomotion == 'AUTOSTOP' && currentInfoWindowsSubscriber.iAskHim" >
-                                <button class="btn btn-warning btn-mini" type="button" ng-click="removeWaitingGuy(currentInfoWindowsSubscriber, currentSubscriber.userRef)" >Annuler ma reservation</button>
+                                <button class="btn btn-warning btn-xs" type="button" ng-click="removeWaitingGuy(currentInfoWindowsSubscriber, currentSubscriber.userRef)" >Annuler ma reservation</button>
                             </div>
                             <div ng-show="currentSubscriber.locomotion == 'AUTOSTOP' && currentInfoWindowsSubscriber.heAskMeToBeInHisCar">
-                                <button class="btn btn-warning btn-mini" type="button" ng-click="removePossibleCar(currentSubscriber, currentInfoWindowsSubscriber.userRef)" >Decliner sa proposition</button>
+                                <button class="btn btn-warning btn-xs" type="button" ng-click="removePossibleCar(currentSubscriber, currentInfoWindowsSubscriber.userRef)" >Decliner sa proposition</button>
                             </div>
                             <!-- AUTOSTOP -->
                             <div ng-show="currentSubscriber.locomotion == 'CAR' && currentInfoWindowsSubscriber.free">
-                                <button class="btn btn-success btn-mini" type="button" ng-click="proposeSeat(currentInfoWindowsSubscriber, currentSubscriber.userRef)" >Proposer une place</button>
+                                <button class="btn btn-success btn-xs" type="button" ng-click="proposeSeat(currentInfoWindowsSubscriber, currentSubscriber.userRef)" >Proposer une place</button>
                             </div>
                             <div ng-show="currentSubscriber.locomotion == 'CAR' && currentInfoWindowsSubscriber.requestedByMe">
-                                <button class="btn btn-warning btn-mini" type="button" ng-click="removePossibleCar(currentInfoWindowsSubscriber, currentSubscriber.userRef)" >Annuler ma proposition</button>
+                                <button class="btn btn-warning btn-xs" type="button" ng-click="removePossibleCar(currentInfoWindowsSubscriber, currentSubscriber.userRef)" >Annuler ma proposition</button>
                             </div>
                             <div ng-show="currentSubscriber.locomotion == 'CAR' && currentInfoWindowsSubscriber.waitingForMyCar">
-                                <button class="btn btn-warning btn-mini" type="button" ng-click="removeWaitingGuy(currentSubscriber, currentInfoWindowsSubscriber.userRef)" >Decliner la reservation</button>
+                                <button class="btn btn-warning btn-xs" type="button" ng-click="removeWaitingGuy(currentSubscriber, currentInfoWindowsSubscriber.userRef)" >Decliner la reservation</button>
                             </div>
                             <div ng-show="currentSubscriber.locomotion == 'CAR' && currentInfoWindowsSubscriber.inMyCar">
-                                <button class="btn btn-warning btn-mini" type="button" ng-click="removePassenger(currentSubscriber, currentInfoWindowsSubscriber.userRef)" >Annuler la reservation</button>
+                                <button class="btn btn-warning btn-xs" type="button" ng-click="removePassenger(currentSubscriber, currentInfoWindowsSubscriber.userRef)" >Annuler la reservation</button>
                             </div>
                         </div>
                         <div ng-show="currentInfoWindowsEvent">
@@ -172,45 +170,59 @@
                     </div>
             </div>
 
-            <div ng-show="!currentSubscriber"  class="span4">
-                <alert ng-repeat="alert in alertsSubsc | orderBy: '-date' " type="alert.type" close="closeAlertSubsc($index)">{{alert.msg}}</alert>
-                <fieldsWallet>
-                    <legend>Vous ne participez pas encore :</legend>
+
+            <!-- MODIFICATION PARTICIPANT COURANT / PARTICIPATION A L'EVENEMENT -->
+            <div ng-show="!currentSubscriber || editMode"  class="col-md-4">
+
+
+                <fieldset>
+                    <legend ng-show="!currentSubscriber">Vous ne participez pas encore :</legend>
+                    <alert ng-repeat="alert in alertsSubsc | orderBy: '-date' " type="alert.type" close="closeAlertSubsc($index)">{{alert.msg}}</alert>
                     <label>Email</label>
-                    <input ng-model="newSubscriber.email" type="email" required></input>
+                    <input class="form-control" ng-model="editedSubscriber.email" type="email" required></input>
                     <label>Nom</label>
-                    <input ng-model="newSubscriber.name" type="text" ></input>
+                    <input class="form-control" ng-model="editedSubscriber.name" type="text" ></input>
                     <label>Prénom</label>
-                    <input ng-model="newSubscriber.surname" type="text" ></input>
+                    <input class="form-control" ng-model="editedSubscriber.surname" type="text" ></input>
                     <label>Point de départ</label>
-                    <input ng-model="newSubscriber.address" googleplace type="text" ></input>
+                    <input class="form-control" ng-model="editedSubscriber.address" googleplace type="text" placeholder="{{editedSubscriber.address.description}}"></input>
                     <label>Je suis :</label>
-                    <select ng-model="newSubscriber.locomotion" ng-options="item.id as item.name for item in items"></select>
-                    <div ng-show="newSubscriber.locomotion == 'CAR'">
+                    <select class="form-control" ng-model="editedSubscriber.locomotion" ng-options="item.id as item.name for item in items"></select>
+                    <div ng-show="editedSubscriber.locomotion == 'CAR'">
                         <label>Nb passagers max</label>
-                        <input ng-model="newSubscriber.car.nbPlaces" type="text" maxlength="1"></input>
+                        <input class="form-control" ng-model="currentSubscriber.car.nbPlaces" type="text" maxlength="1"></input>
                     </div>
                 </fieldset>
-                <button class="btn btn-primary" type="button" ng-click="subscribe()">Participer</button>
+                <div ng-show="!currentSubscriber">
+                    <button class="btn btn-primary" type="button" ng-click="subscribe()">Participer</button>
+                </div>
+                <div ng-show="editMode">
+                    <button  class="btn btn-default" ng-click="setEditMode(false)">Annuler</button>
+                    <button  class="btn btn-primary" ng-click="saveCurrentSubscriber()">Valider</button>
+                </div>
             </div>
 
-            <div ng-show="currentSubscriber" class="span4">
+
+
+            <div ng-show="currentSubscriber" class="col-md-4">
                 <br/>
 
 
                 <div>
-                    <h3><i><img ng-src="{{currentSubscriber.picto}}" /></i>{{currentSubscriber.surname}} {{currentSubscriber.name}}</h3>
+                    <!-- SUBSCRIBER COURANT -->
+                    <h3>
+                        <i><img ng-src="{{currentSubscriber.picto}}" /></i>{{currentSubscriber.surname}} {{currentSubscriber.name}}
+                        <a>
+                            <i tooltip="Modifier mon profil" class="glyphicon glyphicon-edit" ng-show="!editMode" ng-click="setEditMode(true)"></i>
+                        </a>
+                    </h3>
                     <strong>Mon point de départ : </strong>
 
                     <address ng-show="!editMode">
-                      <i class="icon-globe"></i> {{currentSubscriber.address.description}} <button class="btn" ng-show="!editMode" ng-click="setEditMode(true)">Modifier</button>
+                      <i class="glyphicon glyphicon-globe"></i> {{currentSubscriber.address.description}}
                     </address>
 
 
-                    <div class="btn-group">
-                        <button ng-show="currentSubscriber.locomotion == 'AUTOSTOP' || currentSubscriber.locomotion == 'DONT_KNOW_YET'" ng-click="updateLocomotion('CAR')" type="button" class="btn" >Devenir conducteur</button>
-                        <button ng-show="currentSubscriber.locomotion == 'CAR' || currentSubscriber.locomotion == 'DONT_KNOW_YET'" ng-click="updateLocomotion('AUTOSTOP')" type="button" class="btn" >Devenir passager</button>
-                    </div>
 
 
                     <script type="text/ng-template" id="popin.html">
@@ -232,12 +244,18 @@
 
                     <div ng-show="editMode" >
                         <label>Nouvelle adresse : </label>
-                        <div class="input-prepend">
-                            <span class="add-on"><i class="icon-globe"></i></span>
-                            <input ng-model="currentSubscriber.address" googleplace type="text" ></input>
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="glyphicon glyphicon-globe"></i></span>
+                            <input class="form-control" ng-model="currentSubscriber.address" googleplace type="text" placeholder="{{currentSubscriber.address.description}}"></input>
                         </div>
+
+                        <div class="btn-group">
+                            <button ng-show="currentSubscriber.locomotion == 'AUTOSTOP' || currentSubscriber.locomotion == 'DONT_KNOW_YET'" ng-click="updateLocomotion('CAR')" type="button" class="btn btn-default" >Devenir conducteur</button>
+                            <button ng-show="currentSubscriber.locomotion == 'CAR' || currentSubscriber.locomotion == 'DONT_KNOW_YET'" ng-click="updateLocomotion('AUTOSTOP')" type="button" class="btn btn-default" >Devenir passager</button>
+                        </div>
+                        <br/>
+                        <button  class="btn btn-default" ng-click="setEditMode(false)">Annuler</button>
                         <button  class="btn btn-primary" ng-click="saveCurrentSubscriber()">Valider</button>
-                        <button  class="btn" ng-click="setEditMode(false)">Annuler</button>
                     </div>
 
 
@@ -250,13 +268,13 @@
                             <ul >
                                 <li ng-repeat="passenger in currentCar.passengers" >
                                     {{passenger.name}}
-                                    <button ng-show="passenger.deleteRight" class="btn btn-warning btn-mini" type="button" ng-click="removePassenger(currentCar.driver.subscriber, passenger.subscriber.userRef)" >Annuler la reservation</button>
+                                    <button ng-show="passenger.deleteRight" class="btn btn-default btn-xs" type="button" ng-click="removePassenger(currentCar.driver.subscriber, passenger.subscriber.userRef)" >Annuler la reservation</button>
                                     </td>
                                 </li>
                             </ul>
                         </div>
                         {{currentCar.driver.subscriber.car.nbPlaces - currentCar.driver.subscriber.car.passengers.length}} places restantes
-                        <a ng-click="createTopicForCar(subscriber)" ><i class=" icon-comment" tooltip="Démarrer une discussion pour cette voiture" ></i></a>
+                        <a ng-click="createTopicForCar(subscriber)" ><i class=" glyphicon glyphicon-comment" tooltip="Démarrer une discussion pour cette voiture" ></i></a>
                     </div>
 
                     <div ng-show="currentSubscriber.locomotion == 'AUTOSTOP'">
@@ -265,15 +283,15 @@
                             <ul>
                                 <li ng-repeat="subscriber in subscribers" ng-show="subscriber.iAskHim">
                                     {{subscriber.surname}} {{subscriber.name}}
-                                    <button class="btn btn-warning btn-mini" type="button" ng-click="removeWaitingGuy(subscriber, currentSubscriber.userRef)" >Annuler</button>
+                                    <button class="btn btn-warning btn-xs" type="button" ng-click="removeWaitingGuy(subscriber, currentSubscriber.userRef)" >Annuler</button>
                                 </li>
                             </ul>
                             <strong ng-show="currentSubscriber.possibleCars.length > 0">Les utilisateurs suivants me proposent leur voiture :</strong>
                             <ul >
                                 <li ng-repeat="subscriber in subscribers" ng-show="subscriber.heAskMeToBeInHisCar">
                                     {{subscriber.surname}} {{subscriber.name}}
-                                    <button class="btn btn-success btn-mini" type="button" ng-click="validatePassenger(subscriber, currentSubscriber.userRef)" >Accepter</button>
-                                    <button class="btn btn-warning btn-mini" type="button" ng-click="removePossibleCar(currentSubscriber, subscriber.userRef)" >Refuser</button>
+                                    <button class="btn btn-success btn-xs" type="button" ng-click="validatePassenger(subscriber, currentSubscriber.userRef)" >Accepter</button>
+                                    <button class="btn btn-warning btn-xs" type="button" ng-click="removePossibleCar(currentSubscriber, subscriber.userRef)" >Refuser</button>
                                 </li>
                             </ul>
                         </div>
@@ -285,8 +303,8 @@
                             <ul>
                                 <li ng-repeat="passenger in currentSubscriber.car.waitings" >
                                     {{getSubscriber(passenger).surname}} {{getSubscriber(passenger).name}}
-                                    <button class="btn btn-success btn-mini" type="button" ng-click="validatePassenger(currentSubscriber, passenger)" >Valider</button>
-                                    <button class="btn btn-warning btn-mini" type="button" ng-click="removeWaitingGuy(currentSubscriber, passenger)" >Annuler</button>
+                                    <button class="btn btn-success btn-xs" type="button" ng-click="validatePassenger(currentSubscriber, passenger)" >Valider</button>
+                                    <button class="btn btn-warning btn-xs" type="button" ng-click="removeWaitingGuy(currentSubscriber, passenger)" >Annuler</button>
                                 </li>
                             </ul>
                         </div>
@@ -295,7 +313,7 @@
                             <ul>
                                 <li ng-repeat="subscriber in subscribers" ng-show="subscriber.requestedByMe">
                                     {{subscriber.surname}} {{subscriber.name}}
-                                    <button class="btn btn-warning btn-mini" type="button" ng-click="removePossibleCar(subscriber, currentSubscriber.userRef)" >Annuler</button>
+                                    <button class="btn btn-warning btn-xs" type="button" ng-click="removePossibleCar(subscriber, currentSubscriber.userRef)" >Annuler</button>
                                 </li>
                             </ul>
                         </div>
@@ -312,7 +330,7 @@
 		<div>
 		<form class="form-search">
 		Rechercher :
-		  <input type="text" ng-model="query" class="input-medium search-query">
+		  <input class="form-control" type="text" ng-model="query" class="input-medium search-query">
 		</form>
 		</div>
                     <table id="searchTextResults" class="table table-hover">
@@ -321,7 +339,7 @@
                                 <th>locomotion</th>
                                 <th>Nom</th>
                                 <th>Adresse</th>
-                                <th class="hidden-phone">places restantes</th>
+                                <th class="hidden-sm">places restantes</th>
                                 <th ng-show="currentSubscriber.locomotion == 'AUTOSTOP'">Reservations</th>
                                 <th ng-show="currentSubscriber.locomotion == 'CAR'">Prendre/Ne plus prendre</th>
                             </tr>
@@ -330,11 +348,11 @@
                             <tr ng-repeat="subscriber in getSubscribers() | auto:filterUsers:markers  | filter:query" ng-show="!subscriber.current" class="{{subscriber.class}}" >
                                 <td>
                                     <a ng-click="openSubscriberInfo(subscriber)"><img ng-src="{{subscriber.picto}}" /></a>
-                                    <a ng-click="createTopic(subscriber)" ><i class=" icon-comment" tooltip="Démarrer une discussion" ></i></a>
+                                    <a ng-click="createTopic(subscriber)" ><i class=" glyphicon glyphicon-comment" tooltip="Démarrer une discussion" ></i></a>
                                 </td>
                                 <td >{{subscriber.surname}} {{subscriber.name}}</td>
                                 <td>{{subscriber.address.description}}</td>
-                                <td class="hidden-phone">{{subscriber.car.nbPlaces - subscriber.car.passengers.length}}</td>
+                                <td class="hidden-sm">{{subscriber.car.nbPlaces - subscriber.car.passengers.length}}</td>
                                 <!-- CAR -->
                                 <td ng-show="currentSubscriber.locomotion == 'AUTOSTOP' && subscriber.normalCar" >
                                     <button class="btn btn-success" type="button" ng-click="askForSeat(subscriber)" >Reserver une place</button>
@@ -366,17 +384,17 @@
                     </table>
                 </div>
             </div>
-            <div class="span2">
+            <div class="col-md-2">
             </div>
         </div>
-        <div class="row-fluid">
-            <div class="span2">
+        <div class="row">
+            <div class="col-md-2">
             </div>
-            <div class="span5 well">
+            <div class="col-md-5 well">
                 <p class="nav-header">
                     Mur
                 </p>
-                    <textarea class="input-block-level" rows="2" ng-model="wall.currentMessage" ui-keypress="{13:'sendMessageToWall(wall.currentMessage)'}" ></textarea>
+                    <textarea class="input-block-level form-control" rows="2" ng-model="wall.currentMessage" ui-keypress="{13:'sendMessageToWall(wall.currentMessage)'}" ></textarea>
                 <p ng-repeat="msg in wall.messages | orderBy: '-date' | limitTo: eltsInWall" class="dl-horizontalli">
                     <strong ng-show="msg.from != currentSubscriber.userRef" tooltip-placement="left" tooltip="{{msg.date | date:'à HH:mm:ss le dd/MM'}}">
                         {{getSubscriber(msg.from).surname}} {{getSubscriber(msg.from).name}} :
@@ -396,7 +414,7 @@
                 </p>
             </div>
 
-            <div class="span5 well" id="discussion">
+            <div class="col-md-5 well" id="discussion">
                 <div class="tabbable tabs-right" >
                     <ul class="nav nav-tabs">
                         <li class="nav-header">Mes conversations</li>
@@ -416,21 +434,21 @@
                         </li>
                     </ul>
 
-                    <div class="tab-content" class="span3">
-                        <div class="row-fluid">
+                    <div class="tab-content" class="col-md-3">
+                        <div class="row">
                             <p class="nav-header">
                                 Ma conversation avec : <strong ng-show="chaters != currentSubscriber.userRef" ng-repeat="chaters in chat.currentTopic.subscribers">{{getSubscriber(chaters).surname}} {{getSubscriber(chaters).name}}, </strong>
-                                <button ng-show="!editAddTopic" class="btn btn-mini" type="button" ng-click="setEditAddTopic(true)" tooltip="Ajouter à la conversation">+</button>
-                                <button ng-show="editAddTopic" class="btn btn-mini" type="button" ng-click="setEditAddTopic(false)" tooltip="Ajouter à la conversation">-</button>
+                                <button ng-show="!editAddTopic" class="btn btn-xs" type="button" ng-click="setEditAddTopic(true)" tooltip="Ajouter à la conversation">+</button>
+                                <button ng-show="editAddTopic" class="btn btn-default btn-xs" type="button" ng-click="setEditAddTopic(false)" tooltip="Ajouter à la conversation">-</button>
                             </p>
 
                             <div ng-show="editAddTopic">
                                 <div>
                                     <alert ng-repeat="newSubsc in chat.currentTopic.newTopicSubscribers" type="info" close="removeNewTopicSubscriber($index)">{{getSubscriber(newSubsc).surname}} {{getSubscriber(newSubsc).name}}</alert>
-                                    <button ng-show="chat.currentTopic.newTopicSubscribers" class="btn btn-primary" type="button" ng-click="addToTopic()">Valider</button>
+                                    <button ng-show="chat.currentTopic.newTopicSubscribers" class="btn btn-default btn-primary" type="button" ng-click="addToTopic()">Valider</button>
                                 </div>
                                 <div>
-                                    Rechercher : <input class="search-query" type="text" ng-model="chat.currentTopic.userToAddToTopic" typeahead="subsc.userRef as subsc.name for subsc in subscribers | filter:$viewValue" Z>
+                                    Rechercher : <input class="form-control" class="search-query" type="text" ng-model="chat.currentTopic.userToAddToTopic" typeahead="subsc.userRef as subsc.name for subsc in subscribers | filter:$viewValue" Z>
                                 </div>
                                 <br/>
                             </div>
@@ -457,8 +475,8 @@
                             </div>
                         </div>
 
-                        <div class="row-fluid pull-right">
-                            <textarea class="input-xlarge" ng-model="chat.currentMessage" ui-keypress="{13:'sendMessage(chat.currentMessage)'}" ></textarea>
+                        <div class="row pull-right">
+                            <textarea class="form-control" class="input-xlarge" ng-model="chat.currentMessage" ui-keypress="{13:'sendMessage(chat.currentMessage)'}" ></textarea>
                         </div>
                     </div>
                 </div>

@@ -3,19 +3,19 @@
 
 
 	<div class="row">
-  		<div class="span6">
+  		<div class="col-md-6">
       		<h1>@Messages("playauthenticate.login.title")</h1>
     	</div>
   	</div>
     
   <div id="login" class="row">
-      <div class="span3">
+      <div class="col-md-3">
           @Messages("playauthenticate.login.oauth2")
           @_providerPartial(skipCurrent=false)
       </div>
 
 
-    <div class="span3">
+    <div class="col-md-3">
 
     	@helper.form(routes.Application.doLogin) {
     	
@@ -40,7 +40,7 @@
     	}
     </div>
 
-    <div class="span3">
+    <div class="col-md-3">
       @Messages("playauthenticate.login.oauth")
       @* Display list of available providers *@
       @_providerPartial(skipCurrent=false)

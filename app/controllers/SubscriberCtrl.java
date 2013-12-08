@@ -49,9 +49,10 @@ public class SubscriberCtrl extends Controller {
             Subscriber subsc = event.getSubscriberById(idSub);
             SubscriberModel subscriberModel = new SubscriberModel(subsc, event.getId());
             String reponse = objectMapper.writeValueAsString(subscriberModel);
-            Logger.debug("getSubscriber{idEvent: {}, idSub {} : {}", id, idSub, reponse);
+            Logger.debug("getSubscriber : idEvent: {}, idSub {} : {}", id, idSub, reponse);
             return ok(reponse).as("application/json");
         } catch (Exception e){
+            Logger.error("getSubscriber idEvent : "+id+", idSub : "+idSub , e);
             return internalServerError().as("application/json");
         }
     }
@@ -59,7 +60,7 @@ public class SubscriberCtrl extends Controller {
     @BodyParser.Of(BodyParser.Json.class)
     public static Result createSubscriber(String id){
         try{
-            Logger.debug("createSubscriber {idEvent: {}, requestBody {} }", id, request().body().asJson());
+            Logger.debug("createSubscriber : idEvent: {}, requestBody {}", id, request().body().asJson());
             Form<Subscriber> form = subscriberForm.bindFromRequest();
             if(form.hasErrors()){
                 Logger.debug("Error : "+form.errorsAsJson());
@@ -85,7 +86,7 @@ public class SubscriberCtrl extends Controller {
                 return ok().as("application/json");
             }
         } catch (Exception e){
-        	e.printStackTrace();
+        	Logger.error("createSubscriber idEvent : "+id, e);
             return internalServerError().as("application/json");
         }
     }
@@ -93,6 +94,8 @@ public class SubscriberCtrl extends Controller {
     @BodyParser.Of(BodyParser.Json.class)
     public static Result updateSubscriber(String id, String idSub){
         try{
+            Logger.debug("updateSubscriber : idEvent: {}, idSub {}, requestBody {}", id, idSub, request().body().asJson());
+
             Form<Subscriber> form = subscriberForm.bindFromRequest();
             if(form.hasErrors()){
                 return badRequest(form.errorsAsJson()).as("application/json");
@@ -111,20 +114,25 @@ public class SubscriberCtrl extends Controller {
                 return ok(objectMapper.writeValueAsString(subscriberModel)).as("application/json");
             }
         } catch (Exception e){
+            Logger.error("updateSubscriber idEvent : "+id+", idSub : "+idSub, e);
             return internalServerError().as("application/json");
         }
     }
 
     public static Result list(String id){
         try {
+
             Event event = Event.read(id);
             Collection<Subscriber> subscribers = event.getSubscribers();
             Collection<SubscriberModel> models = new ArrayList<SubscriberModel>();
             for(Subscriber subscriber : subscribers){
                 models.add(new SubscriberModel(subscriber, id));
             }
-            return ok(objectMapper.writeValueAsString(models)).as("application/json");
+            String reponse = objectMapper.writeValueAsString(models);
+            Logger.debug("list : idEvent: {}, response {}", id, reponse);
+            return ok(reponse).as("application/json");
         } catch (IOException e) {
+            Logger.error("list idEvent : "+id, e);
             return internalServerError().as("application/json");
         }
     }
@@ -133,6 +141,7 @@ public class SubscriberCtrl extends Controller {
     @BodyParser.Of(BodyParser.Json.class)
     public static Result changeLocomotion(String id, String idSub){
         try{
+            Logger.debug("changeLocomotion, idEvent : {}, idSub {}, locomotion : {}", id, idSub, request().body().asJson());
             Event event = Event.read(id);
             Subscriber subsc = event.getSubscriberById(idSub);
             JsonNode node = request().body().asJson();
@@ -167,6 +176,7 @@ public class SubscriberCtrl extends Controller {
             event.save();
             return ok().as("application/json");
         } catch (Exception e){
+            Logger.error("changeLocomotion idEvent : "+id+", idSub : "+idSub, e);
             return internalServerError().as("application/json");
         }
     }
@@ -175,8 +185,11 @@ public class SubscriberCtrl extends Controller {
         try{
             Event event = Event.read(id);
             Subscriber subsc = event.getSubscriberById(idSub);
-            return ok(objectMapper.writeValueAsString(subsc.getCar())).as("application/json");
+            String reponse = objectMapper.writeValueAsString(subsc.getCar());
+            Logger.debug("getCar, idEvent : {}, idSub {}, car : {}", id, idSub, reponse);
+            return ok(reponse).as("application/json");
         } catch (Exception e){
+            Logger.error("getCar idEvent :", id+", idSub : "+idSub, e);
             return internalServerError().as("application/json");
         }
     }
@@ -184,6 +197,7 @@ public class SubscriberCtrl extends Controller {
     @BodyParser.Of(BodyParser.Json.class)
     public static Result updateCar(String id, String idSub){
         try{
+            Logger.debug("updateCar, idEvent : {}, idSub {}, passenger : {}", id, idSub, request().body().asJson());
             Event event = Event.read(id);
             Car car = event.getSubscriberById(idSub).getCar();
             Set<String> usersToNotify = newHashSet(car.getPassengers());
@@ -223,15 +237,18 @@ public class SubscriberCtrl extends Controller {
 
             return ok().as("application/json");
         } catch (CarIsFullException e){
+            Logger.debug("updateCar, idEvent :"+id+", idSub : "+idSub+", passenger : "+request().body().asJson(), e);
         	return badRequest("{message: 'La voiture est pleine'}").as("application/json");
         } catch (Exception e){
+            Logger.error("updateCar, idEvent :"+id+", idSub : "+idSub+", passenger : "+request().body().asJson(), e);
             return internalServerError(e.getMessage()).as("application/json");
         }
     }
 
     public static Result deletePassenger(String id, String idSub, String idPassenger){
     	try{
-	    	Event event = Event.read(id);
+            Logger.debug("deletePassenger, idEvent : {}, idSub {}, idPassenger : {}", id, idSub, idPassenger);
+            Event event = Event.read(id);
             Car car = event.getSubscriberById(idSub).getCar();
             Set<String> subscribersToNotify = newHashSet(car.getPassengers());
 	    	event.deletePassenger(idPassenger, idSub);
@@ -246,21 +263,23 @@ public class SubscriberCtrl extends Controller {
             if(sub.getLocomotion().equals(Locomotion.CAR)){
             	MessageFormat msg = new MessageFormat("vous ne faites plus parti de la voiture de {0} {1}");
             	msg.format(args);
-                MessagesHandler.sendNotification(id, from, to, "error", msg.format(args), new Date());
+                MessagesHandler.sendNotification(id, from, to, "warning", msg.format(args), new Date());
             }else if(sub.getLocomotion().equals(Locomotion.AUTOSTOP)){
             	MessageFormat msg = new MessageFormat("{0} {1} ne fait plus parti de votre voiture");
             	msg.format(args);
-                MessagesHandler.sendNotification(id, from, to, "error", msg.format(args), new Date());
+                MessagesHandler.sendNotification(id, from, to, "warning", msg.format(args), new Date());
             }
             MessagesHandler.sendNotification(id, from, to, "deletePassenger", "", new Date());
 	    	return ok().as("application/json");
 	    } catch (Exception e){
+            Logger.error("deletePassenger idEvent : "+id+", idSub : "+idSub+", idPassenger : "+idPassenger, e);
 	        return internalServerError(e.getMessage()).as("application/json");
 	    }
     }
 
     public static Result addToWaitingList(String id, String idSub){
         try{
+            Logger.debug("addToWaitingList, idEvent : {}, idSub {}, passenger : {}", id, idSub, request().body().asJson());
             Event event = Event.read(id);
             JsonNode node = request().body().asJson();
             String idPassenger = node.findPath("passenger").textValue();
@@ -282,12 +301,14 @@ public class SubscriberCtrl extends Controller {
             MessagesHandler.sendNotification(id, from, to, "success", msg.format(args), new Date());
             return ok().as("application/json");
         } catch (Exception e){
+            Logger.error("addToWaitingList idEvent : "+id+", idSub : "+idSub, e);
             return internalServerError(e.getMessage()).as("application/json");
         }
     }
     
     public static Result removeFromWaitingList(String id, String idSub, String idPassenger){
         try{
+            Logger.debug("removeFromWaitingList, idEvent : {}, idSub {}, idPassenger : {}", id, idSub, idPassenger);
             Event event = Event.read(id);
             Subscriber subsc = event.getSubscriberById(idSub);
             Car car = subsc.getCar();
@@ -301,11 +322,13 @@ public class SubscriberCtrl extends Controller {
             String[] args = {sub.getSurname(), sub.getName()};
         	MessageFormat msg = new MessageFormat("{0} {1} a décliné votre proposition être passager de votre voiture");
         	msg.format(args);
-            MessagesHandler.sendNotification(id, from, to, "error", msg.format(args), new Date());
+            MessagesHandler.sendNotification(id, from, to, "warning", msg.format(args), new Date());
             return ok().as("application/json");
         } catch (CarIsFullException e){
+            Logger.error("removeFromWaitingList, la voiture est pleine", e);
         	return badRequest("{message: 'La voiture est pleine'}").as("application/json");
         } catch (Exception e){
+            Logger.error("removeFromWaitingList idEvent : "+id+", idSub : "+idSub+", idPassenger :"+idPassenger, e);
             return internalServerError(e.getMessage()).as("application/json");
         }
     }
@@ -317,6 +340,7 @@ public class SubscriberCtrl extends Controller {
     
     public static Result addPossibleCar(String id, String idSub){
         try{
+            Logger.debug("addPossibleCar, idEvent : {}, idSub {}, car : {}", id, idSub, request().body().asJson());
             Event event = Event.read(id);
             JsonNode node = request().body().asJson();
             String idCar = node.findPath("car").textValue();
@@ -337,6 +361,7 @@ public class SubscriberCtrl extends Controller {
             MessagesHandler.sendNotification(id, from, to, "success", msg.format(args), new Date());
             return ok().as("application/json");
         } catch (Exception e){
+            Logger.error("addPossibleCar  idEvent : "+id+", idSub : "+idSub, e);
             return internalServerError(e.getMessage()).as("application/json");
         }
     }
@@ -344,6 +369,7 @@ public class SubscriberCtrl extends Controller {
     @BodyParser.Of(BodyParser.AnyContent.class)
     public static Result deletePossibleCar(String id, String idSub, String idCar){
         try{
+            Logger.debug("deletePossibleCar, idEvent : {}, idSub {}, idCar : {}", id, idSub, idCar);
             Event event = Event.read(id);
             Subscriber subsc = event.getSubscriberById(idSub);
             if(subsc!=null){
@@ -356,9 +382,10 @@ public class SubscriberCtrl extends Controller {
             String[] args = {sub.getSurname(), sub.getName()};
         	MessageFormat msg = new MessageFormat("{0} {1} a décliné votre proposition d'être passager de sa voiture");
         	msg.format(args);
-            MessagesHandler.sendNotification(id, from, to, "error", msg.format(args), new Date());
+            MessagesHandler.sendNotification(id, from, to, "warning", msg.format(args), new Date());
             return ok().as("application/json");
         } catch (Exception e){
+            Logger.error("deletePossibleCar idEvent : "+id+", idSub : "+idSub+", idCar : "+idCar, e);
             return internalServerError(e.getMessage()).as("application/json");
         }
     }
@@ -366,9 +393,12 @@ public class SubscriberCtrl extends Controller {
     public static Result listNotifications(String idEvent, String idSub){
     	List<Notification> result = Notification.listNotifications(idEvent, idSub);
     	try {
-			return ok(objectMapper.writeValueAsString(result)).as("application/json");
+            String reponse = objectMapper.writeValueAsString(result) ;
+            Logger.debug("listNotifications, reponse : {}", reponse);
+			return ok(reponse).as("application/json");
 		} catch (IOException e) {
-			return internalServerError(e.getMessage()).as("application/json");
+            Logger.error("listNotifications idEvent : "+idEvent+", idSub : "+idSub, e);
+            return internalServerError(e.getMessage()).as("application/json");
 		}
     }
     

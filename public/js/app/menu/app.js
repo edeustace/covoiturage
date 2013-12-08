@@ -2,5 +2,5 @@
 
 /* App Module */
 
-angular.module('covoiturage', []);
+angular.module('covoiturage', ['ui.bootstrap']);
 

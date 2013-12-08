@@ -2,15 +2,15 @@
 
 @import helper._
 
-		   <div class="row-fluid">
-		    <div class="span6">
+		   <div class="row">
+		    <div class="col-md-6">
 		      <h1>@Messages("playauthenticate.signup.title")</h1>
 		    </div>
 		  </div>
 		
-		  <div id="signup" class="row-fluid">
+		  <div id="signup" class="row">
 		
-		    <div class="span3">
+		    <div class="col-md-3">
 		        @* Display proprietary login form *@
 		    	@helper.form(routes.Application.doSignup) {
 		    	
