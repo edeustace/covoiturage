@@ -4,7 +4,10 @@
 
 @main(Messages("playauthenticate.event.title"),"event") {
     <link rel="stylesheet" media="screen" href="@routes.Assets.at("css/demo.css")" />
-    <!--
+    <link href="@routes.Assets.at("css/snap.css")" rel="stylesheet" />
+    <link href="@routes.Assets.at("css/angular-snap.min.css")" rel="stylesheet" />
+
+<!--
     <link href="@routes.Assets.at("css/bootstrap-datepicker.css")" rel="stylesheet" />
     <link href="@routes.Assets.at("css/bootstrap-timepicker.css")" rel="stylesheet" />
     -->
@@ -14,6 +17,8 @@
     <script type="text/javascript" src="@routes.Assets.at("js/app/directives/ui-bootstrap.min.js")"></script>
     <script type="text/javascript" src="@routes.Assets.at("js/app/directives/ui-bootstrap-tpls.js")"></script>
     -->
+    <script type="text/javascript" src="@routes.Assets.at("js/lib/snap.min.js")"></script>
+    <script type="text/javascript" src="@routes.Assets.at("js/app/directives/angular-snap.min.js")"></script>
 
     <script type="text/javascript" src="@routes.Assets.at("js/app/directives/chat-directive.js")"></script>
     <script type="text/javascript" src="@routes.Assets.at("js/app/directives/event.js")"></script>
@@ -490,8 +495,12 @@
 
     </div>
     <div snap-drawer="right" id="chatZone" class="row pull-right">
-        <div class="col-md-8 well">
-            <div style="max-height:200px;overflow:auto;" scroll-glue >
+        <div class="col-md-8">
+            <div class="row">
+                <br/>
+            </div>
+            <div class="row">
+            <div class="well" style="max-height:300px;overflow:auto;" scroll-glue >
                 <p ng-repeat="message in chat.messages | orderBy: 'date' ">
                 <!--
                 <div class="chatMessages" ng-repeat="message in chat.messages | orderBy: 'date' ">
@@ -517,32 +526,38 @@
                 <br/>
                 <textarea class="form-control" rows="1" ng-model="chat.currentMessage" ui-keypress="{13:'sendMessage(chat.currentMessage)'}" ></textarea>
             </div>
+            </div>
         </div>
         <div class="col-md-4">
-            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-            <div class="list-group">
-                <a href="javascript:void" class="list-group-item header">
-                    Mes conversations
-                </a>
-                <a class="list-group-item" ng-repeat="topic in chat.topics  | orderBy: '-update'"
-                   ng-class="{'active' : topic.active}"
-                   chat-messages
-                   href="javascript:void" ng-click="loadMessages(topic)">
+            <div class="row">
+                <button type="button" class="close" aria-hidden="true" ng-click="openChat()">Close &times;</button>
+                <br/>
+            </div>
+            <div class="row">
+                <div class="list-group">
+                    <a href="javascript:void" class="list-group-item header">
+                        Mes conversations
+                    </a>
+                    <a class="list-group-item" ng-repeat="topic in chat.topics  | orderBy: '-update'"
+                       ng-class="{'active' : topic.active}"
+                       chat-messages
+                       href="javascript:void" ng-click="loadMessages(topic)">
 
-                                        <span ng-show="topic.categorie=='chat'" >
-                                            <small  ng-show="chaters != currentSubscriber.userRef" ng-repeat="chaters in topic.subscribers">
-                                                {{getSubscriber(chaters).surname}} {{getSubscriber(chaters).name}},
-                                            </small>
-                                        </span>
-                    <ul ng-show="topic.categorie=='carChat'">
-                        <li>Ma voiture</li>
-                    </ul>
-                    <span ng-show="topic.alert" class="label label-danger">message</span>
-                    <br/>
-                    <small class="text-muted" ng-show="topic.statut && topic.statut == 'SENDING'">Creation en cours</small>
-                    <small class="text-muted" ng-show="!topic.statut || topic.statut == 'RECEIVED'" >{{topic.update | date:'HH:mm:ss le dd/MM'}}</small>
-                    <small class="text-danger" ng-show="topic.statut && topic.statut == 'FAILURE'"><span class="badge badge-important">!</span>Erreur la conversation n'a pas été créé</small>
-                </a>
+                                            <span ng-show="topic.categorie=='chat'" >
+                                                <small  ng-show="chaters != currentSubscriber.userRef" ng-repeat="chaters in topic.subscribers">
+                                                    {{getSubscriber(chaters).surname}} {{getSubscriber(chaters).name}},
+                                                </small>
+                                            </span>
+                        <ul ng-show="topic.categorie=='carChat'">
+                            <li>Ma voiture</li>
+                        </ul>
+                        <span ng-show="topic.alert" class="label label-danger">message</span>
+                        <br/>
+                        <small class="text-muted" ng-show="topic.statut && topic.statut == 'SENDING'">Creation en cours</small>
+                        <small class="text-muted" ng-show="!topic.statut || topic.statut == 'RECEIVED'" >{{topic.update | date:'HH:mm:ss le dd/MM'}}</small>
+                        <small class="text-danger" ng-show="topic.statut && topic.statut == 'FAILURE'"><span class="badge badge-important">!</span>Erreur la conversation n'a pas été créé</small>
+                    </a>
+                </div>
             </div>
         </div>
     </div>

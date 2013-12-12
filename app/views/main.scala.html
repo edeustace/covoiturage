@@ -24,8 +24,6 @@
       <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css">
       <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap-theme.min.css">
 
-      <link href="@routes.Assets.at("css/snap.css")" rel="stylesheet" />
-      <link href="@routes.Assets.at("css/angular-snap.min.css")" rel="stylesheet" />
       <!--
           <link href="@routes.Assets.at("css/bootstrap.min.css")" rel="stylesheet" />
           <link href="@routes.Assets.at("css/bootstrap-theme.min.css")" rel="stylesheet" />
@@ -36,8 +34,6 @@
         <!--<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>-->
       <![endif]-->
       <script type="text/javascript" src="@routes.Assets.at("js/lib/angular.js")"></script>
-    <script type="text/javascript" src="@routes.Assets.at("js/lib/snap.min.js")"></script>
-      <script type="text/javascript" src="@routes.Assets.at("js/app/directives/angular-snap.min.js")"></script>
 
     <script type="text/javascript" src="@routes.Assets.at("js/app/directives/ui-bootstrap-tpls.min.js")"></script>
       <script type="text/javascript" src="@routes.Assets.at("js/app/menu/app.js")"></script>
@@ -101,7 +97,7 @@
       </div>
       </nav>
 
-      <div class="container" >
+      <div class="container mainContent"  >
           @if(flash.contains(Application.FLASH_ERROR_KEY)) {
           <div class="alert alert-danger">
               @flash().get(Application.FLASH_ERROR_KEY)
@@ -119,6 +115,7 @@
           <footer>
 
           </footer>
+
       </div> <!-- /container -->
 
   </body>

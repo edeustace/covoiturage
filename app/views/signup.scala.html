@@ -5,7 +5,7 @@
 
 @main(Messages("playauthenticate.signup.title"),"signup") {
     
-  <div class="row">
+  <div class="row" >
     <div class="col-md-6">
       <h1>@Messages("playauthenticate.signup.title")</h1>
     </div>
@@ -25,22 +25,22 @@
 
             @helper.input(signupForm("firstName"), '_label -> Messages("playauthenticate.signup.firstName")){ (id, name, value, args) =>
                 <div class="input-group">
-                <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
-                <input name="@name" id="@id" type="text" />
+                    <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
+                    <input class="form-control" name="@name" id="@id" type="text" />
                 </div>
             }
 
             @helper.input(signupForm("lastName"), '_label -> Messages("playauthenticate.signup.lastName")){ (id, name, value, args) =>
                 <div class="input-group">
                     <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
-                    <input name="@name" id="@id" type="text" />
+                    <input class="form-control" name="@name" id="@id" type="text" />
                 </div>
             }
 
             @helper.input(signupForm("email"),   '_showConstraints -> false, '_label -> Messages("playauthenticate.login.email.placeholder")){ (id, name, value, args) =>
                 <div class="input-group">
                     <span class="input-group-addon"><i class="glyphicon glyphicon-envelope"></i></span>
-                    <input name="@name" id="@id" type="email" />
+                    <input class="form-control" name="@name" id="@id" type="email" />
                 </div>
             }
 
@@ -48,14 +48,14 @@
             @helper.input(signupForm("password"), '_label -> Messages("playauthenticate.login.password.placeholder")){ (id, name, value, args) =>
                 <div class="input-group">
                     <span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
-                    <input name="@name" id="@id" type="password" />
+                    <input class="form-control" name="@name" id="@id" type="password" />
                 </div>
             }
 
             @helper.input(signupForm("repeatPassword"), '_label -> Messages("playauthenticate.login.password.repeat"), '_showConstraints -> false, '_error -> signupForm.error("password")){ (id, name, value, args) =>
                 <div class="input-group">
                     <span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
-                    <input name="@name" id="@id" type="password" />
+                    <input class="form-control" name="@name" id="@id" type="password" />
                 </div>
             }
 

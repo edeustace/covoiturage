@@ -30,7 +30,7 @@ function EventCtrl($scope, $http, $location, $compile, $filter, mailUtils, mapSe
     }
     $scope.snapOptions = {
         hyperextensible: true,
-        minPosition: -500
+        minPosition: -375
     }
     $scope.newMessage = false;
 	//////////////  SCOPE METHODS  ///////////////////
