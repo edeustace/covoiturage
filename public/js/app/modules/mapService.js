@@ -115,13 +115,15 @@ angular.module('mapService', [], function($provide){
                 marker.subscriber = subscriber;
             },
 		    findMarkerByLatLng : function (markers, lat, lng) {
-				for ( var i = 0; i < markers.length; i++) {
-					var pos = markers[i].getPosition();
-					if (floatEqual(pos.lat(), lat)
-							&& floatEqual(pos.lng(), lng)) {
-						return markers[i];
-					}
-				}
+		        if(markers){
+                    for ( var i = 0; i < markers.length; i++) {
+                        var pos = markers[i].getPosition();
+                        if (floatEqual(pos.lat(), lat)
+                                && floatEqual(pos.lng(), lng)) {
+                            return markers[i];
+                        }
+                    }
+		        }
 
 				return null;
 			},

@@ -6,7 +6,7 @@
 
 /* Controllers */
 
-function EventCtrl($scope, $http, $location, $compile, $filter, mailUtils, mapService, eventService, chatService, $anchorScroll, $modal, errorService) {
+function EventCtrl($scope, $http, $location, $compile, $filter, mailUtils, mapService, eventService, chatService, $anchorScroll, $modal, errorService, snapRemote) {
 	//////////////  ATTRIBUTS  ///////////////////
 	$scope.items = [
 	                  { id: "CAR", name: 'en voiture' },
@@ -28,7 +28,11 @@ function EventCtrl($scope, $http, $location, $compile, $filter, mailUtils, mapSe
         car : false,
         autostop : false
     }
-
+    $scope.snapOptions = {
+        hyperextensible: true,
+        minPosition: -500
+    }
+    $scope.newMessage = false;
 	//////////////  SCOPE METHODS  ///////////////////
     $scope.setFilterToCar = function(){
         if($scope.filter && $scope.filter.car){
@@ -203,7 +207,7 @@ function EventCtrl($scope, $http, $location, $compile, $filter, mailUtils, mapSe
     	$scope.editMode = value;	
     };
     $scope.openSubscriberInfo = function(subscriber) {
-    	var marker = mapService.findMarkerByLatLng($scope.myMarkers, subscriber.address.location.lat, subscriber.address.location.lng);
+    	var marker = mapService.findMarkerByLatLng($scope.getMarkers(), subscriber.address.location.lat, subscriber.address.location.lng);
     	$scope.openMarkerInfo(marker);
     };
 	$scope.openMarkerInfo = function(marker) {
@@ -296,17 +300,20 @@ function EventCtrl($scope, $http, $location, $compile, $filter, mailUtils, mapSe
     };
 
     ///////////////  CHAT ////////////////////////////////
-
+    $scope.openChat = function(){
+        snapRemote.toggle('right');
+        $scope.chat.newMessage = false;
+    };
     $scope.createTopic = function(subscriber){
         chatService.createTopic($scope.idEvent, subscriber, eventService.getCurrentSubscriber()).then(function(){
-            $scope.scrollTo('discussion');
+            $scope.openChat();
         }, function(){
             console.log("Erreur à la creation d'un topic");
         });
     };
     $scope.createTopicForCar = function(){
         chatService.createTopicForCar($scope.idEvent, $scope.currentCar).then(function(){
-            $scope.scrollTo('discussion');
+            $scope.openChat();
         });
     };
     $scope.sendMessageToWall = function(currentMessage){
@@ -468,7 +475,7 @@ function EventCtrl($scope, $http, $location, $compile, $filter, mailUtils, mapSe
         $scope.currentCar = car;
     });
 
-    chatService.init($scope);
+    chatService.init($scope, 'chatmessage.html');
 
     var id = extractFromUrl($location.absUrl());
     $scope.idEvent = id;

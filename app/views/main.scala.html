@@ -7,37 +7,40 @@
 <html lang="@lang().code()" ng-app="covoiturage">
   <head>
     <title>@title</title>
-    
+
     <!-- Le meta -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Mon covoiturage - le site de covoiturage social">
-    <meta name="author" content="Larousso">
-    
-    <!-- Le scripts -->
-	<script src="@routes.Application.jsRoutes" defer="defer"></script>
-    <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
-	<!--<script src="@routes.Assets.at("js/bootstrap.min.js")"></script>-->
+    <meta name="author" content="Alexandre Delègue">
 
-    <!-- Le styles -->
-    <link href="@routes.Assets.at("stylesheets/main.min.css")" rel="stylesheet" />
-    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css">
-    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap-theme.min.css">
-<!--
-    <link href="@routes.Assets.at("css/bootstrap.min.css")" rel="stylesheet" />
-	<link href="@routes.Assets.at("css/bootstrap-theme.min.css")" rel="stylesheet" />
--->
+      <!-- Le scripts -->
+      <script src="@routes.Application.jsRoutes" defer="defer"></script>
+      <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
+      <!--<script src="@routes.Assets.at("js/bootstrap.min.js")"></script>-->
 
-    <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
-    <!--[if lt IE 9]>
-      <!--<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>-->
-    <![endif]-->
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.4/angular.min.js"></script>
-    <!--
-    <script type="text/javascript" src="@routes.Assets.at("js/lib/angular.js")"></script>
-    -->
+      <!-- Le styles -->
+      <link href="@routes.Assets.at("stylesheets/main.min.css")" rel="stylesheet" />
+      <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css">
+      <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap-theme.min.css">
+
+      <link href="@routes.Assets.at("css/snap.css")" rel="stylesheet" />
+      <link href="@routes.Assets.at("css/angular-snap.min.css")" rel="stylesheet" />
+      <!--
+          <link href="@routes.Assets.at("css/bootstrap.min.css")" rel="stylesheet" />
+          <link href="@routes.Assets.at("css/bootstrap-theme.min.css")" rel="stylesheet" />
+      -->
+
+      <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+      <!--[if lt IE 9]>
+        <!--<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>-->
+      <![endif]-->
+      <script type="text/javascript" src="@routes.Assets.at("js/lib/angular.js")"></script>
+    <script type="text/javascript" src="@routes.Assets.at("js/lib/snap.min.js")"></script>
+      <script type="text/javascript" src="@routes.Assets.at("js/app/directives/angular-snap.min.js")"></script>
+
     <script type="text/javascript" src="@routes.Assets.at("js/app/directives/ui-bootstrap-tpls.min.js")"></script>
-    <script type="text/javascript" src="@routes.Assets.at("js/app/menu/app.js")"></script>
+      <script type="text/javascript" src="@routes.Assets.at("js/app/menu/app.js")"></script>
     <script type="text/javascript" src="@routes.Assets.at("js/app/menu/controller.js")"></script>
 
 
@@ -46,14 +49,15 @@
 
   <body>
 
+
       <nav class="navbar navbar-inverse navbar-fixed-top" ng-controller="MenuCtrl">
-  <div class="navbar-header">
-      <a class="navbar-brand" href="@routes.Application.index()">Mon covoiturage</a>
-  <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
-      <span class="icon-bar"></span>
-      <span class="icon-bar"></span>
-      <span class="icon-bar"></span>
-      </button>
+      <div class="navbar-header">
+          <a class="navbar-brand" href="@routes.Application.index()">Mon covoiturage</a>
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          </button>
       </div>
   <div class="navbar-header navbar-right">
   <div class="btn-group pull-right">
@@ -97,28 +101,25 @@
       </div>
       </nav>
 
-  <div class="container">
-      @if(flash.contains(Application.FLASH_ERROR_KEY)) {
-  <div class="alert alert-error">
-      @flash().get(Application.FLASH_ERROR_KEY)
-      </div>
-      }
-      @if(flash.contains(Application.FLASH_MESSAGE_KEY)) {
-  <div class="alert alert-success">
-      @flash().get(Application.FLASH_MESSAGE_KEY)
-      </div>
-      }
-      @content
+      <div class="container" >
+          @if(flash.contains(Application.FLASH_ERROR_KEY)) {
+          <div class="alert alert-danger">
+              @flash().get(Application.FLASH_ERROR_KEY)
+              </div>
+              }
+              @if(flash.contains(Application.FLASH_MESSAGE_KEY)) {
+          <div class="alert alert-success">
+              @flash().get(Application.FLASH_MESSAGE_KEY)
+              </div>
+              }
+              @content
 
-  <hr>
+          <hr>
 
-      <footer>
-      <!--
-  <p>&copy; 2012-2013 Play! Authenticate. Licensed under Apache License, Version 2.0. View details <a href="https://github.com/joscha/play-authenticate/blob/master/LICENSE">here</a>.</p>
-  <p>
-      <small>Styles by <a href="http://twitter.github.com/bootstrap/index.html" target="_blank">Twitter Bootstrap</a> &middot; Provider icons by <a href="http://prlloyd.com/Pf4al8" target="_blank">Paul Robert Lloyd</a></small></p>
-      -->
-      </footer>
+          <footer>
+
+          </footer>
       </div> <!-- /container -->
+
   </body>
 </html>

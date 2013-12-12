@@ -252,11 +252,12 @@ angular.module('chatModule', [], function($provide){
         var $onMessageAddedOnWallListeners = new Array();
 
         $chatService = {
-            init : function($scope){
+            init : function($scope, template){
                 $data = $scope;
                 $data.chat = {
                     messages : new Array(),
                     topics : new Array(),
+                    template : template,
                     currentTopic : null
                 };
                 $data.wall = {
@@ -456,6 +457,7 @@ angular.module('chatModule', [], function($provide){
                                         topic.alert = 1;
                                     }
                                 }
+                                $data.chat.newMessage = true;
                             }
                         }
                     }

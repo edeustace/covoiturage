@@ -2,3 +2,34 @@ body {
   padding-top: 50px;
   padding-bottom: 20px;
 }
+
+.scrollable{
+    overflow: auto;
+    -webkit-transition-property: top, bottom;
+    transition-property: top, bottom;
+    -webkit-transition-duration: .2s, .2s;
+    transition-duration: .2s, .2s;
+    -webkit-transition-timing-function: linear, linear;
+    transition-timing-function: linear, linear;
+    -webkit-overflow-scrolling: touch;
+}
+
+#content {
+    background-color: white;
+    padding-top: 50px;
+    -moz-box-shadow: 0 0 20px #888;
+      -webkit-box-shadow: 0 0 20px #888;
+      box-shadow: 0 0 20px #888;
+}
+
+#chatZone {
+    width: 500px;
+    padding-top: 60px;
+}
+
+
+.chatMessages .popover  {
+    position: relative;
+    display: block;
+    float: left;
+}

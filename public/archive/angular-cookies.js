@@ -1,25 +1,14 @@
 /**
- * @license AngularJS v1.2.4
- * (c) 2010-2014 Google, Inc. http://angularjs.org
+ * @license AngularJS v1.0.2
+ * (c) 2010-2012 Google, Inc. http://angularjs.org
  * License: MIT
  */
-(function(window, angular, undefined) {'use strict';
+(function(window, angular, undefined) {
+'use strict';
 
 /**
  * @ngdoc overview
  * @name ngCookies
- * @description
- *
- * # ngCookies
- *
- * The `ngCookies` module provides a convenient wrapper for reading and writing browser cookies. 
- *
- * {@installModule cookies}
- *
- * <div doc-module-components="ngCookies"></div>
- *
- * See {@link ngCookies.$cookies `$cookies`} and
- * {@link ngCookies.$cookieStore `$cookieStore`} for usage.
  */
 
 
@@ -35,21 +24,7 @@ angular.module('ngCookies', ['ng']).
    * Only a simple Object is exposed and by adding or removing properties to/from
    * this object, new cookies are created/deleted at the end of current $eval.
    *
-   * Requires the {@link ngCookies `ngCookies`} module to be installed.
-   *
    * @example
-   <doc:example>
-     <doc:source>
-       <script>
-         function ExampleController($cookies) {
-           // Retrieving a cookie
-           var favoriteCookie = $cookies.myFavorite;
-           // Setting a cookie
-           $cookies.myFavorite = 'oatmeal';
-         }
-       </script>
-     </doc:source>
-   </doc:example>
    */
    factory('$cookies', ['$rootScope', '$browser', function ($rootScope, $browser) {
       var cookies = {},
@@ -81,8 +56,7 @@ angular.module('ngCookies', ['ng']).
 
 
       /**
-       * Pushes all the cookies from the service to the browser and verifies if all cookies were
-       * stored.
+       * Pushes all the cookies from the service to the browser and verifies if all cookies were stored.
        */
       function push() {
         var name,
@@ -142,9 +116,6 @@ angular.module('ngCookies', ['ng']).
    * Provides a key-value (string-object) storage, that is backed by session cookies.
    * Objects put or retrieved from this storage are automatically serialized or
    * deserialized by angular's toJson/fromJson.
-   *
-   * Requires the {@link ngCookies `ngCookies`} module to be installed.
-   *
    * @example
    */
    factory('$cookieStore', ['$cookies', function($cookies) {
@@ -162,8 +133,7 @@ angular.module('ngCookies', ['ng']).
          * @returns {Object} Deserialized cookie value.
          */
         get: function(key) {
-          var value = $cookies[key];
-          return value ? angular.fromJson(value) : value;
+          return angular.fromJson($cookies[key]);
         },
 
         /**
@@ -197,6 +167,5 @@ angular.module('ngCookies', ['ng']).
       };
 
     }]);
-
 
 })(window, window.angular);

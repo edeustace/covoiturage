@@ -14,6 +14,8 @@
     <script type="text/javascript" src="@routes.Assets.at("js/app/directives/ui-bootstrap.min.js")"></script>
     <script type="text/javascript" src="@routes.Assets.at("js/app/directives/ui-bootstrap-tpls.js")"></script>
     -->
+
+    <script type="text/javascript" src="@routes.Assets.at("js/app/directives/chat-directive.js")"></script>
     <script type="text/javascript" src="@routes.Assets.at("js/app/directives/event.js")"></script>
     <script type="text/javascript" src="@routes.Assets.at("js/app/directives/keypress.js")"></script>
     <script type="text/javascript" src="@routes.Assets.at("js/app/directives/ui-map.js")"></script>
@@ -40,6 +42,8 @@
 
     <div ng-controller="EventCtrl" >
 
+
+    <div snap-content snap-options="snapOptions" id="content" class="scrollable" >
         <div class="row" >
             <div class="col-md-2">
 
@@ -186,7 +190,7 @@
                     </div>
                     <div class="modal-footer">
                         <button class="btn btn-primary" ng-click="updateLocomotion('AUTOSTOP');">Valider</button>
-                        <button class="btn btn-warning cancel" ng-click="cancel()">Annuler</button>
+                        <button class="btn btn-default cancel" ng-click="cancel()">Annuler</button>
                     </div>
                 </script>
 
@@ -235,8 +239,14 @@
                     <!-- PARTICIPANT COURANT -->
                     <h3>
                         <i><img ng-src="{{currentSubscriber.picto}}" /></i>{{currentSubscriber.surname}} {{currentSubscriber.name}}
-                        <a>
+                        <a href="javascript:void">
                             <i tooltip="Modifier mon profil" class="glyphicon glyphicon-edit" ng-show="!editMode" ng-click="setEditMode(true)"></i>
+                        </a>
+                        <a href="javascript:void">
+                            <i ng-show="!chat.newMessage" tooltip="Messages" class="glyphicon glyphicon-comment" snap-toggle="right"></i>
+                            <span ng-show="chat.newMessage" ng-click="openChat()" class="label label-danger">
+                                <i tooltip="Nouveau message" class="glyphicon glyphicon-comment" ></i>
+                            </span>
                         </a>
                     </h3>
                     <strong>Mon point de départ : </strong>
@@ -324,139 +334,72 @@
                     <div>
                     <form class="form-search">
                     Rechercher :
-                      <input class="form-control" type="text" ng-model="query" class="input-medium search-query">
+                        <div class="input-group" >
+                            <span class="input-group-addon"><i class="glyphicon glyphicon-search"></i></span>
+                            <input class="form-control" type="text" ng-model="query" class="input-medium search-query">
+                        </div>
                     </form>
                     </div>
-                    <table id="searchTextResults" class="table table-hover">
-                        <thead>
-                            <tr>
-                                <th>locomotion</th>
-                                <th>Nom</th>
-                                <th>Adresse</th>
-                                <th class="hidden-sm">places restantes</th>
-                                <th ng-show="currentSubscriber.locomotion == 'AUTOSTOP'">Reservations</th>
-                                <th ng-show="currentSubscriber.locomotion == 'CAR'">Prendre/Ne plus prendre</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr ng-repeat="subscriber in getSubscribers() | auto:filterUsers:markers  | filter:query" ng-show="!subscriber.current" class="{{subscriber.class}}" >
-                                <td>
-                                    <a ng-click="openSubscriberInfo(subscriber)"><img ng-src="{{subscriber.picto}}" /></a>
-                                    <a ng-click="createTopic(subscriber)" ><i class=" glyphicon glyphicon-comment" tooltip="Démarrer une discussion" ></i></a>
-                                </td>
-                                <td >{{subscriber.surname}} {{subscriber.name}}</td>
-                                <td>{{subscriber.address.description}}</td>
-                                <td class="hidden-sm">{{subscriber.car.nbPlaces - subscriber.car.passengers.length}}</td>
-                                <!-- CAR -->
-                                <td ng-show="currentSubscriber.locomotion == 'AUTOSTOP' && subscriber.normalCar" >
-                                    <button class="btn btn-success" type="button" ng-click="askForSeat(subscriber)" >Reserver une place</button>
-                                </td>
-                                <td ng-show="currentSubscriber.locomotion == 'AUTOSTOP' && subscriber.currentCar" >
-                                    <button class="btn btn-warning" type="button" ng-click="removePassenger(subscriber, currentSubscriber.userRef)" >Annuler ma reservation</button>
-                                </td>
-                                <td ng-show="currentSubscriber.locomotion == 'AUTOSTOP' && subscriber.iAskHim" >
-                                    <button class="btn btn-warning" type="button" ng-click="removeWaitingGuy(subscriber, currentSubscriber.userRef)" >Annuler ma reservation</button>
-                                </td>
-                                <td ng-show="currentSubscriber.locomotion == 'AUTOSTOP' && subscriber.heAskMeToBeInHisCar">
-                                    <button class="btn btn-warning" type="button" ng-click="removePossibleCar(currentSubscriber, subscriber.userRef)" >Decliner sa proposition</button>
-                                </td>
-                                <!-- AUTOSTOP -->
-                                <td ng-show="currentSubscriber.locomotion == 'CAR' && subscriber.free">
-                                    <button class="btn btn-success" type="button" ng-click="proposeSeat(subscriber)" >Proposer une place</button>
-                                </td>
-                                <td ng-show="currentSubscriber.locomotion == 'CAR' && subscriber.requestedByMe">
-                                    <button class="btn btn-warning" type="button" ng-click="removePossibleCar(subscriber, currentSubscriber.userRef)" >Annuler ma proposition</button>
-                                </td>
-                                <td ng-show="currentSubscriber.locomotion == 'CAR' && subscriber.waitingForMyCar">
-                                    <button class="btn btn-warning" type="button" ng-click="removeWaitingGuy(currentSubscriber, subscriber.userRef)" >Annuler ma proposition</button>
-                                </td>
-                                <td ng-show="currentSubscriber.locomotion == 'CAR' && subscriber.inMyCar">
-                                    <button class="btn btn-warning" type="button" ng-click="removePassenger(currentSubscriber, subscriber.userRef)" >Annuler la reservation</button>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    <div table-responsive>
+                        <table id="searchTextResults" class="table table-condensed">
+                            <thead>
+                                <tr>
+                                    <th>locomotion</th>
+                                    <th>Nom</th>
+                                    <th>Adresse</th>
+                                    <th ng-show="currentSubscriber.locomotion == 'AUTOSTOP'">Reservations</th>
+                                    <th ng-show="currentSubscriber.locomotion == 'CAR'">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="subscriber in getSubscribers() | auto:filterUsers:markers  | filter:query" ng-show="!subscriber.current" class="{{subscriber.class}}" >
+                                    <td>
+                                        <a ng-click="openSubscriberInfo(subscriber)" href="javascript:void"><img ng-src="{{subscriber.picto}}" /></a>
+                                        <a ng-click="createTopic(subscriber)" href="javascript:void"><i class=" glyphicon glyphicon-comment" tooltip="Démarrer une discussion" ></i></a>
+                                        <span tooltip="{{subscriber.car.nbPlaces - subscriber.car.passengers.length}} places restantes" class="badge" >{{subscriber.car.nbPlaces - subscriber.car.passengers.length}}</span>
+                                    </td>
+                                    <td >{{subscriber.surname}} {{subscriber.name}}</td>
+                                    <td>{{subscriber.address.description}}</td>
+                                    <!-- CAR -->
+                                    <td ng-show="currentSubscriber.locomotion == 'AUTOSTOP' && subscriber.normalCar" >
+                                        <button class="btn btn-success btn-xs" type="button" ng-click="askForSeat(subscriber)" >Reserver une place</button>
+                                    </td>
+                                    <td ng-show="currentSubscriber.locomotion == 'AUTOSTOP' && subscriber.currentCar" >
+                                        <button class="btn btn-warning btn-xs" type="button" ng-click="removePassenger(subscriber, currentSubscriber.userRef)" >Annuler ma reservation</button>
+                                    </td>
+                                    <td ng-show="currentSubscriber.locomotion == 'AUTOSTOP' && subscriber.iAskHim" >
+                                        <button class="btn btn-warning btn-xs" type="button" ng-click="removeWaitingGuy(subscriber, currentSubscriber.userRef)" >Annuler ma reservation</button>
+                                    </td>
+                                    <td ng-show="currentSubscriber.locomotion == 'AUTOSTOP' && subscriber.heAskMeToBeInHisCar">
+                                        <button class="btn btn-warning btn-xs" type="button" ng-click="removePossibleCar(currentSubscriber, subscriber.userRef)" >Decliner sa proposition</button>
+                                    </td>
+                                    <!-- AUTOSTOP -->
+                                    <td ng-show="currentSubscriber.locomotion == 'CAR' && subscriber.free">
+                                        <button class="btn btn-success btn-xs" type="button" ng-click="proposeSeat(subscriber)" >Proposer une place</button>
+                                    </td>
+                                    <td ng-show="currentSubscriber.locomotion == 'CAR' && subscriber.requestedByMe">
+                                        <button class="btn btn-warning btn-xs" type="button" ng-click="removePossibleCar(subscriber, currentSubscriber.userRef)" >Annuler ma proposition</button>
+                                    </td>
+                                    <td ng-show="currentSubscriber.locomotion == 'CAR' && subscriber.waitingForMyCar">
+                                        <button class="btn btn-warning btn-xs" type="button" ng-click="removeWaitingGuy(currentSubscriber, subscriber.userRef)" >Annuler ma proposition</button>
+                                    </td>
+                                    <td ng-show="currentSubscriber.locomotion == 'CAR' && subscriber.inMyCar">
+                                        <button class="btn btn-warning btn-xs" type="button" ng-click="removePassenger(currentSubscriber, subscriber.userRef)" >Annuler la reservation</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
+
             </div>
             <div class="col-md-2">
-            </div>
-        </div>
-
-
-        <!-- MUR DE DISCUSSION-->
-
-        <div class="row">
-            <div class="col-md-2">
-            </div>
-            <div class="col-md-5 well">
-                <p class="nav-header">
-                    Mur
-                </p>
-                    <textarea class="input-block-level form-control" rows="2" ng-model="wall.currentMessage" ui-keypress="{13:'sendMessageToWall(wall.currentMessage)'}" ></textarea>
-                <p ng-repeat="msg in wall.messages | orderBy: '-date' | limitTo: eltsInWall" class="dl-horizontalli">
-                    <strong ng-show="msg.from != currentSubscriber.userRef" tooltip-placement="left" tooltip="{{msg.date | date:'à HH:mm:ss le dd/MM'}}">
-                        {{getSubscriber(msg.from).surname}} {{getSubscriber(msg.from).name}} :
-                    </strong>
-                    <strong ng-show="msg.from == currentSubscriber.userRef" tooltip-placement="left" tooltip="{{msg.date | date:'à HH:mm:ss le dd/MM'}}">
-                        Moi :
-                    </strong>
-                    <br/>
-                    {{msg.message}}
-                    <small class="muted" ng-show="msg.statut && msg.statut == 'SENDING'">Envoi en cours</small>
-                    <small class="muted" ng-show="!msg.statut || msg.statut == 'RECEIVED'">Envoyé</small>
-                    <small class="text-error" ng-show="msg.statut && msg.statut == 'FAILURE'">Erreur le message n'a pas été envoyé</small>
-                </p>
-                <p>
-                    <a ng-click="eltsInWall = eltsInWall + 5 ">Plus ...</a>
-                    <a class="pull-right" ng-show="eltsInWall > 10" ng-click="eltsInWall = eltsInWall - 5 ">... moins</a>
-                </p>
-            </div>
-
-            <div class="col-md-5 well" id="discussion">
-                <div class="tabbable tabs-right" >
-                    <ul class="nav nav-tabs">
-                        <li class="nav-header">Mes conversations</li>
-                        <li ng-repeat="topic in chat.topics  | orderBy: '-update'" ng-class="{'active' : topic.active}">
-                            <a href="javascript:void" ng-click="loadMessages(topic)">
-                                <ul ng-show="topic.categorie=='chat'">
-                                    <li ng-show="chaters != currentSubscriber.userRef" ng-repeat="chaters in topic.subscribers">{{getSubscriber(chaters).surname}} {{getSubscriber(chaters).name}}, </li>
-                                </ul>
-                                <ul ng-show="topic.categorie=='carChat'">
-                                    <li>Ma voiture</li>
-                                </ul>
-                                <span ng-show="topic.alert" class="badge badge-important">message</span>
-                                <small class="muted" ng-show="topic.statut && topic.statut == 'SENDING'">Creation en cours</small>
-                                <small class="muted" ng-show="!topic.statut || topic.statut == 'RECEIVED'" >{{topic.update | date:'HH:mm:ss le dd/MM'}}</small>
-                                <small class="text-error" ng-show="topic.statut && topic.statut == 'FAILURE'"><span class="badge badge-important">!</span>Erreur la conversation n'a pas été créé</small>
-                            </a>
-                        </li>
-                    </ul>
-
-                    <div class="tab-content" class="col-md-3">
-                        <div class="row">
-                            <p class="nav-header">
-                                Ma conversation avec : <strong ng-show="chaters != currentSubscriber.userRef" ng-repeat="chaters in chat.currentTopic.subscribers">{{getSubscriber(chaters).surname}} {{getSubscriber(chaters).name}}, </strong>
-                                <button ng-show="!editAddTopic" class="btn btn-xs" type="button" ng-click="setEditAddTopic(true)" tooltip="Ajouter à la conversation">+</button>
-                                <button ng-show="editAddTopic" class="btn btn-default btn-xs" type="button" ng-click="setEditAddTopic(false)" tooltip="Ajouter à la conversation">-</button>
-                            </p>
-
-                            <div ng-show="editAddTopic">
-                                <div>
-                                    <alert ng-repeat="newSubsc in chat.currentTopic.newTopicSubscribers" type="info" close="removeNewTopicSubscriber($index)">{{getSubscriber(newSubsc).surname}} {{getSubscriber(newSubsc).name}}</alert>
-                                    <button ng-show="chat.currentTopic.newTopicSubscribers" class="btn btn-default btn-primary" type="button" ng-click="addToTopic()">Valider</button>
-                                </div>
-                                <div>
-                                    Rechercher : <input class="form-control" class="search-query" type="text" ng-model="chat.currentTopic.userToAddToTopic" typeahead="subsc.userRef as subsc.name for subsc in subscribers | filter:$viewValue" Z>
-                                </div>
-                                <br/>
-                            </div>
-                            <small class="muted" ng-show="chat.currentTopic.addNewSubscribersStatut == 'SENDING'">Ajout à la conversation en cours</small>
-                            <small class="text-error" ng-show="chat.currentTopic.addNewSubscribersStatut == 'FAILURE'"><span class="badge badge-important">!</span>Erreur lors de l'ajout à la conversation</small>
-                            <!--
-                            <p >
-                                <a ng-click="eltsInChat = eltsInChat + 5 ">Plus ...</a>
-                            </p>
-                            -->
+                <!--
+                <script type="text/ng-template" id="template/chat/chat.html">
+                    <div class="popover left" ng-class="{ in: isOpen(), fade: animation() }" >
+                        <div class="arrow"></div>
+                        <h3 class="popover-title">Popover left : {{content.messages}}</h3>
+                        <div class="popover-content">
                             <div style="max-height:200px;overflow:auto;" scroll-glue >
                                 <p ng-repeat="message in chat.messages | orderBy: 'date' " >
                                     <strong ng-show="message.from != currentSubscriber.userRef" tooltip-placement="left" tooltip="{{message.date | date:'à HH:mm:ss le dd/MM'}}">
@@ -470,15 +413,142 @@
                                     <small class="muted" ng-show="message.from == currentSubscriber.userRef && !message.statut || message.statut == 'RECEIVED'">Envoyé {{message.date | date:'à HH:mm:ss le dd/MM'}}</small>
                                     <small class="text-error" ng-show="message.from == currentSubscriber.userRef && message.statut && message.statut == 'FAILURE'">Erreur le message n'a pas été envoyé</small>
                                 </p>
+                                <textarea class="form-control" rows="1" ng-model="chat.currentMessage" ui-keypress="{13:'sendMessage(chat.currentMessage)'}" ></textarea>
                             </div>
                         </div>
+                    </div>
+                </script>
 
-                        <div class="row pull-right">
-                            <textarea class="form-control" class="input-xlarge" ng-model="chat.currentMessage" ui-keypress="{13:'sendMessage(chat.currentMessage)'}" ></textarea>
-                        </div>
+                <div class="affix" id="sidebar">
+                    <div class="list-group">
+                            <a href="javascript:void" class="list-group-item header">
+                                Mes conversations
+                            </a>
+                            <a class="list-group-item" ng-repeat="topic in chat.topics  | orderBy: '-update'"
+                               ng-class="{'active' : topic.active}"
+                               chat-messages
+                               href="javascript:void" ng-click="loadMessages(topic)">
+
+                                <span ng-show="topic.categorie=='chat'" >
+                                    <small  ng-show="chaters != currentSubscriber.userRef" ng-repeat="chaters in topic.subscribers">
+                                        {{getSubscriber(chaters).surname}} {{getSubscriber(chaters).name}},
+                                    </small>
+                                </span>
+                                <ul ng-show="topic.categorie=='carChat'">
+                                    <li>Ma voiture</li>
+                                </ul>
+                                <br/>
+                                <span ng-show="topic.alert" class="badge badge-important">message</span>
+                                <small class="text-muted" ng-show="topic.statut && topic.statut == 'SENDING'">Creation en cours</small>
+                                <small class="text-muted" ng-show="!topic.statut || topic.statut == 'RECEIVED'" >{{topic.update | date:'HH:mm:ss le dd/MM'}}</small>
+                                <small class="text-danger" ng-show="topic.statut && topic.statut == 'FAILURE'"><span class="badge badge-important">!</span>Erreur la conversation n'a pas été créé</small>
+                            </a>
                     </div>
                 </div>
+                -->
+            </div>
+            <!--<div class="col-md-2">
+
+            </div>-->
+        </div>
+
+
+        <!-- MUR DE DISCUSSION-->
+
+        <div class="row">
+            <div class="col-md-2">
+            </div>
+            <div class="col-md-5">
+                <ul class="list-group">
+                    <li class="list-group-item">
+                        <h4>Ecrivez un message !</h4>
+                        <textarea class="form-control" rows="2" ng-model="wall.currentMessage" ui-keypress="{13:'sendMessageToWall(wall.currentMessage)'}" ></textarea>
+                    </li>
+                    <li class="list-group-item" ng-repeat="msg in wall.messages | orderBy: '-date' | limitTo: eltsInWall" >
+                        <strong ng-show="msg.from != currentSubscriber.userRef" tooltip-placement="left" tooltip="{{msg.date | date:'à HH:mm:ss le dd/MM'}}">
+                            {{getSubscriber(msg.from).surname}} {{getSubscriber(msg.from).name}} :
+                        </strong>
+                        <strong ng-show="msg.from == currentSubscriber.userRef" tooltip-placement="left" tooltip="{{msg.date | date:'à HH:mm:ss le dd/MM'}}">
+                            Moi :
+                        </strong>
+                        <br/>
+                        {{msg.message}}
+                        <small class="muted" ng-show="msg.statut && msg.statut == 'SENDING'">Envoi en cours</small>
+                        <small class="muted" ng-show="!msg.statut || msg.statut == 'RECEIVED'">Envoyé</small>
+                        <small class="text-error" ng-show="msg.statut && msg.statut == 'FAILURE'">Erreur le message n'a pas été envoyé</small>
+                    </li>
+                    <li class="list-group-item">
+                        <a ng-click="eltsInWall = eltsInWall + 5 ">Plus ...</a>
+                        <a class="pull-right" ng-show="eltsInWall > 10" ng-click="eltsInWall = eltsInWall - 5 ">... moins</a>
+                    </li>
+                </ul>
+            </div>
+
+
+        </div>
+
+
+    </div>
+    <div snap-drawer="right" id="chatZone" class="row pull-right">
+        <div class="col-md-8 well">
+            <div style="max-height:200px;overflow:auto;" scroll-glue >
+                <p ng-repeat="message in chat.messages | orderBy: 'date' ">
+                <!--
+                <div class="chatMessages" ng-repeat="message in chat.messages | orderBy: 'date' ">
+                    <div class="popover" ng-class="{left : message.from != currentSubscriber.userRef, right : message.from == currentSubscriber.userRef}" >
+                        <div class="arrow"></div>
+                        <div class="popover-content">
+                    -->
+                            <strong ng-show="message.from != currentSubscriber.userRef" >
+                                {{getSubscriber(message.from).surname}} {{getSubscriber(message.from).name}} :
+                            </strong>
+                            <strong ng-show="message.from == currentSubscriber.userRef" >
+                                Moi :
+                            </strong>
+                            {{message.message}} <br/>
+                            <small class="muted" ng-show="message.from == currentSubscriber.userRef && message.statut && message.statut == 'SENDING'">Envoi en cours</small>
+                            <small class="muted" ng-show="message.from == currentSubscriber.userRef && !message.statut || message.statut == 'RECEIVED'">Envoyé {{message.date | date:'à HH:mm:ss le dd/MM'}}</small>
+                            <small class="text-error" ng-show="message.from == currentSubscriber.userRef && message.statut && message.statut == 'FAILURE'">Erreur le message n'a pas été envoyé</small>
+                    <!--
+                        </div>
+                    </div>
+                    </div>-->
+                </p>
+                <br/>
+                <textarea class="form-control" rows="1" ng-model="chat.currentMessage" ui-keypress="{13:'sendMessage(chat.currentMessage)'}" ></textarea>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+            <div class="list-group">
+                <a href="javascript:void" class="list-group-item header">
+                    Mes conversations
+                </a>
+                <a class="list-group-item" ng-repeat="topic in chat.topics  | orderBy: '-update'"
+                   ng-class="{'active' : topic.active}"
+                   chat-messages
+                   href="javascript:void" ng-click="loadMessages(topic)">
+
+                                        <span ng-show="topic.categorie=='chat'" >
+                                            <small  ng-show="chaters != currentSubscriber.userRef" ng-repeat="chaters in topic.subscribers">
+                                                {{getSubscriber(chaters).surname}} {{getSubscriber(chaters).name}},
+                                            </small>
+                                        </span>
+                    <ul ng-show="topic.categorie=='carChat'">
+                        <li>Ma voiture</li>
+                    </ul>
+                    <span ng-show="topic.alert" class="label label-danger">message</span>
+                    <br/>
+                    <small class="text-muted" ng-show="topic.statut && topic.statut == 'SENDING'">Creation en cours</small>
+                    <small class="text-muted" ng-show="!topic.statut || topic.statut == 'RECEIVED'" >{{topic.update | date:'HH:mm:ss le dd/MM'}}</small>
+                    <small class="text-danger" ng-show="topic.statut && topic.statut == 'FAILURE'"><span class="badge badge-important">!</span>Erreur la conversation n'a pas été créé</small>
+                </a>
             </div>
         </div>
     </div>
+
+    </div>
+
+</div>
+
 }
