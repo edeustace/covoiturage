@@ -457,7 +457,9 @@ angular.module('chatModule', [], function($provide){
                                         topic.alert = 1;
                                     }
                                 }
-                                $data.chat.newMessage = true;
+                                if(message.from != idCurrentUser){
+                                    $data.chat.newMessage = true;
+                                }
                             }
                         }
                     }
