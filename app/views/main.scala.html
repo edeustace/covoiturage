@@ -5,7 +5,7 @@
 
 <!DOCTYPE html>
 <html lang="@lang().code()" ng-app="covoiturage">
-  <head>
+<head>
     <title>@title</title>
 
     <!-- Le meta -->
@@ -14,88 +14,88 @@
     <meta name="description" content="Mon covoiturage - le site de covoiturage social">
     <meta name="author" content="Alexandre Delègue">
 
-      <!-- Le scripts -->
-      <script src="@routes.Application.jsRoutes" defer="defer"></script>
-      <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
-      <!--<script src="@routes.Assets.at("js/bootstrap.min.js")"></script>-->
+    <!-- Le scripts -->
+    <script src="@routes.Application.jsRoutes" defer="defer"></script>
+    <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
+    <!--<script src="@routes.Assets.at("js/bootstrap.min.js")"></script>-->
 
-      <!-- Le styles -->
-      <link href="@routes.Assets.at("stylesheets/main.min.css")" rel="stylesheet" />
-      <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css">
-      <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap-theme.min.css">
+    <!-- Le styles -->
+    <link href="@routes.Assets.at("stylesheets/main.min.css")" rel="stylesheet" />
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css">
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap-theme.min.css">
 
-      <!--
-          <link href="@routes.Assets.at("css/bootstrap.min.css")" rel="stylesheet" />
-          <link href="@routes.Assets.at("css/bootstrap-theme.min.css")" rel="stylesheet" />
-      -->
+    <!--
+    <link href="@routes.Assets.at("css/bootstrap.min.css")" rel="stylesheet" />
+    <link href="@routes.Assets.at("css/bootstrap-theme.min.css")" rel="stylesheet" />
+    -->
 
-      <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
-      <!--[if lt IE 9]>
-        <!--<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>-->
-      <![endif]-->
-      <script type="text/javascript" src="@routes.Assets.at("js/lib/angular.js")"></script>
+    <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+    <!--<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>-->
+    <![endif]-->
+    <script type="text/javascript" src="@routes.Assets.at("js/lib/angular.js")"></script>
 
     <script type="text/javascript" src="@routes.Assets.at("js/app/directives/ui-bootstrap-tpls.min.js")"></script>
-      <script type="text/javascript" src="@routes.Assets.at("js/app/menu/app.js")"></script>
+    <script type="text/javascript" src="@routes.Assets.at("js/app/menu/app.js")"></script>
     <script type="text/javascript" src="@routes.Assets.at("js/app/menu/controller.js")"></script>
 
 
 
-  </head>
+</head>
 
-  <body>
+<body>
 
 
-      <nav class="navbar navbar-inverse navbar-fixed-top" ng-controller="MenuCtrl">
-      <div class="navbar-header">
-          <a class="navbar-brand" href="@routes.Application.index()">Mon covoiturage</a>
-      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-          </button>
-      </div>
-  <div class="navbar-header navbar-right">
-  <div class="btn-group pull-right">
-      @subjectPresentOr() {
-      @defining(Application.getLocalUser(session())) { user =>
-      <a class="btn btn-default dropdown-toggle" data-toggle="dropdown" href="#">
-      <i class="glyphicon glyphicon-user"></i> @user.getSurname() @user.getName()
-      <span class="caret"></span>
-      </a>
-  <ul class="dropdown-menu">
-  <li><a href="@routes.Application.profile()">@Messages("playauthenticate.navigation.profile")</a></li>
-  <li><a href="@routes.Account.link()">@Messages("playauthenticate.navigation.link_more")</a></li>
-  <li class="divider"></li>
-  <li><a href="@com.feth.play.module.pa.controllers.routes.Authenticate.logout()"><i class="glyphicon glyphicon-off"></i> @Messages("playauthenticate.navigation.logout")</a></li>
-      </ul>
-      }
-      }{
-      <a href="@routes.Application.login()" class="btn btn-primary btn-xs @("disabled".when(nav == "login"))">@Messages("playauthenticate.navigation.login")</a>
-      }
-      </div>
-      </div>
-  <div class="navbar-collapse collapse">
-  <ul class="nav navbar-nav">
-  <li class="@("active".when(nav == ""))"><a href="@routes.Application.index()">@Messages("playauthenticate.navigation.home")</a></li>
-  <li class="@("active".when(nav == "createEvent"))"><a href="@routes.Application.createEvent()">@Messages("playauthenticate.navigation.createEvent")</a></li>
+<nav class="navbar navbar-inverse navbar-fixed-top" ng-controller="MenuCtrl">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" ng-init="navCollapsed = true" ng-click="navCollapsed = !navCollapsed">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="@routes.Application.index()">Mon covoiturage</a>
+    </div>
+    <div class="navbar-header navbar-right">
+        <div class="btn-group pull-right">
+        @subjectPresentOr() {
+            @defining(Application.getLocalUser(session())) { user =>
+                <a class="btn btn-default dropdown-toggle" data-toggle="dropdown" href="#">
+                    <i class="glyphicon glyphicon-user"></i> @user.getSurname() @user.getName()
+                    <span class="caret"></span>
+                </a>
+                <ul class="dropdown-menu">
+                    <li><a href="@routes.Application.profile()">@Messages("playauthenticate.navigation.profile")</a></li>
+                    <li><a href="@routes.Account.link()">@Messages("playauthenticate.navigation.link_more")</a></li>
+                    <li class="divider"></li>
+                    <li><a href="@com.feth.play.module.pa.controllers.routes.Authenticate.logout()"><i class="glyphicon glyphicon-off"></i> @Messages("playauthenticate.navigation.logout")</a></li>
+                </ul>
+            }
+        }{
+            <a href="@routes.Application.login()" class="btn btn-primary btn-xs @("disabled".when(nav == "login"))">@Messages("playauthenticate.navigation.login")</a>
+        }
+        </div>
+    </div>
+    <div class="navbar-collapse collapse" ng-class="!navCollapsed && 'in'">
+        <ul class="nav navbar-nav">
+            <li class="@("active".when(nav == ""))"><a href="@routes.Application.index()">@Messages("playauthenticate.navigation.home")</a></li>
+            <li class="@("active".when(nav == "createEvent"))"><a href="@routes.Application.createEvent()">@Messages("playauthenticate.navigation.createEvent")</a></li>
 
-      @subjectNotPresent() {
-  <li class="@("active".when(nav == "signup"))"><a href="@routes.Application.signup()">@Messages("playauthenticate.navigation.signup")</a></li>
-      }
-      @subjectPresent() {
-      @defining(Application.getLocalUser(session())) { user =>
-  <li ng-class=" {'dropdown open' : open, 'dropdown' : !open}" >
-      <a href="javascript:void" ng-click="openOrClose('@user.getId()')" >@Messages("playauthenticate.navigation.myEvents")</a>
-  <ul class="dropdown-menu">
-  <li ng-repeat="event in events" ><a ng-href="{{event.links.page}}" >{{event.name}}</a></li>
-      </ul>
-      </li>
-      }
-      }
-      </ul>
-      </div>
-      </nav>
+            @subjectNotPresent() {
+                <li class="@("active".when(nav == "signup"))"><a href="@routes.Application.signup()">@Messages("playauthenticate.navigation.signup")</a></li>
+            }
+            @subjectPresent() {
+            @defining(Application.getLocalUser(session())) { user =>
+            <li class="dropdown" >
+                <a href="javascript:void" class="dropdown-toggle" ng-click="openOrClose('@user.getId()')" >@Messages("playauthenticate.navigation.myEvents")</a>
+                <ul class="dropdown-menu">
+                    <li ng-repeat="event in events" ><a ng-href="{{event.links.page}}" >{{event.name}}</a></li>
+                </ul>
+            </li>
+            }
+            }
+        </ul>
+    </div>
+</nav>
 
       <div class="container mainContent"  >
           @if(flash.contains(Application.FLASH_ERROR_KEY)) {
