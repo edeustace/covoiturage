@@ -238,96 +238,94 @@
 
             <div ng-show="currentSubscriber" class="col-md-4">
                 <br/>
-                <div>
+                <!-- PARTICIPANT COURANT -->
+                <h3>
+                    <i><img ng-src="{{currentSubscriber.picto}}" /></i>{{currentSubscriber.surname}} {{currentSubscriber.name}}
+                    <a href="javascript:void">
+                        <i tooltip="Modifier mon profil" class="glyphicon glyphicon-edit" ng-show="!editMode" ng-click="setEditMode(true)"></i>
+                    </a>
+                    <a href="javascript:void">
+                        <i ng-show="!chat.newMessage" tooltip="Messages" class="glyphicon glyphicon-comment" snap-toggle="right"></i>
+                        <span ng-show="chat.newMessage" ng-click="openChat()" class="label label-danger">
+                            <i tooltip="Nouveau message" class="glyphicon glyphicon-comment" ></i>
+                        </span>
+                    </a>
+                </h3>
+                <strong>Mon point de départ : </strong>
 
+                <address ng-show="!editMode">
+                  <i class="glyphicon glyphicon-globe"></i> {{currentSubscriber.address.description}}
+                </address>
+                <strong>Moyen de transport : </strong>
+                <span ng-show="currentSubscriber.locomotion == 'CAR'">en voiture</span>
+                <span ng-show="currentSubscriber.locomotion == 'AUTOSTOP'">à pied</span>
+                <br/>
 
-                    <!-- PARTICIPANT COURANT -->
-                    <h3>
-                        <i><img ng-src="{{currentSubscriber.picto}}" /></i>{{currentSubscriber.surname}} {{currentSubscriber.name}}
-                        <a href="javascript:void">
-                            <i tooltip="Modifier mon profil" class="glyphicon glyphicon-edit" ng-show="!editMode" ng-click="setEditMode(true)"></i>
-                        </a>
-                        <a href="javascript:void">
-                            <i ng-show="!chat.newMessage" tooltip="Messages" class="glyphicon glyphicon-comment" snap-toggle="right"></i>
-                            <span ng-show="chat.newMessage" ng-click="openChat()" class="label label-danger">
-                                <i tooltip="Nouveau message" class="glyphicon glyphicon-comment" ></i>
-                            </span>
-                        </a>
-                    </h3>
-                    <strong>Mon point de départ : </strong>
-
-                    <address ng-show="!editMode">
-                      <i class="glyphicon glyphicon-globe"></i> {{currentSubscriber.address.description}}
-                    </address>
-                    <strong>Moyen de transport : </strong>
-                    <span ng-show="currentSubscriber.locomotion == 'CAR'">en voiture</span>
-                    <span ng-show="currentSubscriber.locomotion == 'AUTOSTOP'">à pied</span>
-                    <br/>
-
-                    <div ng-show="currentCar" class="well">
-                        <strong>Ma voiture :</strong><br/>
-                        <strong>Le conducteur :</strong> {{currentCar.driver.name}} <br/>
-                        <div ng-show="currentCar.passengers.length==0"><strong>Aucun passager</strong><br/></div>
-                        <div ng-show="currentCar.passengers.length>0">
-                            <strong>Les passagers : </strong>
-                            <ul >
-                                <li ng-repeat="passenger in currentCar.passengers" >
-                                    {{passenger.name}}
-                                    <button ng-show="passenger.deleteRight" class="btn btn-default btn-xs" type="button" ng-click="removePassenger(currentCar.driver.subscriber, passenger.subscriber.userRef)" >Annuler la reservation</button>
-                                    </td>
-                                </li>
-                            </ul>
-                        </div>
-                        {{currentCar.driver.subscriber.car.nbPlaces - currentCar.driver.subscriber.car.passengers.length}} places restantes
-                        <a ng-click="createTopicForCar(subscriber)" ><i class=" glyphicon glyphicon-comment" tooltip="Démarrer une discussion pour cette voiture" ></i></a>
+                <div ng-show="currentCar" class="well">
+                    <strong>Ma voiture :</strong><br/>
+                    <strong>Le conducteur :</strong> {{currentCar.driver.name}} <br/>
+                    <div ng-show="currentCar.passengers.length==0"><strong>Aucun passager</strong><br/></div>
+                    <div ng-show="currentCar.passengers.length>0">
+                        <strong>Les passagers : </strong>
+                        <ul >
+                            <li ng-repeat="passenger in currentCar.passengers" >
+                                {{passenger.name}}
+                                <button ng-show="passenger.deleteRight" class="btn btn-default btn-xs" type="button" ng-click="removePassenger(currentCar.driver.subscriber, passenger.subscriber.userRef)" >Annuler la reservation</button>
+                                </td>
+                            </li>
+                        </ul>
                     </div>
+                    {{currentCar.driver.subscriber.car.nbPlaces - currentCar.driver.subscriber.car.passengers.length}} places restantes
+                    <a ng-click="createTopicForCar(subscriber)" ><i class=" glyphicon glyphicon-comment" tooltip="Démarrer une discussion pour cette voiture" ></i></a>
+                </div>
 
-                    <div ng-show="currentSubscriber.locomotion == 'AUTOSTOP'">
-                        <div ng-show="!currentSubscriber.carRef">
-                            <strong ng-show="isThereWaitingAsk()">Mes demandes en attente :</strong>
-                            <ul>
-                                <li ng-repeat="subscriber in subscribers" ng-show="subscriber.iAskHim">
-                                    {{subscriber.surname}} {{subscriber.name}}
-                                    <button class="btn btn-warning btn-xs" type="button" ng-click="removeWaitingGuy(subscriber, currentSubscriber.userRef)" >Annuler</button>
-                                </li>
-                            </ul>
-                            <strong ng-show="currentSubscriber.possibleCars.length > 0">Les utilisateurs suivants me proposent leur voiture :</strong>
-                            <ul >
-                                <li ng-repeat="subscriber in subscribers" ng-show="subscriber.heAskMeToBeInHisCar">
-                                    {{subscriber.surname}} {{subscriber.name}}
-                                    <button class="btn btn-success btn-xs" type="button" ng-click="validatePassenger(subscriber, currentSubscriber.userRef)" >Accepter</button>
-                                    <button class="btn btn-warning btn-xs" type="button" ng-click="removePossibleCar(currentSubscriber, subscriber.userRef)" >Refuser</button>
-                                </li>
-                            </ul>
-                        </div>
+                <div ng-show="currentSubscriber.locomotion == 'AUTOSTOP'">
+                    <div ng-show="!currentSubscriber.carRef">
+                        <strong ng-show="isThereWaitingAsk()">Mes demandes en attente :</strong>
+                        <ul>
+                            <li ng-repeat="subscriber in subscribers" ng-show="subscriber.iAskHim">
+                                {{subscriber.surname}} {{subscriber.name}}
+                                <button class="btn btn-warning btn-xs" type="button" ng-click="removeWaitingGuy(subscriber, currentSubscriber.userRef)" >Annuler</button>
+                            </li>
+                        </ul>
+                        <strong ng-show="currentSubscriber.possibleCars.length > 0">Les utilisateurs suivants me proposent leur voiture :</strong>
+                        <ul >
+                            <li ng-repeat="subscriber in subscribers" ng-show="subscriber.heAskMeToBeInHisCar">
+                                {{subscriber.surname}} {{subscriber.name}}
+                                <button class="btn btn-success btn-xs" type="button" ng-click="validatePassenger(subscriber, currentSubscriber.userRef)" >Accepter</button>
+                                <button class="btn btn-warning btn-xs" type="button" ng-click="removePossibleCar(currentSubscriber, subscriber.userRef)" >Refuser</button>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
 
+                <div ng-show="currentSubscriber.locomotion == 'CAR'">
+                    <div ng-show="currentSubscriber.car &&  currentSubscriber.car.waitingList">
+                        <strong>En attente : </strong>
+                        <ul>
+                            <li ng-repeat="passenger in currentSubscriber.car.waitingList" >
+                                {{getSubscriber(passenger).surname}} {{getSubscriber(passenger).name}}
+                                <button class="btn btn-success btn-xs" type="button" ng-click="validatePassenger(currentSubscriber, passenger)" >Valider</button>
+                                <button class="btn btn-warning btn-xs" type="button" ng-click="removeWaitingGuy(currentSubscriber, passenger)" >Annuler</button>
+                            </li>
+                        </ul>
                     </div>
-                    <div ng-show="currentSubscriber.locomotion == 'CAR'">
-                        <div ng-show="currentSubscriber.car &&  currentSubscriber.car.waitingList">
-                            <strong>En attente : </strong>
-                            <ul>
-                                <li ng-repeat="passenger in currentSubscriber.car.waitingList" >
-                                    {{getSubscriber(passenger).surname}} {{getSubscriber(passenger).name}}
-                                    <button class="btn btn-success btn-xs" type="button" ng-click="validatePassenger(currentSubscriber, passenger)" >Valider</button>
-                                    <button class="btn btn-warning btn-xs" type="button" ng-click="removeWaitingGuy(currentSubscriber, passenger)" >Annuler</button>
-                                </li>
-                            </ul>
-                        </div>
-                        <div >
-                            <strong ng-show="isThereRequest()">Mes propositions en attente de validation : </strong>
-                            <ul>
-                                <li ng-repeat="subscriber in subscribers" ng-show="subscriber.requestedByMe">
-                                    {{subscriber.surname}} {{subscriber.name}}
-                                    <button class="btn btn-warning btn-xs" type="button" ng-click="removePossibleCar(subscriber, currentSubscriber.userRef)" >Annuler</button>
-                                </li>
-                            </ul>
-                        </div>
+                    <div >
+                        <strong ng-show="isThereRequest()">Mes propositions en attente de validation : </strong>
+                        <ul>
+                            <li ng-repeat="subscriber in subscribers" ng-show="subscriber.requestedByMe">
+                                {{subscriber.surname}} {{subscriber.name}}
+                                <button class="btn btn-warning btn-xs" type="button" ng-click="removePossibleCar(subscriber, currentSubscriber.userRef)" >Annuler</button>
+                            </li>
+                        </ul>
                     </div>
-                    <br/>
+                </div>
+                <br/>
 
 
 
                     <!-- TABLEAU DES PARTICIPANTS-->
+                <div ng-show="getSubscribers().length > 1">
                     <span><strong>Afficher : </strong></span>
                     <br/>
                      <div class="btn-group">
@@ -361,7 +359,7 @@
                                     <td>
                                         <a ng-click="openSubscriberInfo(subscriber)" href="javascript:void"><img ng-src="{{subscriber.picto}}" /></a>
                                         <a ng-click="createTopic(subscriber)" href="javascript:void"><i class=" glyphicon glyphicon-comment" tooltip="Démarrer une discussion" ></i></a>
-                                        <span tooltip="{{subscriber.car.nbPlaces - subscriber.car.passengers.length}} places restantes" class="badge" >{{subscriber.car.nbPlaces - subscriber.car.passengers.length}}</span>
+                                        <span ng-show="subscriber.locomotion == 'CAR'" tooltip="{{subscriber.car.nbPlaces - subscriber.car.passengers.length}} places restantes" class="badge" >{{subscriber.car.nbPlaces - subscriber.car.passengers.length}}</span>
                                     </td>
                                     <td >{{subscriber.surname}} {{subscriber.name}}</td>
                                     <td>{{subscriber.address.description}}</td>
@@ -497,6 +495,7 @@
     <div snap-drawer="right" id="chatZone" class="row pull-right">
         <div class="col-md-8">
             <div class="row">
+                <a href="javascript:void" ng-click="openChat()" class="text-right pull-rigth"><strong>Retour</strong><span class="close" aria-hidden="true">&times;</span></a>
                 <br/>
             </div>
             <div class="row">
@@ -530,7 +529,6 @@
         </div>
         <div class="col-md-4">
             <div class="row">
-                <button type="button" class="close" aria-hidden="true" ng-click="openChat()">Close &times;</button>
                 <br/>
             </div>
             <div class="row">

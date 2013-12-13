@@ -1,4 +1,7 @@
 body {
+  height: 100%;
+  width: 100%;
+  position: relative;
   padding-top: 50px;
   padding-bottom: 20px;
 }
@@ -14,17 +17,28 @@ body {
     -webkit-overflow-scrolling: touch;
 }
 
-#mainContent {
-    padding-top: 50px;
-}
-
 #content {
+    height: 100%;
+    width: 100%;
     padding-top: 50px;
     background-color: white;
     -moz-box-shadow: 0 0 20px #888;
       -webkit-box-shadow: 0 0 20px #888;
       box-shadow: 0 0 20px #888;
 }
+
+@media screen and (max-width: 768px) {
+    body {
+      position: relative;
+      padding-top: 100px;
+      padding-bottom: 20px;
+    }
+    #content {
+        position: relative;
+        padding-top: 100px;
+    }
+}
+
 
 #chatZone {
     width: 375px;
