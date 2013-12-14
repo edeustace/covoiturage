@@ -7,10 +7,45 @@
     <link href="@routes.Assets.at("css/snap.css")" rel="stylesheet" />
     <link href="@routes.Assets.at("css/angular-snap.min.css")" rel="stylesheet" />
 
+<script src="http://maps.googleapis.com/maps/api/js?libraries=places&sensor=false&language=fr"></script>
+<script type="text/javascript" src="@routes.Assets.at("js/lib/snap.min.js")"></script>
+<script type="text/javascript" src="@routes.Assets.at("js/app/directives/angular-snap.min.js")"></script>
+<script type="text/javascript" src="@routes.Assets.at("js/app/directives/chat-directive.js")"></script>
+<script type="text/javascript" src="@routes.Assets.at("js/app/directives/event.js")"></script>
+<script type="text/javascript" src="@routes.Assets.at("js/app/directives/keypress.js")"></script>
+<script type="text/javascript" src="@routes.Assets.at("js/app/directives/ui-map.js")"></script>
+<script type="text/javascript" src="@routes.Assets.at("js/app/directives/googleplace.js")"></script>
+<script type="text/javascript" src="@routes.Assets.at("js/app/directives/scrollglue.js")"></script>
+<script type="text/javascript" src="@routes.Assets.at("js/app/directives/ng-infinite-scroll.min.js")"></script>
+<script type="text/javascript" src="@routes.Assets.at("js/app/modules/mailUtils.js")"></script>
+<script type="text/javascript" src="@routes.Assets.at("js/app/modules/eventService.js")"></script>
+<script type="text/javascript" src="@routes.Assets.at("js/app/modules/chatModule.js")"></script>
+<script type="text/javascript" src="@routes.Assets.at("js/app/modules/mapService.js")"></script>
+<script type="text/javascript" src="@routes.Assets.at("js/app/modules/errorModule.js")"></script>
+<script type="text/javascript" src="@routes.Assets.at("js/app/event/app.js")"></script>
+<script type="text/javascript" src="@routes.Assets.at("js/app/event/controller.js")"></script>
+<script type="text/javascript" src="@routes.Assets.at("js/app/filters.js")"></script>
+<script type="text/javascript" src="@routes.Application.jsRoutes()"></script>
 
 
-    <div ng-controller="EventCtrl" >
+<div ng-controller="EventCtrl" >
 
+
+    <script type="text/ng-template" id="popin.html">
+        <div class="modal-header">
+            <button type="button" class="close" ng-click="cancel()" aria-hidden="true">×</button>
+            <h3>Attention</h3>
+        </div>
+        <div class="modal-body">
+            <p>
+                Vous allez supprimer votre voiture et tous les passagers qui sont à bord !
+            </p>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-primary" ng-click="updateLocomotion('AUTOSTOP');">Valider</button>
+            <button class="btn btn-default cancel" ng-click="cancel()">Annuler</button>
+        </div>
+    </script>
 
     <div snap-content snap-options="snapOptions" id="content" class="scrollable" >
         <div class="row" >
@@ -147,21 +182,7 @@
             <!-- MODIFICATION PARTICIPANT COURANT / PARTICIPATION A L'EVENEMENT -->
             <div ng-show="!currentSubscriber || editMode"  class="col-md-4">
 
-                <script type="text/ng-template" id="popin.html">
-                    <div class="modal-header">
-                        <button type="button" class="close" ng-click="cancel()" aria-hidden="true">×</button>
-                        <h3>Attention</h3>
-                    </div>
-                    <div class="modal-body">
-                        <p>
-                            Vous allez supprimer votre voiture et tous les passagers qui sont à bord !
-                        </p>
-                    </div>
-                    <div class="modal-footer">
-                        <button class="btn btn-primary" ng-click="updateLocomotion('AUTOSTOP');">Valider</button>
-                        <button class="btn btn-default cancel" ng-click="cancel()">Annuler</button>
-                    </div>
-                </script>
+
 
                 <fieldset>
                     <legend ng-show="!currentSubscriber">Vous ne participez pas encore :</legend>
@@ -364,8 +385,6 @@
 
             </div>
         </div>
-
-
         <!-- MUR DE DISCUSSION-->
 
         <div class="row">
@@ -480,25 +499,6 @@
 
 </div>
 
-<script src="http://maps.googleapis.com/maps/api/js?libraries=places&sensor=false&language=fr"></script>
-<script type="text/javascript" src="@routes.Assets.at("js/lib/snap.min.js")"></script>
-<script type="text/javascript" src="@routes.Assets.at("js/app/directives/angular-snap.min.js")"></script>
-<script type="text/javascript" src="@routes.Assets.at("js/app/directives/chat-directive.js")"></script>
-<script type="text/javascript" src="@routes.Assets.at("js/app/directives/event.js")"></script>
-<script type="text/javascript" src="@routes.Assets.at("js/app/directives/keypress.js")"></script>
-<script type="text/javascript" src="@routes.Assets.at("js/app/directives/ui-map.js")"></script>
-<script type="text/javascript" src="@routes.Assets.at("js/app/directives/googleplace.js")"></script>
-<script type="text/javascript" src="@routes.Assets.at("js/app/directives/scrollglue.js")"></script>
-<script type="text/javascript" src="@routes.Assets.at("js/app/directives/ng-infinite-scroll.min.js")"></script>
-<script type="text/javascript" src="@routes.Assets.at("js/app/modules/mailUtils.js")"></script>
-<script type="text/javascript" src="@routes.Assets.at("js/app/modules/eventService.js")"></script>
-<script type="text/javascript" src="@routes.Assets.at("js/app/modules/chatModule.js")"></script>
-<script type="text/javascript" src="@routes.Assets.at("js/app/modules/mapService.js")"></script>
-<script type="text/javascript" src="@routes.Assets.at("js/app/modules/errorModule.js")"></script>
-<script type="text/javascript" src="@routes.Assets.at("js/app/event/app.js")"></script>
-<script type="text/javascript" src="@routes.Assets.at("js/app/event/controller.js")"></script>
-<script type="text/javascript" src="@routes.Assets.at("js/app/filters.js")"></script>
-<script type="text/javascript" src="@routes.Application.jsRoutes()"></script>
 
 
 }
