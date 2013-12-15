@@ -2,5 +2,5 @@
 
 /* App Module */
 
-angular.module('covoiturage', ['ui.bootstrap']);
+angular.module('covoiturage', ['ui.bootstrap']).controller('MenuCtrl', MenuCtrl);
 

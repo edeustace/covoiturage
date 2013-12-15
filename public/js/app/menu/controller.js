@@ -38,3 +38,4 @@ function MenuCtrl($scope, $http){
         return theLinks;
     }
 }
+MenuCtrl.$inject = ['$scope', '$http'];

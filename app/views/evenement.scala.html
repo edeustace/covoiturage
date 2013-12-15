@@ -3,28 +3,30 @@
 
 
 @main(Messages("playauthenticate.event.title"),"event") {
-    <link rel="stylesheet" media="screen" href="@routes.Assets.at("css/demo.css")" />
-    <link href="@routes.Assets.at("css/snap.css")" rel="stylesheet" />
-    <link href="@routes.Assets.at("css/angular-snap.min.css")" rel="stylesheet" />
+
+@views.Helper.loader.css("covoiturage")( "css/map.css",  "css/snap.css", "css/angular-snap.min.css")
 
 <script src="http://maps.googleapis.com/maps/api/js?libraries=places&sensor=false&language=fr"></script>
-<script type="text/javascript" src="@routes.Assets.at("js/lib/snap.min.js")"></script>
-<script type="text/javascript" src="@routes.Assets.at("js/app/directives/angular-snap.min.js")"></script>
-<script type="text/javascript" src="@routes.Assets.at("js/app/directives/chat-directive.js")"></script>
-<script type="text/javascript" src="@routes.Assets.at("js/app/directives/event.js")"></script>
-<script type="text/javascript" src="@routes.Assets.at("js/app/directives/keypress.js")"></script>
-<script type="text/javascript" src="@routes.Assets.at("js/app/directives/ui-map.js")"></script>
-<script type="text/javascript" src="@routes.Assets.at("js/app/directives/googleplace.js")"></script>
-<script type="text/javascript" src="@routes.Assets.at("js/app/directives/scrollglue.js")"></script>
-<script type="text/javascript" src="@routes.Assets.at("js/app/directives/ng-infinite-scroll.min.js")"></script>
-<script type="text/javascript" src="@routes.Assets.at("js/app/modules/mailUtils.js")"></script>
-<script type="text/javascript" src="@routes.Assets.at("js/app/modules/eventService.js")"></script>
-<script type="text/javascript" src="@routes.Assets.at("js/app/modules/chatModule.js")"></script>
-<script type="text/javascript" src="@routes.Assets.at("js/app/modules/mapService.js")"></script>
-<script type="text/javascript" src="@routes.Assets.at("js/app/modules/errorModule.js")"></script>
-<script type="text/javascript" src="@routes.Assets.at("js/app/event/app.js")"></script>
-<script type="text/javascript" src="@routes.Assets.at("js/app/event/controller.js")"></script>
-<script type="text/javascript" src="@routes.Assets.at("js/app/filters.js")"></script>
+@views.Helper.loader.scripts("covoiturage")(
+    "js/lib/snap.min.js",
+    "js/app/directives/angular-snap.min.js",
+    "js/app/directives/chat-directive.js",
+    "js/app/directives/event.js",
+    "js/app/directives/keypress.js",
+    "js/app/directives/ui-map.js",
+    "js/app/directives/googleplace.js",
+    "js/app/directives/scrollglue.js",
+    "js/app/directives/ng-infinite-scroll.min.js",
+    "js/app/modules/mailUtils.js",
+    "js/app/modules/eventService.js",
+    "js/app/modules/chatModule.js",
+    "js/app/modules/mapService.js",
+    "js/app/modules/errorModule.js",
+    "js/app/event/app.js",
+    "js/app/event/controller.js",
+    "js/app/filters.js"
+)
+
 <script type="text/javascript" src="@routes.Application.jsRoutes()"></script>
 
 

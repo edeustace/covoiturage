@@ -534,5 +534,6 @@ function EventCtrl($scope, $http, $location, $compile, $filter, mailUtils, mapSe
     }
 
 }
-//EventCtrl.$inject = ['$scope','register'];
+EventCtrl.$inject = ['$scope', '$http', '$location', '$compile', '$filter', 'mailUtils', 'mapService', 'eventService', 'chatService', '$anchorScroll', '$modal', 'errorService', 'snapRemote'];
+
 
