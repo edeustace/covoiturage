@@ -18,8 +18,8 @@ angular.module('mailUtils', [], function($provide){
 				if(mails.indexOf(";")>0){
 					var reg=new RegExp("[ ,;]+", "g");
 					var emails = mails.split(reg);
-					for ( var int = 0; int < emails.length; int++) {
-						var email = emails[int];
+					for ( var i = 0; i < emails.length; i++) {
+						var email = emails[i];
 						if(this.validateMail(email)){
 							array.push(email);	
 						}

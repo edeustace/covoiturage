@@ -44,10 +44,10 @@ angular.module('markerModule', [], function($provide){
 			},  
 			recordSubscriber : function(subscriber, onClick){
 				var markerSubsc = this.getSubscriberMarker(subscriber, onClick);
-				for ( var int = 0; int < currentScope.markers.length; int++) {
-					var marker = currentScope.markers[int];
+				for ( var i = 0; i < currentScope.markers.length; i++) {
+					var marker = currentScope.markers[i];
 					if(marker.subscriber && marker.subscriber.userRef == subscriber.userRef){
-						currentScope.markers[int] =  markerSubsc;
+						currentScope.markers[i] =  markerSubsc;
 						return;
 					}
 				}

@@ -18,8 +18,8 @@ function MenuCtrl($scope, $http){
     $scope.loadEvents = function(idUser){
         $http.get('/rest/users/'+idUser+'/events').success(function(events) {
             $scope.events = events;
-            for ( var int = 0; int < $scope.events.length; int++) {
-                var event = $scope.events[int];
+            for ( var i = 0; i < $scope.events.length; i++) {
+                var event = $scope.events[i];
                 event.links = buildLinks(event.links);
             }
         }).error(function(error){

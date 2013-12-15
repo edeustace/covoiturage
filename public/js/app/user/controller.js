@@ -35,8 +35,8 @@ function UserCtrl($scope, $http) {
 			$scope.user = user;
 			$http.get('/rest/users/'+user.id+'/events').success(function(events) {
 				$scope.events = events;
-				for ( var int = 0; int < $scope.events.length; int++) {
-					var event = $scope.events[int];
+				for ( var i = 0; i < $scope.events.length; i++) {
+					var event = $scope.events[i];
 					event.links = buildLinks(event.links);
 					if(user.id == event.creatorRef){
 					    event.isCreator = true;

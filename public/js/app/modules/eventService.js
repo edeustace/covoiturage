@@ -9,8 +9,8 @@ angular.module('eventModule', [], function($provide){
 
         function inArray(value, array){
             if(array && value){
-                for ( var int = 0; int < array.length; int++) {
-                    var arrayValue = array[int];
+                for ( var i = 0; i < array.length; i++) {
+                    var arrayValue = array[i];
                     if(arrayValue == value){
                         return true;
                     }

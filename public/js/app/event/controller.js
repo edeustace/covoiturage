@@ -170,8 +170,8 @@ function EventCtrl($scope, $http, $location, $compile, $filter, mailUtils, mapSe
 	function oneSubscriberTrue(testFunction){
 	    var answer = false;
 	    var subscribers = eventService.getSubscribers();
-	    for ( var int = 0; int < subscribers.length; int++) {
-	        var test = testFunction(subscribers[int]);
+	    for ( var i = 0; i < subscribers.length; i++) {
+	        var test = testFunction(subscribers[i]);
             if(test == true){
                 return true;
             }
@@ -250,8 +250,8 @@ function EventCtrl($scope, $http, $location, $compile, $filter, mailUtils, mapSe
         $scope.newContacts = mailUtils.pushMails(contacts, $scope.newContacts);
         //TODO créer un service dans chat
         $http.post(eventService.getEventLinks().contacts, {contacts:$scope.newContacts}).success(function(){
-            for ( var int = 0; int < $scope.newContacts.length; int++) {
-                var contact = $scope.newContacts[int];
+            for ( var i = 0; i < $scope.newContacts.length; i++) {
+                var contact = $scope.newContacts[i];
                 $scope.event.contacts.push(contact);
             }
             $scope.addedContact = null;
@@ -492,8 +492,8 @@ function EventCtrl($scope, $http, $location, $compile, $filter, mailUtils, mapSe
 
                 if(data && data.currentSubscriber && eventService.getSubscriberLinks(data.currentSubscriber.userRef).notifications){
                     $http.get(eventService.getSubscriberLinks(data.currentSubscriber.userRef).notifications).success(function(notifications) {
-                        for ( var int = 0; int < notifications.length; int++) {
-                            var notification = notifications[int];
+                        for ( var i = 0; i < notifications.length; i++) {
+                            var notification = notifications[i];
                             if(notification.message){
                                 var msg = notification.message;
                                 $scope.alerts.push({type:notification.type, msg:msg, notification:notification});
