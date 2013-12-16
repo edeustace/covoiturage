@@ -170,7 +170,9 @@ angular.module('mapService', [], function($provide){
 		    	}
 		    },
 		    fitBounds : function(){
-		        $mapData.map.fitBounds($mapData.bounds);
+                if($mapData.map){
+                    $mapData.map.fitBounds($mapData.bounds);
+                }
 		    }
 	   };
    });

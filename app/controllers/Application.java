@@ -12,13 +12,8 @@ import play.mvc.Result;
 import providers.MyUsernamePasswordAuthProvider;
 import providers.MyUsernamePasswordAuthProvider.MyLogin;
 import providers.MyUsernamePasswordAuthProvider.MySignup;
+import views.html.*;
 import views.txt.robot;
-import views.html.evenementCreation;
-import views.html.index;
-import views.html.login;
-import views.html.profile;
-import views.html.restricted;
-import views.html.signup;
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
 
@@ -45,8 +40,8 @@ public class Application extends Controller {
 		final User localUser = User.findByAuthUserIdentity(currentAuthUser);
 		return localUser;
 	}
-	
-	@Restrict(@Group(Application.USER_ROLE))
+
+    @Restrict(@Group(Application.USER_ROLE))
 	public static Result createEvent() {
 		return ok(evenementCreation.render());
 	}
