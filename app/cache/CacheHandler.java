@@ -22,17 +22,19 @@ public class CacheHandler {
         CachedEvent currentEvent = (CachedEvent) Cache.get("Event-" + id);
         if(currentEvent==null){
             Event event = Event.read(id);
-            if(event.getContactsOnly()){
-                List<String> ids = newArrayList();
-                ids.add(event.getCreatorRef());
-                for(Subscriber subscriber : event.getSubscribers()){
-                    ids.add(subscriber.getUserRef());
+            if(event!=null){
+                if(event.getContactsOnly()){
+                    List<String> ids = newArrayList();
+                    ids.add(event.getCreatorRef());
+                    for(Subscriber subscriber : event.getSubscribers()){
+                        ids.add(subscriber.getUserRef());
+                    }
+                    currentEvent = new CachedEvent(Boolean.TRUE, event.getContacts(), ids);
+                }else{
+                    currentEvent = new CachedEvent();
                 }
-                currentEvent = new CachedEvent(Boolean.TRUE, event.getContacts(), ids);
-            }else{
-                currentEvent = new CachedEvent();
+                Cache.set("Event-"+id, currentEvent);
             }
-            Cache.set("Event-"+id, currentEvent);
         }
         return currentEvent;
     }
