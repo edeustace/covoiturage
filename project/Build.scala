@@ -36,14 +36,5 @@ object ApplicationBuild extends Build {
       resolvers += Resolver.url("My GitHub Play Repository", url("http://alexanderjarvis.github.com/releases/"))(Resolver.ivyStylePatterns),
 
       resolvers ++= Seq(edeustaceReleases, edeustaceSnapshots)
-    )
-
-  object Resolvers {
-    val easyMailReleaseRepository = "play-easymail (release)" at "http://joscha.github.com/play-easymail/repo/releases/"
-    val easyMailSnapshotRepository = "play-easymail (snapshot)" at "http://joscha.github.com/play-easymail/repo/snapshots/"
-    val authRelease = "play-authenticate (release)" at "http://joscha.github.com/play-authenticate/repo/releases/"
-    val authSnapshot = "play-authenticate (snapshot)" at "http://joscha.github.com/play-authenticate/repo/snapshots/"
-
-  }
-
+  )
 }
