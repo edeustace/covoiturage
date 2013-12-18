@@ -56,7 +56,7 @@ public class EventCtrl extends Controller {
             String reponse = objectMapper.writeValueAsString(new EventModel(event));
             Logger.debug("getEvent : idEvent : {}, reponse : ", id, reponse);
             return ok(reponse).as("application/json");
-        } catch (IOException e) {
+        } catch (Exception e) {
             Logger.error("getEvent idEvent : "+id, e);
             return internalServerError("Error");
         }
