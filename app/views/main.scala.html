@@ -97,26 +97,25 @@
     </div>
 </nav>
 
-      <div class="container"  >
-          @if(flash.contains(Application.FLASH_ERROR_KEY)) {
-          <div class="alert alert-danger">
-              @flash().get(Application.FLASH_ERROR_KEY)
-              </div>
-              }
-              @if(flash.contains(Application.FLASH_MESSAGE_KEY)) {
-          <div class="alert alert-success">
-              @flash().get(Application.FLASH_MESSAGE_KEY)
-              </div>
-              }
-              @content
+<div class="container"  >
+  @if(flash.contains(Application.FLASH_ERROR_KEY)) {
+  <div class="alert alert-danger">
+      @flash().get(Application.FLASH_ERROR_KEY)
+      </div>
+      }
+      @if(flash.contains(Application.FLASH_MESSAGE_KEY)) {
+  <div class="alert alert-success">
+      @flash().get(Application.FLASH_MESSAGE_KEY)
+      </div>
+      }
+      @content
 
-          <hr>
+  <hr>
 
-          <footer>
+  <footer>
+  </footer>
 
-          </footer>
-
-      </div> <!-- /container -->
+</div> <!-- /container -->
 
   </body>
 </html>
