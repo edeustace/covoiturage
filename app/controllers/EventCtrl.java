@@ -54,7 +54,7 @@ public class EventCtrl extends Controller {
         try {
             Event event = Event.read(id);
             String reponse = objectMapper.writeValueAsString(new EventModel(event));
-            Logger.debug("getEvent : idEvent : {}, reponse : ", id, reponse);
+            Logger.debug("getEvent : idEvent : {}, reponse : {}", id, reponse);
             return ok(reponse).as("application/json");
         } catch (Exception e) {
             Logger.error("getEvent idEvent : "+id, e);
@@ -262,20 +262,19 @@ public class EventCtrl extends Controller {
             this.links.add(Link.link("contacts", controllers.routes.EventCtrl.addContacts(this.event.getId()).toString()));
             this.links.add(Link.link("securised", controllers.routes.EventCtrl.securised(this.event.getId()).toString()));
             this.links.add(Link.link("topics", controllers.routes.ChatCtrl.createTopic(this.event.getId()).toString()));
-            this.links.add(Link.link("pictoFinish", controllers.routes.Assets.at("icons/finish.png").toString()));
-            this.links.add(Link.link("pictoCarDark", controllers.routes.Assets.at("icons/car_dark.png").toString()));
-            this.links.add(Link.link("pictoCar", controllers.routes.Assets.at("icons/car_classic.png").toString()));
-            this.links.add(Link.link("pictoMyCar", controllers.routes.Assets.at("icons/car_red.png").toString()));
-            this.links.add(Link.link("pictoCarLight", controllers.routes.Assets.at("icons/car_light.png").toString()));
-            this.links.add(Link.link("pictoCarGrey", controllers.routes.Assets.at("icons/car_grey.png").toString()));
-            this.links.add(Link.link("pictoMyPassenger", controllers.routes.Assets.at("icons/pedestriancrossing_red.png").toString()));
-            this.links.add(Link.link("pictoStopDark", controllers.routes.Assets.at("icons/pedestriancrossing_green-dark.png").toString()));
-            this.links.add(Link.link("pictoStop", controllers.routes.Assets.at("icons/pedestriancrossing_green-classic.png").toString()));
-            this.links.add(Link.link("pictoStopLight", controllers.routes.Assets.at("icons/pedestriancrossing_light.png").toString()));
-            this.links.add(Link.link("pictoStopGrey", controllers.routes.Assets.at("icons/pedestriancrossing_grey.png").toString()));
-            this.links.add(Link.link("pictoDontKnow", controllers.routes.Assets.at("icons/symbol_blank.png").toString()));
-            this.links.add(Link.link("pictoDontKnowLight", controllers.routes.Assets.at("icons/symbol_blank_jaune_def.png").toString()));
-
+            this.links.add(Link.link("pictoFinish", com.ee.assets.controllers.routes.Assets.at("icons/finish.png").toString()));
+            this.links.add(Link.link("pictoCarDark", com.ee.assets.controllers.routes.Assets.at("icons/car_dark.png").toString()));
+            this.links.add(Link.link("pictoCar", com.ee.assets.controllers.routes.Assets.at("icons/car_classic.png").toString()));
+            this.links.add(Link.link("pictoMyCar", com.ee.assets.controllers.routes.Assets.at("icons/car_red.png").toString()));
+            this.links.add(Link.link("pictoCarLight", com.ee.assets.controllers.routes.Assets.at("icons/car_light.png").toString()));
+            this.links.add(Link.link("pictoCarGrey", com.ee.assets.controllers.routes.Assets.at("icons/car_grey.png").toString()));
+            this.links.add(Link.link("pictoMyPassenger", com.ee.assets.controllers.routes.Assets.at("icons/pedestriancrossing_red.png").toString()));
+            this.links.add(Link.link("pictoStopDark", com.ee.assets.controllers.routes.Assets.at("icons/pedestriancrossing_green-dark.png").toString()));
+            this.links.add(Link.link("pictoStop", com.ee.assets.controllers.routes.Assets.at("icons/pedestriancrossing_green-classic.png").toString()));
+            this.links.add(Link.link("pictoStopLight", com.ee.assets.controllers.routes.Assets.at("icons/pedestriancrossing_light.png").toString()));
+            this.links.add(Link.link("pictoStopGrey", com.ee.assets.controllers.routes.Assets.at("icons/pedestriancrossing_grey.png").toString()));
+            this.links.add(Link.link("pictoDontKnow", com.ee.assets.controllers.routes.Assets.at("icons/symbol_blank.png").toString()));
+            this.links.add(Link.link("pictoDontKnowLight", com.ee.assets.controllers.routes.Assets.at("icons/symbol_blank_jaune_def.png").toString()));
         }
 
         @JsonProperty("links")

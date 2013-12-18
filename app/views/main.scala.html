@@ -1,4 +1,4 @@
-@(title: String, nav: String = "")(content: Html)
+@(title: String, nav: String = "", js: Seq[String] = Seq(), css: Seq[String] = Seq())(content: Html)
 
 @import be.objectify.deadbolt.java.views.html._
 @import be.objectify.deadbolt.core.utils.TemplateUtils._
@@ -17,22 +17,23 @@
     <!-- Le scripts -->
     <script src="@routes.Application.jsRoutes" defer="defer"></script>
     <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
-    <!--<script src="@routes.Assets.at("js/bootstrap.min.js")"></script>-->
+    <!--<script src="@com.ee.assets.controllers.routes.Assets.at("js/bootstrap.min.js")"></script>-->
 
     <!-- Le styles -->
-    <link href="@routes.Assets.at("stylesheets/main.min.css")" rel="stylesheet" />
+    <link href="@com.ee.assets.controllers.routes.Assets.at("stylesheets/main.min.css")" rel="stylesheet" />
     <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css">
     <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap-theme.min.css">
 
     <!--
-    <link href="@routes.Assets.at("css/bootstrap.min.css")" rel="stylesheet" />
-    <link href="@routes.Assets.at("css/bootstrap-theme.min.css")" rel="stylesheet" />
+    <link href="@com.ee.assets.controllers.routes.Assets.at("css/bootstrap.min.css")" rel="stylesheet" />
+    <link href="@com.ee.assets.controllers.routes.Assets.at("css/bootstrap-theme.min.css")" rel="stylesheet" />
     -->
 
     <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
     <!--[if lt IE 9]>
     <!--<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>-->
     <![endif]-->
+
     @views.Helper.loader.scripts("main")(
         "js/lib/snap.min.js",
         "js/lib/angular.js",
@@ -40,7 +41,13 @@
         "js/app/menu/controller.js",
         "js/app/menu/app.js"
     )
-
+    <!--
+    <script type="text/javascript" src="@com.ee.assets.controllers.routes.Assets.at("js/lib/snap.min.js")"></script>
+    <script type="text/javascript" src="@com.ee.assets.controllers.routes.Assets.at("js/lib/angular.js")"></script>
+    <script type="text/javascript" src="@com.ee.assets.controllers.routes.Assets.at("js/app/directives/ui-bootstrap-tpls.min.js")"></script>
+    <script type="text/javascript" src="@com.ee.assets.controllers.routes.Assets.at("js/app/menu/controller.js")"></script>
+    <script type="text/javascript" src="@com.ee.assets.controllers.routes.Assets.at("js/app/menu/app.js")"></script>
+    -->
 </head>
 
 <body>
