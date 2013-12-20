@@ -2,29 +2,7 @@
 @import helper.twitterBootstrap._
 
 
-@main(Messages("playauthenticate.event.title"),"event", Seq(
-    "js/lib/snap.min.js",
-    "js/app/directives/angular-snap.min.js",
-    "js/app/directives/chat-directive.js",
-    "js/app/directives/event.js",
-    "js/app/directives/keypress.js",
-    "js/app/directives/ui-map.js",
-    "js/app/directives/googleplace.js",
-    "js/app/directives/scrollglue.js",
-    "js/app/directives/ng-infinite-scroll.min.js",
-    "js/app/modules/mailUtils.js",
-    "js/app/modules/eventService.js",
-    "js/app/modules/chatModule.js",
-    "js/app/modules/mapService.js",
-    "js/app/modules/errorModule.js",
-    "js/app/event/controller.js",
-    "js/app/event/app.js",
-    "js/app/filters.js"
-), Seq(
-    "css/map.css",
-    "css/snap.css",
-    "css/angular-snap.min.css"
-)) {
+@main(Messages("playauthenticate.event.title"),"event") {
 
 @views.Helper.loader.css("covoiturage")( "css/map.css",  "css/snap.css", "css/angular-snap.min.css")
 
@@ -33,15 +11,12 @@
 <script type="text/javascript" src="@routes.Application.jsRoutes()"></script>
 
 
-<div ng-controller="EventCtrl" >
+
 
 
 <ng-include src="'/assets/html/event.html'" >
 </ng-include>
 
-
-
-</div>
 
 
 <script src="http://maps.googleapis.com/maps/api/js?libraries=places&sensor=false&language=fr"></script>
