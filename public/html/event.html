@@ -198,12 +198,12 @@
         <!-- PARTICIPANT COURANT -->
         <h3>
             <i><img ng-src="{{currentSubscriber.picto}}" /></i>{{currentSubscriber.surname}} {{currentSubscriber.name}}
-            <a href="javascript:void">
+            <a href="#">
                 <i tooltip="Modifier mon profil" class="glyphicon glyphicon-edit" ng-show="!editMode" ng-click="setEditMode(true)"></i>
             </a>
-            <a href="javascript:void">
+            <a href="#">
                 <i ng-show="!chat.newMessage" tooltip="Messages" class="glyphicon glyphicon-comment" snap-toggle="right"></i>
-                            <span ng-show="chat.newMessage" ng-click="openChat()" class="label label-danger">
+                            <span ng-show="chat.newMessage" ng-click="toogleChat()" class="label label-danger">
                                 <i tooltip="Nouveau message" class="glyphicon glyphicon-comment" ></i>
                             </span>
             </a>
@@ -314,8 +314,8 @@
                     <tbody>
                     <tr ng-repeat="subscriber in getSubscribers() | auto:filterUsers:markers  | filter:query" ng-show="!subscriber.current" class="{{subscriber.class}}" >
                         <td>
-                            <a ng-click="openSubscriberInfo(subscriber)" href="javascript:void"><img ng-src="{{subscriber.picto}}" /></a>
-                            <a ng-click="createTopic(subscriber)" href="javascript:void"><i class=" glyphicon glyphicon-comment" tooltip="Démarrer une discussion" ></i></a>
+                            <a ng-click="openSubscriberInfo(subscriber)" href="#"><img ng-src="{{subscriber.picto}}" /></a>
+                            <a ng-click="createTopic(subscriber)" href="#"><i class=" glyphicon glyphicon-comment" tooltip="Démarrer une discussion" ></i></a>
                             <span ng-show="subscriber.locomotion == 'CAR'" tooltip="{{subscriber.car.nbPlaces - subscriber.car.passengers.length}} places restantes" class="badge" >{{subscriber.car.nbPlaces - subscriber.car.passengers.length}}</span>
                         </td>
                         <td >{{subscriber.surname}} {{subscriber.name}}</td>
@@ -397,7 +397,7 @@
     <div snap-drawer="right" id="chatZone" class="row pull-right">
         <div class="col-md-8">
             <div class="row">
-                <a href="javascript:void" ng-click="openChat()" class="text-right pull-rigth"><strong>Retour</strong><span class="close" aria-hidden="true">&times;</span></a>
+                <a href="#" ng-click="closeChat()" class="text-right pull-rigth"><strong>Retour</strong><span class="close" aria-hidden="true">&times;</span></a>
                 <br/>
             </div>
             <div class="row">
@@ -441,22 +441,22 @@
             </div>
             <div class="row">
                 <div class="list-group">
-                    <a href="javascript:void" class="list-group-item header">
+                    <a href="#" class="list-group-item header">
                         <strong>Mes conversations</strong>
                     </a>
                     <a class="list-group-item" ng-repeat="topic in chat.topics  | orderBy: '-update'"
                        ng-class="{'active' : topic.active}"
                        chat-messages
-                       href="javascript:void" ng-click="loadMessages(topic)">
+                       href="#" ng-click="loadMessages(topic)">
 
-                            <span ng-show="topic.categorie=='chat'" >
-                                <small  ng-show="chaters != currentSubscriber.userRef" ng-repeat="chaters in topic.subscribers">
-                                    {{getSubscriber(chaters).surname}} {{getSubscriber(chaters).name}},
-                                </small>
-                            </span>
-                        <ul ng-show="topic.categorie=='carChat'">
-                            <li>Ma voiture</li>
-                        </ul>
+                        <span ng-show="topic.categorie=='chat'" >
+                            <small  ng-show="chaters != currentSubscriber.userRef" ng-repeat="chaters in topic.subscribers">
+                                {{getSubscriber(chaters).surname}} {{getSubscriber(chaters).name}},
+                            </small>
+                        </span>
+                        <span ng-show="topic.categorie=='carChat'" >
+                            <small>Ma voiture</small>
+                        </span>
                         <span ng-show="topic.alert" class="label label-danger">message</span>
                         <br/>
                         <small class="text-muted" ng-show="topic.statut && topic.statut == 'SENDING'">Creation en cours</small>

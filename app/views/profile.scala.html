@@ -45,12 +45,24 @@
             </ul>
             <button class="btn btn-primary" type="button" ng-click="saveUser()" >Sauvegarder</button>
         </div>
-        <h2>Mes participations :</h2>
-        <ul>
-            <li ng-repeat="event in events" >
-                {{event.name}} - {{event.description}} <strong ng-show="event.isCreator">Createur!</strong><a ng-href="{{event.links.page}}" >Voir</a>
-            </li>
-        </ul>
+        <div ng-show="events">
+            <h2>Mes participations :</h2>
+            <ul>
+                <li ng-repeat="event in events" >
+                    {{event.name}} - {{event.description}} <strong ng-show="event.isCreator">Createur!</strong><a ng-href="{{event.links.page}}" >Voir</a>
+                </li>
+            </ul>
+        </div>
+        <div ng-show="invitations">
+            <h2>Mes invitations :</h2>
+            <ul>
+                <li ng-repeat="event in invitations" >
+                    {{event.name}} - {{event.description}} <a ng-href="{{event.links.page}}" >Voir</a>
+                </li>
+            </ul>
+        </div>
+
+
       </div>
       <div class="col-md-4">
           <legend>@Messages("playauthenticate.profile.link.account")</legend>

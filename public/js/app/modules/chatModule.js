@@ -28,7 +28,18 @@ angular.module('chatModule', [], function($provide){
                     currentTopic.active = false;
                 }
             }
-
+        }
+        function setCurrentTmpTopic(tmpId){
+            var tmpId = tmpId + "";
+            for(var i in $data.chat.topics){
+                var currentTopic = $data.chat.topics[i];
+                if(currentTopic.tmpId === tmpId){
+                    currentTopic.active = true;
+                    $data.chat.currentTopic = currentTopic;
+                }else{
+                    currentTopic.active = false;
+                }
+            }
         }
         function removeTopic(topic){
             var id = topic.id;
@@ -111,7 +122,7 @@ angular.module('chatModule', [], function($provide){
                 pushTopic(topic);
                 var url = jsRoutes.controllers.ChatCtrl.createTopic(idEvent);
                 $http.post(url.url, topic).success(function(aTopic){
-                    $chatService.loadMessages(aTopic);
+                    setCurrentTmpTopic(tmpIdTopic);
                     deferred.resolve(aTopic);
                 }).error(function(){
                     deferred.reject(aTopic);

@@ -44,6 +44,8 @@ public class Topic extends AbstractModel {
     @NotNull
     public String creator;
 
+
+
     public List<String> subscribers = new ArrayList<String>();
 
     public Topic() {
@@ -192,5 +194,37 @@ public class Topic extends AbstractModel {
 
     public List<String> getSubscribers() {
         return subscribers;
+    }
+
+    public void setIdEvent(String idEvent) {
+        this.idEvent = idEvent;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public void setCategorie(TopicCategorie categorie) {
+        this.categorie = categorie;
+    }
+
+    public void setTmpId(String tmpId) {
+        this.tmpId = tmpId;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
+    }
+
+    public void setUpdate(Date update) {
+        this.update = update;
+    }
+
+    public void setCreator(String creator) {
+        this.creator = creator;
+    }
+
+    public void setSubscribers(List<String> subscribers) {
+        this.subscribers = subscribers;
     }
 }

@@ -46,6 +46,8 @@ public class ChatMessage extends AbstractModel {
         this.date = new Date();
     }
 
+
+
     ////////////  STATIC  ////////////////
     public ChatMessage save(){
         if(this.topicRef==null){
@@ -61,5 +63,61 @@ public class ChatMessage extends AbstractModel {
 
     public static List<ChatMessage> findByIdTopic(String idTopic){
         return getDao().findByIdTopic(idTopic);
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    public String getFrom() {
+        return from;
+    }
+
+    public void setFrom(String from) {
+        this.from = from;
+    }
+
+    public String getTopicRef() {
+        return topicRef;
+    }
+
+    public void setTopicRef(String topicRef) {
+        this.topicRef = topicRef;
+    }
+
+    public String getTmpId() {
+        return tmpId;
+    }
+
+    public void setTmpId(String tmpId) {
+        this.tmpId = tmpId;
+    }
+
+    public Topic getTopic() {
+        return topic;
+    }
+
+    public void setTopic(Topic topic) {
+        this.topic = topic;
+    }
+
+    public Date getDate() {
+        return date;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public String getMessage() {
+        return message;
     }
 }

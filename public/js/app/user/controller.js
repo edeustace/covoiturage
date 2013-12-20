@@ -35,20 +35,35 @@ function UserCtrl($scope, $http) {
 			$scope.user = user;
 			$http.get('/rest/users/'+user.id+'/events').success(function(events) {
 				$scope.events = events;
-				for ( var i = 0; i < $scope.events.length; i++) {
-					var event = $scope.events[i];
-					event.links = buildLinks(event.links);
-					if(user.id == event.creatorRef){
-					    event.isCreator = true;
-					}
-				}
+				convertEvents($scope.events);
 			}).error(function(error){
 				alert('error : '+error);
 			});
+
+			$http.get('/rest/users/'+user.id+'/invitations').success(function(events) {
+                $scope.invitations = events;
+                convertEvents($scope.invitations);
+            }).error(function(error){
+                alert('error : '+error);
+            });
 		}
 	}).error(function(error){
 		alert('error : '+error);
 	});
+
+	function convertEvents(events){
+	    for ( var i = 0; i < events.length; i++) {
+            convertEvent(events[i]);
+        }
+	}
+
+	function convertEvent(event){
+	    event.links = buildLinks(event.links);
+        if(user.id == event.creatorRef){
+            event.isCreator = true;
+        }
+	}
+
 	function buildLinks(links){
     	var theLinks = {};
     	if(links){

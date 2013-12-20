@@ -302,8 +302,14 @@ function EventCtrl($scope, $http, $location, $compile, $filter, mailUtils, mapSe
 
     ///////////////  CHAT ////////////////////////////////
     $scope.openChat = function(){
-        snapRemote.toggle('right');
+        snapRemote.open('right');
         $scope.chat.newMessage = false;
+    };
+    $scope.closeChat = function(){
+        snapRemote.close();
+    };
+    $scope.toogleChat = function(){
+        snapRemote.toggle('right');
     };
     $scope.createTopic = function(subscriber){
         chatService.createTopic($scope.idEvent, subscriber, eventService.getCurrentSubscriber()).then(function(){
