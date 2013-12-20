@@ -476,7 +476,7 @@ function EventCtrl($scope, $http, $location, $compile, $filter, mailUtils, mapSe
         $scope.currentCar = car;
     });
 
-    chatService.init($scope, 'chatmessage.html');
+    chatService.init($scope);
 
     var id = extractFromUrl($location.absUrl());
     $scope.idEvent = id;
