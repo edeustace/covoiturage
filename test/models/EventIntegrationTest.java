@@ -1,32 +1,19 @@
 package models;
 
 
-import com.mongodb.DB;
-import com.mongodb.Mongo;
+import commons.AbstractIntegrationTest;
+
 import models.enums.Locomotion;
-import net.vz.mongodb.jackson.JacksonDBCollection;
 import org.junit.*;
 
-import java.net.UnknownHostException;
+import java.util.Arrays;
+import java.util.List;
 
 import static org.fest.assertions.Assertions.assertThat;
+import static org.fest.assertions.Collections.found;
 import static play.test.Helpers.*;
 
-public class EventIntegrationTest {
-
-
-    private DB currentDataBase = null;
-
-    @Before
-    public void setUp() throws UnknownHostException {
-        Mongo mongoClient = new Mongo("localhost", 27017);
-        currentDataBase = mongoClient.getDB("covoiturage-test");
-    }
-
-    @After
-    public void tearDown(){
-          currentDataBase.dropDatabase();
-    }
+public class EventIntegrationTest extends AbstractIntegrationTest {
 
     @Test
     public void simpleInsert(){
@@ -46,6 +33,44 @@ public class EventIntegrationTest {
             }
         });
     }
+
+    @Test
+    public void testOneInvitation(){
+        running(fakeApplication(), new Runnable() {
+            public void run() {
+
+                Event event = Event.event().setName("a getName").setContacts(Arrays.asList("email1@toto.com", "email2@toto.com")).save();
+                assertThat(event.getId()).isNotNull();
+
+                List<Event> events = Event.listInvitedByEmail("email1@toto.com");
+                assertThat(events).isNotEmpty();
+                assertThat(events.size()).isEqualTo(1);
+                found(events.iterator().next().getContacts(), "email1@toto.com");
+            }
+        });
+    }
+
+    @Test
+    public void testSomeInvitations(){
+        running(fakeApplication(), new Runnable() {
+            public void run() {
+
+                Event event = Event.event().setName("a name1").setContacts(Arrays.asList("email1@toto.com", "email2@toto.com")).save();
+                assertThat(event.getId()).isNotNull();
+                Event event2 = Event.event().setName("a name2").setContacts(Arrays.asList("email1@toto.com", "email6@toto.com")).save();
+                assertThat(event2.getId()).isNotNull();
+                Event event3 = Event.event().setName("a name3").setContacts(Arrays.asList("email1@toto.com", "email7@toto.com")).save();
+                assertThat(event3.getId()).isNotNull();
+                Event event4 = Event.event().setName("a name4").setContacts(Arrays.asList("email2@toto.com", "email7@toto.com")).save();
+                assertThat(event4.getId()).isNotNull();
+
+                List<Event> events = Event.listInvitedByEmail("email1@toto.com");
+                assertThat(events).isNotEmpty();
+                assertThat(events.size()).isEqualTo(3);
+            }
+        });
+    }
+
 
     /**
      * Test with a getCreator. The getCreator should be added as subscriber with the good DBRef.

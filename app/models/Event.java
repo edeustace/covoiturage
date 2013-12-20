@@ -10,6 +10,7 @@ import javax.persistence.Id;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import dao.EventDao;
 import dao.RepositoryLocator;
 import models.validators.EmailAlreadyUsed;
@@ -29,6 +30,7 @@ import org.codehaus.jackson.map.ObjectReader;
 
 import play.modules.mongodb.jackson.MongoDB;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 @MongoCollection(name="events")
 public class Event extends AbstractModel {
 
@@ -274,6 +276,9 @@ public class Event extends AbstractModel {
         return event;
     }
 
+    public static List<Event> listInvitedByEmail(String email){
+        return getDao().listInvitedByEmail(email);
+    }
 
     //////////////////////////////////////////////
     /////////  GETTERS AND SETTERS ///////////////

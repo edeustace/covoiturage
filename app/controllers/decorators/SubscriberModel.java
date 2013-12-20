@@ -27,9 +27,9 @@ public class SubscriberModel {
     public SubscriberModel(Subscriber subscriber, String idEvent) {
         this.subscriber = subscriber;
         this.idEvent = idEvent;
-        if(subscriber!=null){
-            this.links.add(Link.link(Link.SELF, controllers.routes.SubscriberCtrl.getSubscriber(idEvent, subscriber.getUserRef()).toString()));
+        if(subscriber!=null && subscriber.getUserRef()!=null){
             this.links.add(Link.link(Link.CREATE, controllers.routes.SubscriberCtrl.createSubscriber(idEvent).toString()));
+            this.links.add(Link.link(Link.SELF, controllers.routes.SubscriberCtrl.getSubscriber(idEvent, subscriber.getUserRef()).toString()));
             this.links.add(Link.link(Link.UPDATE, controllers.routes.SubscriberCtrl.updateSubscriber(idEvent, subscriber.getUserRef()).toString()));
             this.links.add(Link.link("car", controllers.routes.SubscriberCtrl.updateCar(idEvent, subscriber.getUserRef()).toString()));
             this.links.add(Link.link("locomotion", controllers.routes.SubscriberCtrl.changeLocomotion(idEvent, subscriber.getUserRef()).toString()));

@@ -101,7 +101,7 @@ GET     /rest/users/current               controllers.UserCtrl.getCurrentUser()
 GET     /rest/users/:id                   controllers.UserCtrl.getUser(id :String)
 PUT     /rest/users/:id                   controllers.UserCtrl.updateUser(id :String)
 GET     /rest/users/:id/events            controllers.UserCtrl.listEvent(id :String)
-
+GET     /rest/users/:id/invitations       controllers.UserCtrl.listInvitations(id :String)
 
 
 # Map static resources from the /public folder to the /assets URL path

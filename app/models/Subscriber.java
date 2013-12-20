@@ -125,7 +125,7 @@ public class Subscriber {
     //////////////////////////////////////////////
     @JsonProperty("user")
     public User getUser() {
-        if (this.userRef!=null && this.userRef!=null){
+        if (this.userRef!=null){
             this.user = User.findById(this.userRef);
         }
         return user;

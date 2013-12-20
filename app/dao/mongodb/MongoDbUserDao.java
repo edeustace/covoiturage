@@ -27,7 +27,7 @@ public class MongoDbUserDao extends AbstractMongoDao<User> implements UserDao {
         return cursor.hasNext();
     }
 
-        public User getUserwithEmail(String email){
+    public User getUserwithEmail(String email){
         return getCollection().findOne(DBQuery.is("email",email));
     }
 

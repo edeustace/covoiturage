@@ -2,9 +2,13 @@ package dao.mongodb;
 
 import dao.Dao;
 import models.AbstractModel;
+import net.vz.mongodb.jackson.DBCursor;
 import net.vz.mongodb.jackson.JacksonDBCollection;
 import net.vz.mongodb.jackson.WriteResult;
 import play.modules.mongodb.jackson.MongoDB;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -39,5 +43,13 @@ public abstract class AbstractMongoDao <T extends AbstractModel> implements Dao<
 
     public T get(String id){
         return getCollection().findOneById(id);
+    }
+
+    public List<T> toList(DBCursor<T> cursor){
+        List<T> result = new ArrayList<T>();
+        while(cursor.hasNext()){
+            result.add(cursor.next());
+        }
+        return result;
     }
 }

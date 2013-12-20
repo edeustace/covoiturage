@@ -29,12 +29,7 @@ public class MongoDbChatMessageDao extends AbstractMongoDao<ChatMessage> impleme
     }
 
     public List<ChatMessage> findByIdTopic(String idTopic){
-        DBCursor<ChatMessage> cursor = getCollection().find(DBQuery.is("topicRef", idTopic));
-        List<ChatMessage> result = new ArrayList<ChatMessage>();
-        while(cursor.hasNext()){
-            result.add(cursor.next());
-        }
-        return result;
+        return toList(getCollection().find(DBQuery.is("topicRef", idTopic)));
     }
 
 }

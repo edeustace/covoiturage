@@ -1,4 +1,6 @@
 
+<div ng-controller="EventCtrl" >
+
     <script type="text/ng-template" id="popin.html">
         <div class="modal-header">
             <button type="button" class="close" ng-click="cancel()" aria-hidden="true">×</button>
@@ -94,6 +96,7 @@
         <alert ng-repeat="alert in alerts | orderBy: '-date' " type="alert.type" close="closeAlert($index)">{{alert.msg}}</alert>
         <br/>
 
+
         <!-- GESTION DES MARKERS SUR LA CARTE GOOGLE -->
         <div ng-repeat="marker in getMarkers()" ui-map-marker="getMarker($index)"
              ui-event="{'map-click': 'openMarkerInfo(marker)'}">
@@ -108,7 +111,7 @@
                             {{getSubscriber(aPassenger).surname}} {{getSubscriber(aPassenger).name}}
                         </li>
                     </ul>
-                    {{currentInfoWindowsSubscriber.car.nbPlaces - currentInfoWindowsSubscriber.car.passengers.length}} places restantes
+                    <span class="badge">{{currentInfoWindowsSubscriber.car.nbPlaces - currentInfoWindowsSubscriber.car.passengers.length}}</span> places restantes
                 </div>
                 <div ng-show="currentSubscriber.locomotion == 'AUTOSTOP' && currentInfoWindowsSubscriber.normalCar" >
                     <button class="btn btn-success btn-xs" type="button" ng-click="askForSeat(currentInfoWindowsSubscriber)" >Reserver une place</button>
@@ -145,6 +148,7 @@
              ui-options="getMapOptions()">
         </div>
     </div>
+
 
 
     <!-- MODIFICATION PARTICIPANT COURANT / PARTICIPATION A L'EVENEMENT -->
@@ -228,7 +232,7 @@
                     </li>
                 </ul>
             </div>
-            {{currentCar.driver.subscriber.car.nbPlaces - currentCar.driver.subscriber.car.passengers.length}} places restantes
+            <span class="badge">{{currentCar.driver.subscriber.car.nbPlaces - currentCar.driver.subscriber.car.passengers.length}}</span> places restantes
             <a ng-click="createTopicForCar(subscriber)" ><i class=" glyphicon glyphicon-comment" tooltip="Démarrer une discussion pour cette voiture" ></i></a>
         </div>
 
@@ -465,3 +469,5 @@
     </div>
     <!--Fin snap-->
     </div>
+
+</div>

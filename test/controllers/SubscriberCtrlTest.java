@@ -7,6 +7,7 @@ import static play.test.Helpers.testServer;
 
 import java.net.UnknownHostException;
 
+import commons.AbstractIntegrationTest;
 import models.Address;
 import models.Event;
 import models.Location;
@@ -33,19 +34,7 @@ import com.mongodb.Mongo;
  * Time: 22:22
  * To change this template use File | Settings | File Templates.
  */
-public class SubscriberCtrlTest {
-    private DB currentDataBase = null;
-
-    @Before
-    public void setUp() throws UnknownHostException {
-        Mongo mongoClient = new Mongo("localhost", 27017);
-        currentDataBase = mongoClient.getDB("covoiturage-test");
-    }
-
-    @After
-    public void tearDown(){
-        currentDataBase.dropDatabase();
-    }
+public class SubscriberCtrlTest extends AbstractIntegrationTest{
 
     @Test
     public void testCreateOk() {
@@ -64,7 +53,9 @@ public class SubscriberCtrlTest {
                         .setEmail("adelegue@hotmail.com").setLocomotion(Locomotion.CAR).setUser(User.user().setEmail("adelegue@hotmail.com").setPassword("password"));
                 ObjectMapper objectMapper = new ObjectMapper();
                 JsonNode node = objectMapper.convertValue(subscriber, JsonNode.class);
-                WS.Response response = WS.url("http://localhost:3333/rest/events/"+event.getId()+"/subscribers/").post(node).get();
+
+                String url =  "http://localhost:3333/rest/events/"+event.getId()+"/subscribers/";
+                WS.Response response = WS.url("http://localhost:3333/rest/events/"+event.getId()+"/subscribers/").post(node).get(10000);
                 //System.out.println(response.getBody());
                 //JsonNode resp = null;
                 //try {

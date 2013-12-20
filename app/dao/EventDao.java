@@ -15,5 +15,7 @@ public interface EventDao extends Dao<Event> {
 
     List<Event> listByUser(String idUser);
 
+    List<Event> listInvitedByEmail(String email);
+
 
 }

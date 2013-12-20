@@ -1,27 +1,26 @@
 package controllers;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import controllers.decorators.Link;
+import be.objectify.deadbolt.java.actions.Group;
+import be.objectify.deadbolt.java.actions.Restrict;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.feth.play.module.pa.PlayAuthenticate;
+import com.feth.play.module.pa.user.AuthUser;
+import controllers.decorators.EventLight;
 import controllers.decorators.UserModel;
-import controllers.decorators.UserModelLight;
 import models.Event;
 import models.User;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.lang3.StringUtils;
+import play.Logger;
 import play.data.Form;
 import play.mvc.BodyParser;
 import play.mvc.Controller;
 import play.mvc.Result;
 
-import com.feth.play.module.pa.PlayAuthenticate;
-import com.feth.play.module.pa.user.AuthUser;
-
-import controllers.decorators.EventLight;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static play.data.Form.form;
 
@@ -46,6 +45,7 @@ public class UserCtrl extends Controller {
         }
     }
 
+    @Restrict(@Group(Application.USER_ROLE))
     public static Result getCurrentUser() throws IOException{
     	AuthUser authUser = PlayAuthenticate.getUser(ctx());
     	if(authUser!=null){
@@ -55,6 +55,7 @@ public class UserCtrl extends Controller {
     	return ok().as("application/json");
     }
 
+    @Restrict(@Group(Application.USER_ROLE))
     @BodyParser.Of(BodyParser.Json.class)
     public static Result updateUser(String id) {
        try{
@@ -83,18 +84,38 @@ public class UserCtrl extends Controller {
     }
 
 
+    @Restrict(@Group(Application.USER_ROLE))
     public static Result listEvent(String id){
-    	List<Event> list = Event.listByUser(id);
-    	List<EventLight> result = new ArrayList<EventLight>();
-    	for (Event event : list) {
-			EventLight model = new EventLight(event);
-			result.add(model);
-		}
 		try {
-			return ok(objectMapper.writeValueAsString(result)).as("application/json");
+			return ok(objectMapper.writeValueAsString(toEventLight(Event.listByUser(id)))).as("application/json");
 		} catch (IOException e) {
 			return badRequest(e.getMessage());
 		}
     }
-    
+
+    @Restrict(@Group(Application.USER_ROLE))
+    public static Result listInvitations(String id){
+        try {
+            User user = User.findById(id);
+            if(user==null || StringUtils.isEmpty(user.getEmail())){
+                Logger.error("listInvitations user or user email is empty");
+                return badRequest();
+            }
+            return ok(objectMapper.writeValueAsString(toEventLight(Event.listInvitedByEmail(user.getEmail())))).as("application/json");
+        } catch (IOException e) {
+            return badRequest(e.getMessage());
+        }
+    }
+
+    private static List<EventLight> toEventLight(List<Event> list){
+        List<EventLight> result = new ArrayList<EventLight>();
+        if(list!=null){
+            for (Event event : list) {
+                EventLight model = new EventLight(event);
+                result.add(model);
+            }
+        }
+        return result;
+    }
+
 }

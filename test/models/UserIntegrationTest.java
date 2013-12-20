@@ -6,6 +6,7 @@ import static play.test.Helpers.running;
 
 import java.net.UnknownHostException;
 
+import commons.AbstractIntegrationTest;
 import net.vz.mongodb.jackson.JacksonDBCollection;
 
 import org.junit.After;
@@ -25,19 +26,7 @@ import com.mongodb.Mongo;
  * Time: 21:46
  * To change this template use File | Settings | File Templates.
  */
-public class UserIntegrationTest {
-    private DB currentDataBase = null;
-
-    @Before
-    public void setUp() throws UnknownHostException {
-        Mongo mongoClient = new Mongo("localhost", 27017);
-        currentDataBase = mongoClient.getDB("covoiturage-test");
-    }
-
-    @After
-    public void tearDown(){
-        currentDataBase.dropDatabase();
-    }
+public class UserIntegrationTest extends AbstractIntegrationTest {
 
     @Test
     public void simpleInsert(){

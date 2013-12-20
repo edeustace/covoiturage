@@ -20,7 +20,7 @@ public class UserModelLight {
 
     public UserModelLight(User user) {
         this.user = user;
-        if(user!=null){
+        if(user!=null && user.getId()!=null){
             String link = controllers.routes.UserCtrl.getUser(user.getId()).toString();
             this.link = Link.link(Link.SELF, link);
         }

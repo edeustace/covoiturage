@@ -9,6 +9,7 @@ import static play.test.Helpers.testServer;
 import java.io.IOException;
 import java.net.UnknownHostException;
 
+import commons.AbstractIntegrationTest;
 import models.Address;
 import models.Event;
 import models.Location;
@@ -33,20 +34,8 @@ import com.mongodb.Mongo;
  * Time: 21:49
  * To change this template use File | Settings | File Templates.
  */
-public class EventCtrlTest {
+public class EventCtrlTest extends AbstractIntegrationTest {
 
-    private DB currentDataBase = null;
-
-    @Before
-    public void setUp() throws UnknownHostException {
-        Mongo mongoClient = new Mongo("localhost", 27017);
-        currentDataBase = mongoClient.getDB("covoiturage-test");
-    }
-
-    @After
-    public void tearDown(){
-        currentDataBase.dropDatabase();
-    }
     /**
      * add your integration test here
      * in this example we just check if the welcome page is being shown

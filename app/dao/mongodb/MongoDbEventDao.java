@@ -22,13 +22,14 @@ public class MongoDbEventDao extends AbstractMongoDao<Event> implements EventDao
         return Event.class;
     }
 
+    @Override
     public List<Event> listByUser(String idUser){
-        DBCursor<Event> cursor = getCollection().find(DBQuery.or(DBQuery.is("subscribers.userRef", idUser), DBQuery.is("creatorRef", idUser)));
-        List<Event> result = new ArrayList<Event>();
-        while(cursor.hasNext()){
-            result.add(cursor.next());
-        }
-        return result;
+        return toList(getCollection().find(DBQuery.or(DBQuery.is("subscribers.userRef", idUser), DBQuery.is("creatorRef", idUser))));
+    }
+
+    @Override
+    public List<Event> listInvitedByEmail(String email) {
+        return toList(getCollection().find(DBQuery.is("contacts", email)));
     }
 
 

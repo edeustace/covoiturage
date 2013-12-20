@@ -38,12 +38,7 @@ public class MongoDbTopicDao extends AbstractMongoDao<Topic> implements TopicDao
     }
 
     public List<Topic> findByIdEventAndCategorie(String idEvent, Topic.TopicCategorie categorie){
-        DBCursor<Topic> cursor = getCollection().find(DBQuery.and(DBQuery.is("categorie", categorie), DBQuery.is("idEvent", idEvent)));
-        List<Topic> result = new ArrayList<Topic>();
-        while(cursor.hasNext()){
-            result.add(cursor.next());
-        }
-        return result;
+        return toList(getCollection().find(DBQuery.and(DBQuery.is("categorie", categorie), DBQuery.is("idEvent", idEvent))));
     }
 
     public Topic findByIdEventCategorieAndCreator(String idEvent, Topic.TopicCategorie categorie, String idCreator){
@@ -51,12 +46,7 @@ public class MongoDbTopicDao extends AbstractMongoDao<Topic> implements TopicDao
     }
 
     public List<Topic> findByIdEventAndIdUser(String idEvent, String idUser){
-        DBCursor<Topic> cursor = getCollection().find(DBQuery.and(DBQuery.is("subscribers", idUser), DBQuery.is("idEvent", idEvent)));
-        List<Topic> result = new ArrayList<Topic>();
-        while(cursor.hasNext()){
-            result.add(cursor.next());
-        }
-        return result;
+        return toList(getCollection().find(DBQuery.and(DBQuery.is("subscribers", idUser), DBQuery.is("idEvent", idEvent))));
     }
 
 }
