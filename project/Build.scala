@@ -7,15 +7,13 @@ object ApplicationBuild extends Build {
   val appName = "covoiturage-java"
   val appVersion = "1.0-SNAPSHOT"
 
-  val assetsLoader = "com.ee" %% "assets-loader" % "0.11.1"
-
   val appDependencies = Seq(
     "be.objectify"  %%  "deadbolt-java"     % "2.2-RC2" ,
     "com.feth"      %%  "play-authenticate" % "0.5.2-SNAPSHOT" ,
     "net.vz.mongodb.jackson" %% "play-mongo-jackson-mapper" % "1.1.0" exclude("org.scala-stm", "scala-stm_2.10.0"),
     javaCore,
     cache,
-    assetsLoader exclude("org.scala-stm", "scala-stm_2.10.0")
+    "com.ee" %% "assets-loader" % "0.11.2-SNAPSHOT" exclude("org.scala-stm", "scala-stm_2.10.0")
   )
 
   val edeustaceReleases= "ed eustace" at "http://edeustace.com/repository/releases/"
@@ -31,8 +29,8 @@ object ApplicationBuild extends Build {
 
       resolvers += Resolver.url("play-authenticate (release)", url("http://joscha.github.com/play-authenticate/repo/releases/"))(Resolver.ivyStylePatterns),
       resolvers += Resolver.url("play-authenticate (snapshot)", url("http://joscha.github.com/play-authenticate/repo/snapshots/"))(Resolver.ivyStylePatterns),
-      resolvers += Resolver.url("My GitHub Play Repository", url("http://alexanderjarvis.github.com/releases/"))(Resolver.ivyStylePatterns),
 
+      resolvers += Resolver.url("My GitHub Play Repository", url("http://alexanderjarvis.github.com/releases/"))(Resolver.ivyStylePatterns),
       resolvers += Resolver.url("My GitHub Play Repository", url("http://alexanderjarvis.github.com/releases/"))(Resolver.ivyStylePatterns),
 
       resolvers ++= Seq(edeustaceReleases, edeustaceSnapshots)
